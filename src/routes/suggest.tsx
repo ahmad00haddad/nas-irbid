@@ -1,0 +1,120 @@
+import { createFileRoute } from "@tanstack/react-router";
+import { useState } from "react";
+import { toast } from "sonner";
+import { Send, Sparkles } from "lucide-react";
+
+export const Route = createFileRoute("/suggest")({
+  component: SuggestPage,
+  head: () => ({
+    meta: [
+      { title: "اقترح حكاية · ناس إربد" },
+      { name: "description", content: "رشّح شخصية، مهنة قديمة، أو حكاية لتظهر في حلقة قادمة من ناس إربد." },
+      { property: "og:title", content: "اقترح حكاية · ناس إربد" },
+      { property: "og:description", content: "البرنامج يصنعه أهله. رشّح حدا تعرف يستاهل حلقة." },
+    ],
+  }),
+});
+
+function SuggestPage() {
+  const [submitting, setSubmitting] = useState(false);
+
+  const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setSubmitting(true);
+    setTimeout(() => {
+      setSubmitting(false);
+      toast.success("وصلنا اقتراحك — شكراً إلك!", {
+        description: "رح نراجعه ونرد عليك في حال احتجنا تفاصيل أكثر.",
+      });
+      (e.target as HTMLFormElement).reset();
+    }, 800);
+  };
+
+  return (
+    <div className="container mx-auto px-6 py-20">
+      <div className="max-w-3xl mx-auto">
+        <header className="text-center mb-12">
+          <div className="inline-flex w-16 h-16 rounded-2xl bg-gradient-warm items-center justify-center shadow-glow mb-6">
+            <Sparkles size={28} className="text-primary-foreground" />
+          </div>
+          <h1 className="font-display text-5xl md:text-6xl mb-5 text-foreground">
+            اقترح <span className="text-gradient-gold">حكاية</span>
+          </h1>
+          <p className="text-lg text-muted-foreground leading-relaxed">
+            تعرف حدا من أهل إربد يستاهل حلقة؟ صاحب محل قديم، حكواتي، حرفي،
+            أو ست بيت بحكاية ما حدا سمعها؟ احكيلنا عنه، ورح نتواصل معه.
+          </p>
+        </header>
+
+        <form onSubmit={onSubmit} className="bg-card border border-border/60 rounded-2xl p-8 md:p-10 shadow-deep space-y-6">
+          <div className="grid md:grid-cols-2 gap-5">
+            <Field label="اسم الشخصية المقترحة *" name="character" placeholder="مثال: أبو سامي العطار" required />
+            <Field label="المهنة / الدور" name="role" placeholder="عطار، إسكافي، خبّاز…" />
+          </div>
+
+          <div className="grid md:grid-cols-2 gap-5">
+            <Field label="الحي أو المكان *" name="place" placeholder="حارة البارحة، وسط البلد…" required />
+            <Field label="العمر التقريبي" name="age" placeholder="٧٠ سنة تقريباً" />
+          </div>
+
+          <TextArea
+            label="ليش بتشوفه يستاهل حلقة؟ *"
+            name="story"
+            placeholder="احكيلنا قصته باختصار: شو الإشي المميز فيه؟ شو الحكاية اللي بتستحق تنحكى؟"
+            required
+            rows={5}
+          />
+
+          <div className="grid md:grid-cols-2 gap-5">
+            <Field label="اسمك *" name="name" placeholder="عشان نتواصل معك" required />
+            <Field label="رقم تواصلك (واتساب) *" name="phone" placeholder="07XXXXXXXX" required type="tel" />
+          </div>
+
+          <div className="flex items-start gap-3 pt-2">
+            <input type="checkbox" id="contact-ok" required className="mt-1 w-4 h-4 accent-[var(--gold)]" />
+            <label htmlFor="contact-ok" className="text-sm text-muted-foreground">
+              متفق إنه فريق البرنامج يتواصل مع الشخصية المرشحة (بإذنها) لتقييم الحلقة.
+            </label>
+          </div>
+
+          <button
+            type="submit"
+            disabled={submitting}
+            className="w-full md:w-auto inline-flex items-center justify-center gap-2 px-8 py-4 rounded-full bg-gradient-warm text-primary-foreground font-bold shadow-glow hover:opacity-90 transition disabled:opacity-60"
+          >
+            <Send size={18} />
+            {submitting ? "جاري الإرسال…" : "ابعت الترشيح"}
+          </button>
+        </form>
+
+        <p className="text-center text-xs text-muted-foreground mt-6">
+          خصوصيتك مهمة عنّا. معلوماتك ما رح تنحفظ إلا لغرض التواصل بخصوص هذا الترشيح.
+        </p>
+      </div>
+    </div>
+  );
+}
+
+function Field({ label, ...props }: { label: string } & React.InputHTMLAttributes<HTMLInputElement>) {
+  return (
+    <label className="block">
+      <span className="block text-sm font-semibold text-foreground mb-2">{label}</span>
+      <input
+        {...props}
+        className="w-full px-4 py-3 rounded-lg bg-input border border-border text-foreground placeholder:text-muted-foreground/60 focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition"
+      />
+    </label>
+  );
+}
+
+function TextArea({ label, ...props }: { label: string } & React.TextareaHTMLAttributes<HTMLTextAreaElement>) {
+  return (
+    <label className="block">
+      <span className="block text-sm font-semibold text-foreground mb-2">{label}</span>
+      <textarea
+        {...props}
+        className="w-full px-4 py-3 rounded-lg bg-input border border-border text-foreground placeholder:text-muted-foreground/60 focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition resize-none"
+      />
+    </label>
+  );
+}
