@@ -17,6 +17,7 @@ import { Route as AdminRouteImport } from './routes/admin'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
+import { Route as EpisodesSlugRouteImport } from './routes/episodes.$slug'
 import { Route as AdminSuggestionsRouteImport } from './routes/admin.suggestions'
 import { Route as AdminQuestionsRouteImport } from './routes/admin.questions'
 import { Route as AdminMessagesRouteImport } from './routes/admin.messages'
@@ -63,6 +64,11 @@ const AdminIndexRoute = AdminIndexRouteImport.update({
   path: '/',
   getParentRoute: () => AdminRoute,
 } as any)
+const EpisodesSlugRoute = EpisodesSlugRouteImport.update({
+  id: '/$slug',
+  path: '/$slug',
+  getParentRoute: () => EpisodesRoute,
+} as any)
 const AdminSuggestionsRoute = AdminSuggestionsRouteImport.update({
   id: '/suggestions',
   path: '/suggestions',
@@ -94,7 +100,7 @@ export interface FileRoutesByFullPath {
   '/about': typeof AboutRoute
   '/admin': typeof AdminRouteWithChildren
   '/auth': typeof AuthRoute
-  '/episodes': typeof EpisodesRoute
+  '/episodes': typeof EpisodesRouteWithChildren
   '/memories': typeof MemoriesRoute
   '/suggest': typeof SuggestRoute
   '/admin/episodes': typeof AdminEpisodesRoute
@@ -102,13 +108,14 @@ export interface FileRoutesByFullPath {
   '/admin/messages': typeof AdminMessagesRoute
   '/admin/questions': typeof AdminQuestionsRoute
   '/admin/suggestions': typeof AdminSuggestionsRoute
+  '/episodes/$slug': typeof EpisodesSlugRoute
   '/admin/': typeof AdminIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/auth': typeof AuthRoute
-  '/episodes': typeof EpisodesRoute
+  '/episodes': typeof EpisodesRouteWithChildren
   '/memories': typeof MemoriesRoute
   '/suggest': typeof SuggestRoute
   '/admin/episodes': typeof AdminEpisodesRoute
@@ -116,6 +123,7 @@ export interface FileRoutesByTo {
   '/admin/messages': typeof AdminMessagesRoute
   '/admin/questions': typeof AdminQuestionsRoute
   '/admin/suggestions': typeof AdminSuggestionsRoute
+  '/episodes/$slug': typeof EpisodesSlugRoute
   '/admin': typeof AdminIndexRoute
 }
 export interface FileRoutesById {
@@ -124,7 +132,7 @@ export interface FileRoutesById {
   '/about': typeof AboutRoute
   '/admin': typeof AdminRouteWithChildren
   '/auth': typeof AuthRoute
-  '/episodes': typeof EpisodesRoute
+  '/episodes': typeof EpisodesRouteWithChildren
   '/memories': typeof MemoriesRoute
   '/suggest': typeof SuggestRoute
   '/admin/episodes': typeof AdminEpisodesRoute
@@ -132,6 +140,7 @@ export interface FileRoutesById {
   '/admin/messages': typeof AdminMessagesRoute
   '/admin/questions': typeof AdminQuestionsRoute
   '/admin/suggestions': typeof AdminSuggestionsRoute
+  '/episodes/$slug': typeof EpisodesSlugRoute
   '/admin/': typeof AdminIndexRoute
 }
 export interface FileRouteTypes {
@@ -149,6 +158,7 @@ export interface FileRouteTypes {
     | '/admin/messages'
     | '/admin/questions'
     | '/admin/suggestions'
+    | '/episodes/$slug'
     | '/admin/'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -163,6 +173,7 @@ export interface FileRouteTypes {
     | '/admin/messages'
     | '/admin/questions'
     | '/admin/suggestions'
+    | '/episodes/$slug'
     | '/admin'
   id:
     | '__root__'
@@ -178,6 +189,7 @@ export interface FileRouteTypes {
     | '/admin/messages'
     | '/admin/questions'
     | '/admin/suggestions'
+    | '/episodes/$slug'
     | '/admin/'
   fileRoutesById: FileRoutesById
 }
@@ -186,7 +198,7 @@ export interface RootRouteChildren {
   AboutRoute: typeof AboutRoute
   AdminRoute: typeof AdminRouteWithChildren
   AuthRoute: typeof AuthRoute
-  EpisodesRoute: typeof EpisodesRoute
+  EpisodesRoute: typeof EpisodesRouteWithChildren
   MemoriesRoute: typeof MemoriesRoute
   SuggestRoute: typeof SuggestRoute
 }
@@ -249,6 +261,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminIndexRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/episodes/$slug': {
+      id: '/episodes/$slug'
+      path: '/$slug'
+      fullPath: '/episodes/$slug'
+      preLoaderRoute: typeof EpisodesSlugRouteImport
+      parentRoute: typeof EpisodesRoute
+    }
     '/admin/suggestions': {
       id: '/admin/suggestions'
       path: '/suggestions'
@@ -307,12 +326,24 @@ const AdminRouteChildren: AdminRouteChildren = {
 
 const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
 
+interface EpisodesRouteChildren {
+  EpisodesSlugRoute: typeof EpisodesSlugRoute
+}
+
+const EpisodesRouteChildren: EpisodesRouteChildren = {
+  EpisodesSlugRoute: EpisodesSlugRoute,
+}
+
+const EpisodesRouteWithChildren = EpisodesRoute._addFileChildren(
+  EpisodesRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AboutRoute: AboutRoute,
   AdminRoute: AdminRouteWithChildren,
   AuthRoute: AuthRoute,
-  EpisodesRoute: EpisodesRoute,
+  EpisodesRoute: EpisodesRouteWithChildren,
   MemoriesRoute: MemoriesRoute,
   SuggestRoute: SuggestRoute,
 }

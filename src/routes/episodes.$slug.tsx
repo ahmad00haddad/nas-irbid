@@ -7,15 +7,18 @@ import { ArrowRight, MapPin, Calendar, User, HelpCircle, Send } from "lucide-rea
 
 export const Route = createFileRoute("/episodes/$slug")({
   component: EpisodeDetail,
-  head: ({ loaderData }) => ({
-    meta: loaderData ? [
-      { title: `${loaderData.title} · ناس إربد` },
-      { name: "description", content: loaderData.short_description ?? loaderData.title },
-      { property: "og:title", content: loaderData.title },
-      { property: "og:description", content: loaderData.short_description ?? "" },
-      { property: "og:image", content: loaderData.cover_image_url ?? (loaderData.youtube_id ? `https://img.youtube.com/vi/${loaderData.youtube_id}/maxresdefault.jpg` : "") },
-    ] : [{ title: "حلقة · ناس إربد" }],
-  }),
+  head: ({ loaderData }) => {
+    const ep = loaderData as any;
+    return {
+      meta: ep ? [
+        { title: `${ep.title} · ناس إربد` },
+        { name: "description", content: ep.short_description ?? ep.title },
+        { property: "og:title", content: ep.title },
+        { property: "og:description", content: ep.short_description ?? "" },
+        { property: "og:image", content: ep.cover_image_url ?? (ep.youtube_id ? `https://img.youtube.com/vi/${ep.youtube_id}/maxresdefault.jpg` : "") },
+      ] : [{ title: "حلقة · ناس إربد" }],
+    };
+  },
   loader: async ({ params }) => {
     const { data, error } = await supabase
       .from("episodes").select("*")
