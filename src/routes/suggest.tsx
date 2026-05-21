@@ -2,6 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { toast } from "sonner";
 import { Send, Sparkles } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/suggest")({
   component: SuggestPage,
@@ -18,16 +19,32 @@ export const Route = createFileRoute("/suggest")({
 function SuggestPage() {
   const [submitting, setSubmitting] = useState(false);
 
-  const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setSubmitting(true);
-    setTimeout(() => {
-      setSubmitting(false);
-      toast.success("وصلنا اقتراحك — شكراً إلك!", {
-        description: "رح نراجعه ونرد عليك في حال احتجنا تفاصيل أكثر.",
-      });
-      (e.target as HTMLFormElement).reset();
-    }, 800);
+    const f = e.target as HTMLFormElement;
+    const fd = new FormData(f);
+
+    const { error } = await supabase.from("guest_suggestions").insert({
+      candidate_name: String(fd.get("character") ?? ""),
+      profession: String(fd.get("role") ?? "") || null,
+      neighborhood: String(fd.get("place") ?? "") || null,
+      story_summary: String(fd.get("story") ?? ""),
+      submitter_name: String(fd.get("name") ?? "") || null,
+      contact_info: String(fd.get("phone") ?? "") || null,
+    });
+
+    setSubmitting(false);
+
+    if (error) {
+      toast.error("تعذّر الإرسال", { description: error.message });
+      return;
+    }
+
+    toast.success("وصلنا اقتراحك — شكراً إلك!", {
+      description: "رح نراجعه ونرد عليك في حال احتجنا تفاصيل أكثر.",
+    });
+    f.reset();
   };
 
   return (
@@ -61,7 +78,7 @@ function SuggestPage() {
             label="ليش بتشوفه يستاهل حلقة؟ *"
             name="story"
             placeholder="احكيلنا قصته باختصار: شو الإشي المميز فيه؟ شو الحكاية اللي بتستحق تنحكى؟"
-            required
+            required minLength={5}
             rows={5}
           />
 

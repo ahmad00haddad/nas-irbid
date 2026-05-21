@@ -1,7 +1,9 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import { toast } from "sonner";
-import { Upload, Heart } from "lucide-react";
+import { Heart } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/memories")({
   component: MemoriesPage,
@@ -15,22 +17,19 @@ export const Route = createFileRoute("/memories")({
   }),
 });
 
-const memories = [
-  {
-    quote: "كنّا نطلع من المدرسة نشتري كعك ساركيس بقرشين، وريحته ما زالت بأنفي لليوم.",
-    by: "أم محمد · حارة الدلاقمة",
-  },
-  {
-    quote: "جدي كان يقرأ علينا من الراديو كل مغرب… ذاك الصوت ما بينمحي من الذاكرة.",
-    by: "خالد التل",
-  },
-  {
-    quote: "في كشك الزرعيني اشتريت أول كتاب بمصروفي. ‹رجال في الشمس›… ما نسيت.",
-    by: "د. سامي · أستاذ جامعي",
-  },
-];
-
 function MemoriesPage() {
+  const { data: memories = [] } = useQuery({
+    queryKey: ["public-memories"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("memories").select("*").eq("approved", true)
+        .order("featured", { ascending: false }).order("created_at", { ascending: false })
+        .limit(30);
+      if (error) throw error;
+      return data;
+    },
+  });
+
   return (
     <div className="container mx-auto px-6 py-20">
       <header className="text-center max-w-3xl mx-auto mb-16">
@@ -42,97 +41,98 @@ function MemoriesPage() {
         </h1>
         <p className="text-lg text-muted-foreground leading-relaxed">
           كل ذكرى تكتبها، كل صورة قديمة تشاركها، تضيف حجراً في بناء أرشيف شعبي
-          لمدينة إربد. اختر طريقة المشاركة:
+          لمدينة إربد. شاركنا حكايتك.
         </p>
       </header>
 
-      <div className="grid md:grid-cols-2 gap-6 max-w-5xl mx-auto mb-20">
+      <div className="max-w-3xl mx-auto mb-20">
         <MemoryForm />
-        <PhotoForm />
       </div>
 
-      {/* Wall of memories */}
       <section className="max-w-5xl mx-auto">
         <h2 className="font-display text-3xl md:text-4xl text-center mb-12 text-foreground">
           من <span className="text-gradient-gold">جدار الذكريات</span>
         </h2>
-        <div className="grid md:grid-cols-3 gap-6">
-          {memories.map((m, i) => (
-            <article key={i} className="p-7 rounded-xl bg-card border border-border/60 hover:border-primary/30 transition relative">
-              <div className="text-4xl font-display text-primary/60 leading-none mb-3">❝</div>
-              <p className="text-foreground leading-relaxed mb-5 font-display text-lg italic">
-                {m.quote}
-              </p>
-              <div className="text-sm text-muted-foreground font-semibold border-t border-border/60 pt-4">
-                — {m.by}
-              </div>
-            </article>
-          ))}
-        </div>
+        {memories.length === 0 ? (
+          <p className="text-center text-muted-foreground text-sm">كن أول من يكتب ذكرى هنا.</p>
+        ) : (
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {memories.map((m: any) => (
+              <article key={m.id} className={`p-7 rounded-xl bg-card border ${m.featured ? "border-primary/40 shadow-glow" : "border-border/60"} hover:border-primary/30 transition relative`}>
+                {m.photo_url && <img src={m.photo_url} alt="" className="w-full h-40 object-cover rounded-lg mb-4" />}
+                <div className="text-4xl font-display text-primary/60 leading-none mb-3">❝</div>
+                {m.title && <h3 className="font-display text-lg text-foreground mb-2">{m.title}</h3>}
+                <p className="text-foreground leading-relaxed mb-5 font-display text-base italic whitespace-pre-wrap">
+                  {m.body}
+                </p>
+                <div className="text-sm text-muted-foreground font-semibold border-t border-border/60 pt-4">
+                  — {m.contributor_name ?? "صديق المدينة"}
+                  {m.neighborhood && <span className="text-xs"> · {m.neighborhood}</span>}
+                </div>
+              </article>
+            ))}
+          </div>
+        )}
       </section>
     </div>
   );
 }
 
 function MemoryForm() {
-  const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const [busy, setBusy] = useState(false);
+
+  const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    toast.success("وصلتنا ذكرتك — شكراً إلك!");
-    (e.target as HTMLFormElement).reset();
+    setBusy(true);
+    const f = e.target as HTMLFormElement;
+    const fd = new FormData(f);
+
+    const { error } = await supabase.from("memories").insert({
+      body: String(fd.get("body") ?? ""),
+      contributor_name: String(fd.get("name") ?? "") || null,
+      neighborhood: String(fd.get("neighborhood") ?? "") || null,
+      decade: String(fd.get("decade") ?? "") || null,
+      approved: false,
+      featured: false,
+    });
+    setBusy(false);
+
+    if (error) {
+      toast.error("تعذّر الإرسال", { description: error.message });
+      return;
+    }
+    toast.success("وصلتنا ذكرتك — رح تظهر بعد المراجعة. شكراً إلك!");
+    f.reset();
   };
+
   return (
     <form onSubmit={onSubmit} className="bg-card border border-border/60 rounded-2xl p-8 shadow-deep">
-      <h3 className="font-display text-2xl text-foreground mb-2">اكتب ذكرى</h3>
-      <p className="text-sm text-muted-foreground mb-6">موقف، رائحة، صوت، أو حكاية من إربد القديمة.</p>
+      <h3 className="font-display text-2xl text-foreground mb-2">اكتب ذكرى من إربد القديمة</h3>
+      <p className="text-sm text-muted-foreground mb-6">موقف، رائحة، صوت، أو حكاية. كل ذكرى تستحق أن تُحفظ.</p>
+
       <textarea
-        required
-        rows={6}
+        name="body" required minLength={5} rows={6}
         placeholder="احكيلنا…"
         className="w-full px-4 py-3 rounded-lg bg-input border border-border text-foreground focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none resize-none mb-4"
       />
-      <input
-        required
-        placeholder="اسمك (أو لقبك)"
-        className="w-full px-4 py-3 rounded-lg bg-input border border-border text-foreground focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none mb-5"
-      />
-      <button className="w-full px-6 py-3 rounded-full bg-gradient-warm text-primary-foreground font-bold shadow-glow hover:opacity-90 transition">
-        انشر ذكرتي
-      </button>
-    </form>
-  );
-}
 
-function PhotoForm() {
-  const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    toast.success("وصلتنا الصورة — رح نراجعها ونضيفها للأرشيف.");
-    (e.target as HTMLFormElement).reset();
-  };
-  return (
-    <form onSubmit={onSubmit} className="bg-card border border-border/60 rounded-2xl p-8 shadow-deep">
-      <h3 className="font-display text-2xl text-foreground mb-2">ارفع صورة قديمة</h3>
-      <p className="text-sm text-muted-foreground mb-6">صورة من ألبوم العائلة، أو لشارع/محل من إربد القديمة.</p>
+      <div className="grid sm:grid-cols-3 gap-4 mb-5">
+        <input
+          name="name" placeholder="اسمك (أو لقبك)" required
+          className="w-full px-4 py-3 rounded-lg bg-input border border-border text-foreground focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none"
+        />
+        <input
+          name="neighborhood" placeholder="الحي (اختياري)"
+          className="w-full px-4 py-3 rounded-lg bg-input border border-border text-foreground focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none"
+        />
+        <input
+          name="decade" placeholder="العقد (مثلاً: السبعينات)"
+          className="w-full px-4 py-3 rounded-lg bg-input border border-border text-foreground focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none"
+        />
+      </div>
 
-      <label className="block border-2 border-dashed border-border hover:border-primary/50 rounded-xl p-8 text-center cursor-pointer transition mb-4">
-        <Upload size={28} className="mx-auto text-muted-foreground mb-3" />
-        <span className="block text-sm font-semibold text-foreground">اختر صورة</span>
-        <span className="block text-xs text-muted-foreground mt-1">JPG · PNG · حتى ١٠ ميجا</span>
-        <input type="file" accept="image/*" className="hidden" />
-      </label>
-
-      <textarea
-        required
-        rows={3}
-        placeholder="احكيلنا قصة الصورة: وين؟ إيمتى؟ مين فيها؟"
-        className="w-full px-4 py-3 rounded-lg bg-input border border-border text-foreground focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none resize-none mb-4"
-      />
-      <input
-        required
-        placeholder="اسمك"
-        className="w-full px-4 py-3 rounded-lg bg-input border border-border text-foreground focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none mb-5"
-      />
-      <button className="w-full px-6 py-3 rounded-full bg-gradient-warm text-primary-foreground font-bold shadow-glow hover:opacity-90 transition">
-        ارفع للأرشيف
+      <button disabled={busy} className="w-full px-6 py-3 rounded-full bg-gradient-warm text-primary-foreground font-bold shadow-glow hover:opacity-90 transition disabled:opacity-60">
+        {busy ? "..." : "انشر ذكرتي"}
       </button>
     </form>
   );
