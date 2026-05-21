@@ -17,6 +17,11 @@ import { Route as AdminRouteImport } from './routes/admin'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
+import { Route as AdminSuggestionsRouteImport } from './routes/admin.suggestions'
+import { Route as AdminQuestionsRouteImport } from './routes/admin.questions'
+import { Route as AdminMessagesRouteImport } from './routes/admin.messages'
+import { Route as AdminMemoriesRouteImport } from './routes/admin.memories'
+import { Route as AdminEpisodesRouteImport } from './routes/admin.episodes'
 
 const SuggestRoute = SuggestRouteImport.update({
   id: '/suggest',
@@ -58,6 +63,31 @@ const AdminIndexRoute = AdminIndexRouteImport.update({
   path: '/',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminSuggestionsRoute = AdminSuggestionsRouteImport.update({
+  id: '/suggestions',
+  path: '/suggestions',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminQuestionsRoute = AdminQuestionsRouteImport.update({
+  id: '/questions',
+  path: '/questions',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminMessagesRoute = AdminMessagesRouteImport.update({
+  id: '/messages',
+  path: '/messages',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminMemoriesRoute = AdminMemoriesRouteImport.update({
+  id: '/memories',
+  path: '/memories',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminEpisodesRoute = AdminEpisodesRouteImport.update({
+  id: '/episodes',
+  path: '/episodes',
+  getParentRoute: () => AdminRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -67,6 +97,11 @@ export interface FileRoutesByFullPath {
   '/episodes': typeof EpisodesRoute
   '/memories': typeof MemoriesRoute
   '/suggest': typeof SuggestRoute
+  '/admin/episodes': typeof AdminEpisodesRoute
+  '/admin/memories': typeof AdminMemoriesRoute
+  '/admin/messages': typeof AdminMessagesRoute
+  '/admin/questions': typeof AdminQuestionsRoute
+  '/admin/suggestions': typeof AdminSuggestionsRoute
   '/admin/': typeof AdminIndexRoute
 }
 export interface FileRoutesByTo {
@@ -76,6 +111,11 @@ export interface FileRoutesByTo {
   '/episodes': typeof EpisodesRoute
   '/memories': typeof MemoriesRoute
   '/suggest': typeof SuggestRoute
+  '/admin/episodes': typeof AdminEpisodesRoute
+  '/admin/memories': typeof AdminMemoriesRoute
+  '/admin/messages': typeof AdminMessagesRoute
+  '/admin/questions': typeof AdminQuestionsRoute
+  '/admin/suggestions': typeof AdminSuggestionsRoute
   '/admin': typeof AdminIndexRoute
 }
 export interface FileRoutesById {
@@ -87,6 +127,11 @@ export interface FileRoutesById {
   '/episodes': typeof EpisodesRoute
   '/memories': typeof MemoriesRoute
   '/suggest': typeof SuggestRoute
+  '/admin/episodes': typeof AdminEpisodesRoute
+  '/admin/memories': typeof AdminMemoriesRoute
+  '/admin/messages': typeof AdminMessagesRoute
+  '/admin/questions': typeof AdminQuestionsRoute
+  '/admin/suggestions': typeof AdminSuggestionsRoute
   '/admin/': typeof AdminIndexRoute
 }
 export interface FileRouteTypes {
@@ -99,6 +144,11 @@ export interface FileRouteTypes {
     | '/episodes'
     | '/memories'
     | '/suggest'
+    | '/admin/episodes'
+    | '/admin/memories'
+    | '/admin/messages'
+    | '/admin/questions'
+    | '/admin/suggestions'
     | '/admin/'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -108,6 +158,11 @@ export interface FileRouteTypes {
     | '/episodes'
     | '/memories'
     | '/suggest'
+    | '/admin/episodes'
+    | '/admin/memories'
+    | '/admin/messages'
+    | '/admin/questions'
+    | '/admin/suggestions'
     | '/admin'
   id:
     | '__root__'
@@ -118,6 +173,11 @@ export interface FileRouteTypes {
     | '/episodes'
     | '/memories'
     | '/suggest'
+    | '/admin/episodes'
+    | '/admin/memories'
+    | '/admin/messages'
+    | '/admin/questions'
+    | '/admin/suggestions'
     | '/admin/'
   fileRoutesById: FileRoutesById
 }
@@ -189,14 +249,59 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminIndexRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/suggestions': {
+      id: '/admin/suggestions'
+      path: '/suggestions'
+      fullPath: '/admin/suggestions'
+      preLoaderRoute: typeof AdminSuggestionsRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/questions': {
+      id: '/admin/questions'
+      path: '/questions'
+      fullPath: '/admin/questions'
+      preLoaderRoute: typeof AdminQuestionsRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/messages': {
+      id: '/admin/messages'
+      path: '/messages'
+      fullPath: '/admin/messages'
+      preLoaderRoute: typeof AdminMessagesRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/memories': {
+      id: '/admin/memories'
+      path: '/memories'
+      fullPath: '/admin/memories'
+      preLoaderRoute: typeof AdminMemoriesRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/episodes': {
+      id: '/admin/episodes'
+      path: '/episodes'
+      fullPath: '/admin/episodes'
+      preLoaderRoute: typeof AdminEpisodesRouteImport
+      parentRoute: typeof AdminRoute
+    }
   }
 }
 
 interface AdminRouteChildren {
+  AdminEpisodesRoute: typeof AdminEpisodesRoute
+  AdminMemoriesRoute: typeof AdminMemoriesRoute
+  AdminMessagesRoute: typeof AdminMessagesRoute
+  AdminQuestionsRoute: typeof AdminQuestionsRoute
+  AdminSuggestionsRoute: typeof AdminSuggestionsRoute
   AdminIndexRoute: typeof AdminIndexRoute
 }
 
 const AdminRouteChildren: AdminRouteChildren = {
+  AdminEpisodesRoute: AdminEpisodesRoute,
+  AdminMemoriesRoute: AdminMemoriesRoute,
+  AdminMessagesRoute: AdminMessagesRoute,
+  AdminQuestionsRoute: AdminQuestionsRoute,
+  AdminSuggestionsRoute: AdminSuggestionsRoute,
   AdminIndexRoute: AdminIndexRoute,
 }
 
@@ -214,3 +319,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
