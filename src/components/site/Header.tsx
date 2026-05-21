@@ -1,6 +1,7 @@
 import { Link } from "@tanstack/react-router";
 import { useState } from "react";
-import { Menu, X } from "lucide-react";
+import { Menu, X, LayoutDashboard } from "lucide-react";
+import { useAuth } from "@/lib/auth";
 
 const navItems = [
   { to: "/", label: "الرئيسية" },
@@ -12,6 +13,7 @@ const navItems = [
 
 export function Header() {
   const [open, setOpen] = useState(false);
+  const { isEditor } = useAuth();
 
   return (
     <header className="sticky top-0 z-50 backdrop-blur-md bg-background/80 border-b border-border/60">
@@ -40,13 +42,20 @@ export function Header() {
           ))}
         </nav>
 
-        <Link
-          to="/about"
-          hash="support"
-          className="hidden md:inline-flex items-center px-5 py-2.5 rounded-full bg-gradient-warm text-primary-foreground text-sm font-bold shadow-glow hover:opacity-90 transition"
-        >
-          ادعم البرنامج
-        </Link>
+        <div className="hidden md:flex items-center gap-2">
+          {isEditor && (
+            <Link to="/admin" className="inline-flex items-center gap-1.5 px-3 py-2 rounded-full border border-border text-xs font-bold text-foreground hover:border-primary/60 transition">
+              <LayoutDashboard size={13} /> الإدارة
+            </Link>
+          )}
+          <Link
+            to="/about"
+            hash="support"
+            className="inline-flex items-center px-5 py-2.5 rounded-full bg-gradient-warm text-primary-foreground text-sm font-bold shadow-glow hover:opacity-90 transition"
+          >
+            ادعم البرنامج
+          </Link>
+        </div>
 
         <button className="md:hidden text-foreground" onClick={() => setOpen(!open)} aria-label="القائمة">
           {open ? <X size={24} /> : <Menu size={24} />}
