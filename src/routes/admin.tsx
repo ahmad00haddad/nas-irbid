@@ -53,7 +53,7 @@ function AdminLayout() {
             <nav className="flex flex-col gap-1">
               {adminNav.map((it) => (
                 <Link
-                  key={it.to} to={it.to}
+                  key={it.to} to={it.to as "/admin"}
                   activeOptions={{ exact: it.exact }}
                   className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-muted-foreground hover:text-foreground hover:bg-background/60 transition"
                   activeProps={{ className: "flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-bold text-primary bg-primary/10" }}
