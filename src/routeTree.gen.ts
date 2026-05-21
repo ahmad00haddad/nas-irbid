@@ -12,8 +12,17 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as SuggestRouteImport } from './routes/suggest'
 import { Route as MemoriesRouteImport } from './routes/memories'
 import { Route as EpisodesRouteImport } from './routes/episodes'
+import { Route as AuthRouteImport } from './routes/auth'
+import { Route as AdminRouteImport } from './routes/admin'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AdminIndexRouteImport } from './routes/admin.index'
+import { Route as EpisodesSlugRouteImport } from './routes/episodes.$slug'
+import { Route as AdminSuggestionsRouteImport } from './routes/admin.suggestions'
+import { Route as AdminQuestionsRouteImport } from './routes/admin.questions'
+import { Route as AdminMessagesRouteImport } from './routes/admin.messages'
+import { Route as AdminMemoriesRouteImport } from './routes/admin.memories'
+import { Route as AdminEpisodesRouteImport } from './routes/admin.episodes'
 
 const SuggestRoute = SuggestRouteImport.update({
   id: '/suggest',
@@ -30,6 +39,16 @@ const EpisodesRoute = EpisodesRouteImport.update({
   path: '/episodes',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthRoute = AuthRouteImport.update({
+  id: '/auth',
+  path: '/auth',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminRoute = AdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AboutRoute = AboutRouteImport.update({
   id: '/about',
   path: '/about',
@@ -40,41 +59,146 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminIndexRoute = AdminIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AdminRoute,
+} as any)
+const EpisodesSlugRoute = EpisodesSlugRouteImport.update({
+  id: '/$slug',
+  path: '/$slug',
+  getParentRoute: () => EpisodesRoute,
+} as any)
+const AdminSuggestionsRoute = AdminSuggestionsRouteImport.update({
+  id: '/suggestions',
+  path: '/suggestions',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminQuestionsRoute = AdminQuestionsRouteImport.update({
+  id: '/questions',
+  path: '/questions',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminMessagesRoute = AdminMessagesRouteImport.update({
+  id: '/messages',
+  path: '/messages',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminMemoriesRoute = AdminMemoriesRouteImport.update({
+  id: '/memories',
+  path: '/memories',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminEpisodesRoute = AdminEpisodesRouteImport.update({
+  id: '/episodes',
+  path: '/episodes',
+  getParentRoute: () => AdminRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
-  '/episodes': typeof EpisodesRoute
+  '/admin': typeof AdminRouteWithChildren
+  '/auth': typeof AuthRoute
+  '/episodes': typeof EpisodesRouteWithChildren
   '/memories': typeof MemoriesRoute
   '/suggest': typeof SuggestRoute
+  '/admin/episodes': typeof AdminEpisodesRoute
+  '/admin/memories': typeof AdminMemoriesRoute
+  '/admin/messages': typeof AdminMessagesRoute
+  '/admin/questions': typeof AdminQuestionsRoute
+  '/admin/suggestions': typeof AdminSuggestionsRoute
+  '/episodes/$slug': typeof EpisodesSlugRoute
+  '/admin/': typeof AdminIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
-  '/episodes': typeof EpisodesRoute
+  '/auth': typeof AuthRoute
+  '/episodes': typeof EpisodesRouteWithChildren
   '/memories': typeof MemoriesRoute
   '/suggest': typeof SuggestRoute
+  '/admin/episodes': typeof AdminEpisodesRoute
+  '/admin/memories': typeof AdminMemoriesRoute
+  '/admin/messages': typeof AdminMessagesRoute
+  '/admin/questions': typeof AdminQuestionsRoute
+  '/admin/suggestions': typeof AdminSuggestionsRoute
+  '/episodes/$slug': typeof EpisodesSlugRoute
+  '/admin': typeof AdminIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
-  '/episodes': typeof EpisodesRoute
+  '/admin': typeof AdminRouteWithChildren
+  '/auth': typeof AuthRoute
+  '/episodes': typeof EpisodesRouteWithChildren
   '/memories': typeof MemoriesRoute
   '/suggest': typeof SuggestRoute
+  '/admin/episodes': typeof AdminEpisodesRoute
+  '/admin/memories': typeof AdminMemoriesRoute
+  '/admin/messages': typeof AdminMessagesRoute
+  '/admin/questions': typeof AdminQuestionsRoute
+  '/admin/suggestions': typeof AdminSuggestionsRoute
+  '/episodes/$slug': typeof EpisodesSlugRoute
+  '/admin/': typeof AdminIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/about' | '/episodes' | '/memories' | '/suggest'
+  fullPaths:
+    | '/'
+    | '/about'
+    | '/admin'
+    | '/auth'
+    | '/episodes'
+    | '/memories'
+    | '/suggest'
+    | '/admin/episodes'
+    | '/admin/memories'
+    | '/admin/messages'
+    | '/admin/questions'
+    | '/admin/suggestions'
+    | '/episodes/$slug'
+    | '/admin/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/about' | '/episodes' | '/memories' | '/suggest'
-  id: '__root__' | '/' | '/about' | '/episodes' | '/memories' | '/suggest'
+  to:
+    | '/'
+    | '/about'
+    | '/auth'
+    | '/episodes'
+    | '/memories'
+    | '/suggest'
+    | '/admin/episodes'
+    | '/admin/memories'
+    | '/admin/messages'
+    | '/admin/questions'
+    | '/admin/suggestions'
+    | '/episodes/$slug'
+    | '/admin'
+  id:
+    | '__root__'
+    | '/'
+    | '/about'
+    | '/admin'
+    | '/auth'
+    | '/episodes'
+    | '/memories'
+    | '/suggest'
+    | '/admin/episodes'
+    | '/admin/memories'
+    | '/admin/messages'
+    | '/admin/questions'
+    | '/admin/suggestions'
+    | '/episodes/$slug'
+    | '/admin/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AboutRoute: typeof AboutRoute
-  EpisodesRoute: typeof EpisodesRoute
+  AdminRoute: typeof AdminRouteWithChildren
+  AuthRoute: typeof AuthRoute
+  EpisodesRoute: typeof EpisodesRouteWithChildren
   MemoriesRoute: typeof MemoriesRoute
   SuggestRoute: typeof SuggestRoute
 }
@@ -102,6 +226,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof EpisodesRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/auth': {
+      id: '/auth'
+      path: '/auth'
+      fullPath: '/auth'
+      preLoaderRoute: typeof AuthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin': {
+      id: '/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AdminRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/about': {
       id: '/about'
       path: '/about'
@@ -116,13 +254,96 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin/': {
+      id: '/admin/'
+      path: '/'
+      fullPath: '/admin/'
+      preLoaderRoute: typeof AdminIndexRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/episodes/$slug': {
+      id: '/episodes/$slug'
+      path: '/$slug'
+      fullPath: '/episodes/$slug'
+      preLoaderRoute: typeof EpisodesSlugRouteImport
+      parentRoute: typeof EpisodesRoute
+    }
+    '/admin/suggestions': {
+      id: '/admin/suggestions'
+      path: '/suggestions'
+      fullPath: '/admin/suggestions'
+      preLoaderRoute: typeof AdminSuggestionsRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/questions': {
+      id: '/admin/questions'
+      path: '/questions'
+      fullPath: '/admin/questions'
+      preLoaderRoute: typeof AdminQuestionsRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/messages': {
+      id: '/admin/messages'
+      path: '/messages'
+      fullPath: '/admin/messages'
+      preLoaderRoute: typeof AdminMessagesRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/memories': {
+      id: '/admin/memories'
+      path: '/memories'
+      fullPath: '/admin/memories'
+      preLoaderRoute: typeof AdminMemoriesRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/episodes': {
+      id: '/admin/episodes'
+      path: '/episodes'
+      fullPath: '/admin/episodes'
+      preLoaderRoute: typeof AdminEpisodesRouteImport
+      parentRoute: typeof AdminRoute
+    }
   }
 }
+
+interface AdminRouteChildren {
+  AdminEpisodesRoute: typeof AdminEpisodesRoute
+  AdminMemoriesRoute: typeof AdminMemoriesRoute
+  AdminMessagesRoute: typeof AdminMessagesRoute
+  AdminQuestionsRoute: typeof AdminQuestionsRoute
+  AdminSuggestionsRoute: typeof AdminSuggestionsRoute
+  AdminIndexRoute: typeof AdminIndexRoute
+}
+
+const AdminRouteChildren: AdminRouteChildren = {
+  AdminEpisodesRoute: AdminEpisodesRoute,
+  AdminMemoriesRoute: AdminMemoriesRoute,
+  AdminMessagesRoute: AdminMessagesRoute,
+  AdminQuestionsRoute: AdminQuestionsRoute,
+  AdminSuggestionsRoute: AdminSuggestionsRoute,
+  AdminIndexRoute: AdminIndexRoute,
+}
+
+const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
+
+interface EpisodesRouteChildren {
+  EpisodesSlugRoute: typeof EpisodesSlugRoute
+}
+
+const EpisodesRouteChildren: EpisodesRouteChildren = {
+  EpisodesSlugRoute: EpisodesSlugRoute,
+}
+
+const EpisodesRouteWithChildren = EpisodesRoute._addFileChildren(
+  EpisodesRouteChildren,
+)
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AboutRoute: AboutRoute,
-  EpisodesRoute: EpisodesRoute,
+  AdminRoute: AdminRouteWithChildren,
+  AuthRoute: AuthRoute,
+  EpisodesRoute: EpisodesRouteWithChildren,
   MemoriesRoute: MemoriesRoute,
   SuggestRoute: SuggestRoute,
 }
