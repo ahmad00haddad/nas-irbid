@@ -8,14 +8,14 @@ export const Route = createFileRoute("/admin")({
   head: () => ({ meta: [{ title: "لوحة الإدارة · ناس إربد" }] }),
 });
 
-const adminNav = [
+const adminNav: { to: string; label: string; icon: typeof LayoutDashboard; exact?: boolean }[] = [
   { to: "/admin", label: "نظرة عامة", icon: LayoutDashboard, exact: true },
   { to: "/admin/episodes", label: "الحلقات", icon: Film },
   { to: "/admin/suggestions", label: "الاقتراحات", icon: Users },
   { to: "/admin/memories", label: "الذكريات", icon: Heart },
   { to: "/admin/questions", label: "بنك الأسئلة", icon: HelpCircle },
   { to: "/admin/messages", label: "الرسائل", icon: MessageSquare },
-] as const;
+];
 
 function AdminLayout() {
   const { user, loading, isEditor, signOut } = useAuth();
