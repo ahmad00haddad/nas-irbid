@@ -14,16 +14,272 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      contact_messages: {
+        Row: {
+          created_at: string
+          email: string | null
+          handled: boolean
+          id: string
+          message: string
+          message_type: string
+          name: string
+          phone: string | null
+          subject: string | null
+        }
+        Insert: {
+          created_at?: string
+          email?: string | null
+          handled?: boolean
+          id?: string
+          message: string
+          message_type?: string
+          name: string
+          phone?: string | null
+          subject?: string | null
+        }
+        Update: {
+          created_at?: string
+          email?: string | null
+          handled?: boolean
+          id?: string
+          message?: string
+          message_type?: string
+          name?: string
+          phone?: string | null
+          subject?: string | null
+        }
+        Relationships: []
+      }
+      episodes: {
+        Row: {
+          behind_the_scenes: string | null
+          character_name: string | null
+          cover_image_url: string | null
+          created_at: string
+          decade: string | null
+          episode_number: number | null
+          gallery_urls: string[] | null
+          id: string
+          neighborhood: string | null
+          profession: string | null
+          published: boolean
+          published_at: string | null
+          season: number | null
+          short_description: string | null
+          slug: string
+          story: string | null
+          title: string
+          updated_at: string
+          youtube_id: string | null
+        }
+        Insert: {
+          behind_the_scenes?: string | null
+          character_name?: string | null
+          cover_image_url?: string | null
+          created_at?: string
+          decade?: string | null
+          episode_number?: number | null
+          gallery_urls?: string[] | null
+          id?: string
+          neighborhood?: string | null
+          profession?: string | null
+          published?: boolean
+          published_at?: string | null
+          season?: number | null
+          short_description?: string | null
+          slug: string
+          story?: string | null
+          title: string
+          updated_at?: string
+          youtube_id?: string | null
+        }
+        Update: {
+          behind_the_scenes?: string | null
+          character_name?: string | null
+          cover_image_url?: string | null
+          created_at?: string
+          decade?: string | null
+          episode_number?: number | null
+          gallery_urls?: string[] | null
+          id?: string
+          neighborhood?: string | null
+          profession?: string | null
+          published?: boolean
+          published_at?: string | null
+          season?: number | null
+          short_description?: string | null
+          slug?: string
+          story?: string | null
+          title?: string
+          updated_at?: string
+          youtube_id?: string | null
+        }
+        Relationships: []
+      }
+      guest_suggestions: {
+        Row: {
+          admin_notes: string | null
+          candidate_name: string
+          contact_info: string | null
+          created_at: string
+          id: string
+          neighborhood: string | null
+          photo_url: string | null
+          profession: string | null
+          status: string
+          story_summary: string
+          submitter_email: string | null
+          submitter_name: string | null
+        }
+        Insert: {
+          admin_notes?: string | null
+          candidate_name: string
+          contact_info?: string | null
+          created_at?: string
+          id?: string
+          neighborhood?: string | null
+          photo_url?: string | null
+          profession?: string | null
+          status?: string
+          story_summary: string
+          submitter_email?: string | null
+          submitter_name?: string | null
+        }
+        Update: {
+          admin_notes?: string | null
+          candidate_name?: string
+          contact_info?: string | null
+          created_at?: string
+          id?: string
+          neighborhood?: string | null
+          photo_url?: string | null
+          profession?: string | null
+          status?: string
+          story_summary?: string
+          submitter_email?: string | null
+          submitter_name?: string | null
+        }
+        Relationships: []
+      }
+      memories: {
+        Row: {
+          approved: boolean
+          body: string
+          contributor_email: string | null
+          contributor_name: string | null
+          created_at: string
+          decade: string | null
+          featured: boolean
+          id: string
+          neighborhood: string | null
+          photo_url: string | null
+          title: string | null
+        }
+        Insert: {
+          approved?: boolean
+          body: string
+          contributor_email?: string | null
+          contributor_name?: string | null
+          created_at?: string
+          decade?: string | null
+          featured?: boolean
+          id?: string
+          neighborhood?: string | null
+          photo_url?: string | null
+          title?: string | null
+        }
+        Update: {
+          approved?: boolean
+          body?: string
+          contributor_email?: string | null
+          contributor_name?: string | null
+          created_at?: string
+          decade?: string | null
+          featured?: boolean
+          id?: string
+          neighborhood?: string | null
+          photo_url?: string | null
+          title?: string | null
+        }
+        Relationships: []
+      }
+      questions: {
+        Row: {
+          created_at: string
+          episode_id: string | null
+          id: string
+          question_text: string
+          selected: boolean
+          submitter_email: string | null
+          submitter_name: string | null
+          target_character: string | null
+        }
+        Insert: {
+          created_at?: string
+          episode_id?: string | null
+          id?: string
+          question_text: string
+          selected?: boolean
+          submitter_email?: string | null
+          submitter_name?: string | null
+          target_character?: string | null
+        }
+        Update: {
+          created_at?: string
+          episode_id?: string | null
+          id?: string
+          question_text?: string
+          selected?: boolean
+          submitter_email?: string | null
+          submitter_name?: string | null
+          target_character?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "questions_episode_id_fkey"
+            columns: ["episode_id"]
+            isOneToOne: false
+            referencedRelation: "episodes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_roles: {
+        Row: {
+          created_at: string
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
     }
     Enums: {
-      [_ in never]: never
+      app_role: "admin" | "editor"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +406,8 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: ["admin", "editor"],
+    },
   },
 } as const
