@@ -10,7 +10,6 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as SuggestRouteImport } from './routes/suggest'
-import { Route as MemoriesRouteImport } from './routes/memories'
 import { Route as EpisodesRouteImport } from './routes/episodes'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AdminRouteImport } from './routes/admin'
@@ -21,17 +20,11 @@ import { Route as EpisodesSlugRouteImport } from './routes/episodes.$slug'
 import { Route as AdminSuggestionsRouteImport } from './routes/admin.suggestions'
 import { Route as AdminQuestionsRouteImport } from './routes/admin.questions'
 import { Route as AdminMessagesRouteImport } from './routes/admin.messages'
-import { Route as AdminMemoriesRouteImport } from './routes/admin.memories'
 import { Route as AdminEpisodesRouteImport } from './routes/admin.episodes'
 
 const SuggestRoute = SuggestRouteImport.update({
   id: '/suggest',
   path: '/suggest',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const MemoriesRoute = MemoriesRouteImport.update({
-  id: '/memories',
-  path: '/memories',
   getParentRoute: () => rootRouteImport,
 } as any)
 const EpisodesRoute = EpisodesRouteImport.update({
@@ -84,11 +77,6 @@ const AdminMessagesRoute = AdminMessagesRouteImport.update({
   path: '/messages',
   getParentRoute: () => AdminRoute,
 } as any)
-const AdminMemoriesRoute = AdminMemoriesRouteImport.update({
-  id: '/memories',
-  path: '/memories',
-  getParentRoute: () => AdminRoute,
-} as any)
 const AdminEpisodesRoute = AdminEpisodesRouteImport.update({
   id: '/episodes',
   path: '/episodes',
@@ -101,10 +89,8 @@ export interface FileRoutesByFullPath {
   '/admin': typeof AdminRouteWithChildren
   '/auth': typeof AuthRoute
   '/episodes': typeof EpisodesRouteWithChildren
-  '/memories': typeof MemoriesRoute
   '/suggest': typeof SuggestRoute
   '/admin/episodes': typeof AdminEpisodesRoute
-  '/admin/memories': typeof AdminMemoriesRoute
   '/admin/messages': typeof AdminMessagesRoute
   '/admin/questions': typeof AdminQuestionsRoute
   '/admin/suggestions': typeof AdminSuggestionsRoute
@@ -116,10 +102,8 @@ export interface FileRoutesByTo {
   '/about': typeof AboutRoute
   '/auth': typeof AuthRoute
   '/episodes': typeof EpisodesRouteWithChildren
-  '/memories': typeof MemoriesRoute
   '/suggest': typeof SuggestRoute
   '/admin/episodes': typeof AdminEpisodesRoute
-  '/admin/memories': typeof AdminMemoriesRoute
   '/admin/messages': typeof AdminMessagesRoute
   '/admin/questions': typeof AdminQuestionsRoute
   '/admin/suggestions': typeof AdminSuggestionsRoute
@@ -133,10 +117,8 @@ export interface FileRoutesById {
   '/admin': typeof AdminRouteWithChildren
   '/auth': typeof AuthRoute
   '/episodes': typeof EpisodesRouteWithChildren
-  '/memories': typeof MemoriesRoute
   '/suggest': typeof SuggestRoute
   '/admin/episodes': typeof AdminEpisodesRoute
-  '/admin/memories': typeof AdminMemoriesRoute
   '/admin/messages': typeof AdminMessagesRoute
   '/admin/questions': typeof AdminQuestionsRoute
   '/admin/suggestions': typeof AdminSuggestionsRoute
@@ -151,10 +133,8 @@ export interface FileRouteTypes {
     | '/admin'
     | '/auth'
     | '/episodes'
-    | '/memories'
     | '/suggest'
     | '/admin/episodes'
-    | '/admin/memories'
     | '/admin/messages'
     | '/admin/questions'
     | '/admin/suggestions'
@@ -166,10 +146,8 @@ export interface FileRouteTypes {
     | '/about'
     | '/auth'
     | '/episodes'
-    | '/memories'
     | '/suggest'
     | '/admin/episodes'
-    | '/admin/memories'
     | '/admin/messages'
     | '/admin/questions'
     | '/admin/suggestions'
@@ -182,10 +160,8 @@ export interface FileRouteTypes {
     | '/admin'
     | '/auth'
     | '/episodes'
-    | '/memories'
     | '/suggest'
     | '/admin/episodes'
-    | '/admin/memories'
     | '/admin/messages'
     | '/admin/questions'
     | '/admin/suggestions'
@@ -199,7 +175,6 @@ export interface RootRouteChildren {
   AdminRoute: typeof AdminRouteWithChildren
   AuthRoute: typeof AuthRoute
   EpisodesRoute: typeof EpisodesRouteWithChildren
-  MemoriesRoute: typeof MemoriesRoute
   SuggestRoute: typeof SuggestRoute
 }
 
@@ -210,13 +185,6 @@ declare module '@tanstack/react-router' {
       path: '/suggest'
       fullPath: '/suggest'
       preLoaderRoute: typeof SuggestRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/memories': {
-      id: '/memories'
-      path: '/memories'
-      fullPath: '/memories'
-      preLoaderRoute: typeof MemoriesRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/episodes': {
@@ -289,13 +257,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminMessagesRouteImport
       parentRoute: typeof AdminRoute
     }
-    '/admin/memories': {
-      id: '/admin/memories'
-      path: '/memories'
-      fullPath: '/admin/memories'
-      preLoaderRoute: typeof AdminMemoriesRouteImport
-      parentRoute: typeof AdminRoute
-    }
     '/admin/episodes': {
       id: '/admin/episodes'
       path: '/episodes'
@@ -308,7 +269,6 @@ declare module '@tanstack/react-router' {
 
 interface AdminRouteChildren {
   AdminEpisodesRoute: typeof AdminEpisodesRoute
-  AdminMemoriesRoute: typeof AdminMemoriesRoute
   AdminMessagesRoute: typeof AdminMessagesRoute
   AdminQuestionsRoute: typeof AdminQuestionsRoute
   AdminSuggestionsRoute: typeof AdminSuggestionsRoute
@@ -317,7 +277,6 @@ interface AdminRouteChildren {
 
 const AdminRouteChildren: AdminRouteChildren = {
   AdminEpisodesRoute: AdminEpisodesRoute,
-  AdminMemoriesRoute: AdminMemoriesRoute,
   AdminMessagesRoute: AdminMessagesRoute,
   AdminQuestionsRoute: AdminQuestionsRoute,
   AdminSuggestionsRoute: AdminSuggestionsRoute,
@@ -344,7 +303,6 @@ const rootRouteChildren: RootRouteChildren = {
   AdminRoute: AdminRouteWithChildren,
   AuthRoute: AuthRoute,
   EpisodesRoute: EpisodesRouteWithChildren,
-  MemoriesRoute: MemoriesRoute,
   SuggestRoute: SuggestRoute,
 }
 export const routeTree = rootRouteImport

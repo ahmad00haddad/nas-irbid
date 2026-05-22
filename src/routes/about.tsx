@@ -2,7 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import {
   Heart, Coffee, Megaphone, Building2, Users, Camera, Mic2, Palette,
   Share2, MessageCircle, MapPin, Lightbulb, Handshake, GraduationCap,
-  Landmark, Sparkles, ArrowLeft, Check, Quote
+  Landmark, Sparkles, ArrowLeft, Quote
 } from "lucide-react";
 
 export const Route = createFileRoute("/about")({
@@ -34,21 +34,8 @@ function AboutPage() {
           </p>
         </div>
 
-        {/* Numbers */}
-        <div className="max-w-4xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-6 mt-16">
-          {[
-            { n: "+١٢", l: "حلقة موثّقة" },
-            { n: "+٢٠", l: "شخصية روت قصتها" },
-            { n: "+٨", l: "حياً تم تصويره" },
-            { n: "١", l: "مدينة، آلاف الحكايات" },
-          ].map((s) => (
-            <div key={s.l} className="text-center p-6 rounded-xl bg-card border border-border/60">
-              <div className="font-display text-4xl md:text-5xl text-gradient-gold mb-2">{s.n}</div>
-              <div className="text-xs text-muted-foreground">{s.l}</div>
-            </div>
-          ))}
-        </div>
       </section>
+
 
       {/* ============ Support Hero ============ */}
       <section id="support" className="relative scroll-mt-24 border-y border-border/60 bg-card/30 py-20">
@@ -180,10 +167,8 @@ function AboutPage() {
               <div className="text-xs font-bold text-primary tracking-widest mb-2">{s.tier}</div>
               <div className="font-display text-4xl text-gradient-gold mb-3">{s.amount}</div>
               <p className="text-sm text-muted-foreground leading-relaxed mb-7">{s.desc}</p>
-              <p className="text-xs text-muted-foreground/80 italic mb-6 leading-relaxed">
-                إن رغبتَ بعدم ذكر اسمك، نحترم ذلك. وإن أردتَ أن يُذكر، نشكرك بكلمةٍ بسيطة في صفحة الداعمين — لا أكثر.
-              </p>
               <a
+
                 href="mailto:hello@nas-irbid.jo?subject=أرغب بدعم حلقة"
                 className="block text-center w-full py-3 rounded-full bg-gradient-warm text-primary-foreground text-sm font-bold shadow-glow hover:opacity-90"
               >
@@ -192,7 +177,11 @@ function AboutPage() {
             </div>
           ))}
         </div>
+        <p className="text-center text-xs text-muted-foreground/80 italic mt-8 max-w-xl mx-auto">
+          إن رغبتَ بعدم ذكر اسمك، نحترم ذلك.
+        </p>
       </section>
+
 
       {/* ============ 3. Institutional Partners ============ */}
       <section id="partners" className="container mx-auto px-6 py-20 scroll-mt-24 border-t border-border/60">
@@ -254,10 +243,10 @@ function AboutPage() {
         <div className="max-w-6xl mx-auto grid md:grid-cols-2 lg:grid-cols-3 gap-5 mt-12">
           {[
             { icon: Share2, title: "شارك الحلقات", desc: "كلّ مشاركة بتوصل البرنامج لعائلة جديدة." },
-            { icon: MessageCircle, title: "اكتب تعليقاً", desc: "تعليقك على يوتيوب يساعد الحلقة توصل لمزيد من الناس." },
+            { icon: MessageCircle, title: "اكتب تعليقاً", desc: "تعليقك — على أي منصّة — يساعد الحلقة توصل لمزيد من الناس." },
             { icon: Users, title: "رشّح شخصية", desc: "تعرف حدا عنده حكاية تستحقّ التوثيق؟ رشّحه.", to: "/suggest" },
             { icon: MapPin, title: "افتح لنا بيتك أو محلّك", desc: "نحتاج مواقع تصوير أصيلة في إربد القديمة." },
-            { icon: Camera, title: "تبرّع بصور قديمة", desc: "صورك العائلية من إربد القديمة كنزٌ توثيقي.", to: "/memories" },
+            { icon: Handshake, title: "عرّفنا على ناس إربد", desc: "اربطنا بأصحاب المهن، الحكواتية، والشخصيات اللي تستاهل حلقة." },
             { icon: Mic2, title: "تطوّع بمهارتك", desc: "مصور، مونتير، صوت، مترجم؟ فريقنا بحاجتك." },
             { icon: Lightbulb, title: "اقترح فكرة حلقة", desc: "ميدان، مهنة، حدث — أي شي يستحقّ التوثيق." },
             { icon: Palette, title: "ترجم محتوانا", desc: "ساعدنا نوصل لجمهور أوسع داخل الأردن وخارجه." },
@@ -298,49 +287,30 @@ function AboutPage() {
             description="لأنّ الثقة أساس أيّ علاقة، ننشر تقريراً مفصّلاً عن كلّ مساهمة تصلنا — مهما كانت صغيرة."
           />
 
-          <div className="mt-12 grid md:grid-cols-2 gap-6">
-            <div className="p-6 rounded-2xl bg-card border border-border/60">
-              <h4 className="font-display text-xl text-foreground mb-4">توزيع تكلفة الحلقة الواحدة</h4>
-              <div className="space-y-3">
+          <div className="mt-12">
+            <div className="p-8 rounded-2xl bg-card border border-border/60 shadow-deep max-w-2xl mx-auto">
+              <h4 className="font-display text-xl text-foreground mb-5">توزيع تكلفة الحلقة الواحدة</h4>
+              <div className="space-y-4">
                 {[
-                  { l: "تصوير وكاميرات (إيجار + فريق)", v: 40 },
-                  { l: "مونتاج وتلوين سينمائي", v: 30 },
-                  { l: "بحث ميداني وتنقّلات", v: 15 },
-                  { l: "إنتاج موسيقي وأصوات", v: 10 },
-                  { l: "نشر وتوزيع", v: 5 },
+                  { l: "التصوير والعدسات السينمائية (إيجار + فريق + خبرة)", v: 38 },
+                  { l: "المونتاج والتلوين السينمائي (DaVinci Resolve)", v: 32 },
+                  { l: "البروديوسينق وإدارة الإنتاج (بحث، تنسيق، إخراج)", v: 20 },
+                  { l: "بحث ميداني وتنقّلات", v: 10 },
                 ].map((row) => (
                   <div key={row.l}>
-                    <div className="flex justify-between text-xs mb-1">
-                      <span className="text-muted-foreground">{row.l}</span>
-                      <span className="font-bold text-primary">{row.v}%</span>
+                    <div className="flex justify-between text-xs mb-1.5 gap-3">
+                      <span className="text-foreground/80 font-semibold">{row.l}</span>
+                      <span className="font-bold text-primary shrink-0">{row.v}%</span>
                     </div>
-                    <div className="h-2 rounded-full bg-background/60 overflow-hidden">
+                    <div className="h-2.5 rounded-full bg-muted overflow-hidden">
                       <div className="h-full bg-gradient-warm" style={{ width: `${row.v}%` }} />
                     </div>
                   </div>
                 ))}
               </div>
             </div>
-
-            <div className="p-6 rounded-2xl bg-card border border-border/60">
-              <h4 className="font-display text-xl text-foreground mb-4">تعهّداتنا</h4>
-              <ul className="space-y-3">
-                {[
-                  "تقرير مالي مبسّط آخر كلّ موسم، منشور للعموم",
-                  "صفر إعلانات داخل الحلقات",
-                  "صفر محتوى مموّل أو مخفي",
-                  "كلّ دينار يذهب لإنتاج البرنامج، لا أرباح شخصية",
-                  "كلّ المحتوى يبقى مجاناً للمشاهدة، للأبد",
-                  "نحترم رغبة من يفضّل عدم ذكر اسمه",
-                ].map((t) => (
-                  <li key={t} className="flex items-start gap-2 text-sm text-foreground/90">
-                    <Check size={16} className="text-primary mt-0.5 shrink-0" />
-                    <span>{t}</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
           </div>
+
         </div>
       </section>
 
