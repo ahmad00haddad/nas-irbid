@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { Film, Users, Heart, MessageSquare, HelpCircle } from "lucide-react";
+import { Film, Users, MessageSquare, HelpCircle } from "lucide-react";
 
 export const Route = createFileRoute("/admin/")({
   component: AdminHome,
@@ -11,17 +11,15 @@ function AdminHome() {
   const { data } = useQuery({
     queryKey: ["admin-counts"],
     queryFn: async () => {
-      const [eps, sugg, mems, msgs, qs] = await Promise.all([
+      const [eps, sugg, msgs, qs] = await Promise.all([
         supabase.from("episodes").select("id", { count: "exact", head: true }),
         supabase.from("guest_suggestions").select("id", { count: "exact", head: true }).eq("status", "new"),
-        supabase.from("memories").select("id", { count: "exact", head: true }).eq("approved", false),
         supabase.from("contact_messages").select("id", { count: "exact", head: true }).eq("handled", false),
         supabase.from("questions").select("id", { count: "exact", head: true }),
       ]);
       return {
         episodes: eps.count ?? 0,
         newSuggestions: sugg.count ?? 0,
-        pendingMemories: mems.count ?? 0,
         newMessages: msgs.count ?? 0,
         questions: qs.count ?? 0,
       };
@@ -31,7 +29,6 @@ function AdminHome() {
   const cards = [
     { label: "حلقات إجمالاً", value: data?.episodes ?? "—", icon: Film },
     { label: "اقتراحات جديدة", value: data?.newSuggestions ?? "—", icon: Users, urgent: (data?.newSuggestions ?? 0) > 0 },
-    { label: "ذكريات بانتظار الموافقة", value: data?.pendingMemories ?? "—", icon: Heart, urgent: (data?.pendingMemories ?? 0) > 0 },
     { label: "رسائل جديدة", value: data?.newMessages ?? "—", icon: MessageSquare, urgent: (data?.newMessages ?? 0) > 0 },
     { label: "أسئلة في البنك", value: data?.questions ?? "—", icon: HelpCircle },
   ];

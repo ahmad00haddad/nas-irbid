@@ -1,7 +1,7 @@
 import { createFileRoute, useNavigate, Outlet, Link } from "@tanstack/react-router";
 import { useEffect } from "react";
 import { useAuth } from "@/lib/auth";
-import { LayoutDashboard, Film, Users, Heart, MessageSquare, HelpCircle, LogOut } from "lucide-react";
+import { LayoutDashboard, Film, Users, MessageSquare, HelpCircle, LogOut } from "lucide-react";
 
 export const Route = createFileRoute("/admin")({
   component: AdminLayout,
@@ -12,7 +12,6 @@ const adminNav: { to: string; label: string; icon: typeof LayoutDashboard; exact
   { to: "/admin", label: "نظرة عامة", icon: LayoutDashboard, exact: true },
   { to: "/admin/episodes", label: "الحلقات", icon: Film },
   { to: "/admin/suggestions", label: "الاقتراحات", icon: Users },
-  { to: "/admin/memories", label: "الذكريات", icon: Heart },
   { to: "/admin/questions", label: "بنك الأسئلة", icon: HelpCircle },
   { to: "/admin/messages", label: "الرسائل", icon: MessageSquare },
 ];

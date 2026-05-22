@@ -2,7 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import heroImg from "@/assets/hero.jpg";
 import { episodes } from "@/lib/episodes";
 import { EpisodeCard } from "@/components/site/EpisodeCard";
-import { ArrowLeft, Camera, MessageSquareHeart, Image as ImageIcon, Users } from "lucide-react";
+import { ArrowLeft, Camera, Users, HelpCircle, Share2 } from "lucide-react";
 
 export const Route = createFileRoute("/")({
   component: Index,
@@ -33,7 +33,7 @@ function Index() {
           <div className="max-w-3xl">
             <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary/10 border border-primary/30 mb-6">
               <span className="w-2 h-2 rounded-full bg-primary animate-pulse" />
-              <span className="text-xs font-semibold text-primary tracking-wider">برنامج وثائقي · موسم ٢٠٢٥</span>
+              <span className="text-xs font-semibold text-primary tracking-wider">برنامج وثائقي · موسم ٢٠٢٦</span>
             </div>
             <h1 className="font-display text-5xl md:text-7xl lg:text-8xl leading-[1.05] mb-6">
               <span className="text-foreground">حكاياتُ مدينة</span>
@@ -75,7 +75,7 @@ function Index() {
           </p>
         </div>
 
-        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
           {[
             {
               icon: Users,
@@ -85,31 +85,24 @@ function Index() {
               cta: "ابعت ترشيحك",
             },
             {
-              icon: MessageSquareHeart,
-              title: "شاركنا ذكرى",
-              text: "اكتب لنا ذكرى من إربد القديمة، حكاية جدّك، أو موقف من حارتك.",
-              link: "/memories",
-              cta: "اكتب ذكرى",
-            },
-            {
-              icon: ImageIcon,
-              title: "صورة وحكاية",
-              text: "ارفع صورة قديمة من ألبوم العائلة، واكتب قصتها بكلماتك.",
-              link: "/memories",
-              cta: "ارفع صورة",
-            },
-            {
-              icon: Camera,
+              icon: HelpCircle,
               title: "اسأل الضيف",
               text: "قبل كل تصوير، نفتح بابك لتسأل أنت ما تريد معرفته من ضيف الحلقة.",
               link: "/suggest",
               cta: "أرسل سؤالك",
             },
+            {
+              icon: Share2,
+              title: "انشر الحلقة",
+              text: "كل مشاركة بتوصل البرنامج لعائلة جديدة، وحكاية إربد لجمهور أوسع.",
+              link: "/episodes",
+              cta: "شاهد الحلقات",
+            },
           ].map(({ icon: Icon, title, text, link, cta }) => (
             <Link
               key={title}
               to={link}
-              className="group p-7 rounded-2xl bg-card border border-border/60 hover:border-primary/50 transition-all hover:-translate-y-1"
+              className="group p-7 rounded-2xl bg-card border border-border/60 hover:border-primary/50 transition-all hover:-translate-y-1 shadow-deep"
             >
               <div className="w-12 h-12 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center mb-5 group-hover:bg-gradient-warm group-hover:border-transparent transition">
                 <Icon size={22} className="text-primary group-hover:text-primary-foreground transition" />
