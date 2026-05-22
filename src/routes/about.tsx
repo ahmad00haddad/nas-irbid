@@ -2,7 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import {
   Heart, Coffee, Megaphone, Building2, Users, Camera, Mic2, Palette,
   Share2, MessageCircle, MapPin, Lightbulb, Handshake, GraduationCap,
-  Landmark, Sparkles, ArrowLeft, Check, Quote
+  Landmark, Sparkles, ArrowLeft, Quote
 } from "lucide-react";
 
 export const Route = createFileRoute("/about")({
