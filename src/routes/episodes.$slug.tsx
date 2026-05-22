@@ -85,7 +85,7 @@ function EpisodeDetail() {
           {ep.story && (
             <section>
               <h2 className="font-display text-2xl text-gradient-gold mb-4">القصة</h2>
-              <div className="prose prose-invert text-foreground leading-loose whitespace-pre-wrap text-base md:text-lg">
+              <div className="prose text-foreground leading-loose whitespace-pre-wrap text-base md:text-lg">
                 {ep.story}
               </div>
             </section>
