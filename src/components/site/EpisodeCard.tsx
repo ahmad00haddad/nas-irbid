@@ -3,17 +3,17 @@ import { Clock, MapPin } from "lucide-react";
 
 export function EpisodeCard({ ep }: { ep: Episode }) {
   return (
-    <article className="group relative overflow-hidden rounded-xl bg-card border border-border/60 hover:border-primary/40 transition-all shadow-deep">
-      <div className="relative aspect-[4/3] overflow-hidden">
+    <article className="group relative bg-card border border-accent/20 hover:border-accent/60 transition-all shadow-deep arch-frame">
+      <div className="relative aspect-[3/4] overflow-hidden arch-top">
         <img
           src={ep.image}
           alt={ep.title}
           loading="lazy"
-          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 sepia-[0.15]"
+          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-card via-card/30 to-transparent" />
-        <div className="absolute top-4 right-4 px-3 py-1 rounded-full bg-background/80 backdrop-blur border border-primary/30">
-          <span className="font-display text-xs text-primary">حلقة {ep.number}</span>
+        <div className="absolute inset-0 bg-gradient-to-t from-card via-card/20 to-transparent" />
+        <div className="absolute top-5 right-5 px-3 py-1 rounded-full bg-background/85 backdrop-blur border border-accent/40">
+          <span className="font-display text-xs text-accent">حلقة {ep.number}</span>
         </div>
       </div>
       <div className="p-6">
