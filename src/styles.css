@@ -4,12 +4,12 @@
 
 @custom-variant dark (&:is(.dark *));
 
-/* Fonts: Cairo (body) + Amiri (display serif) for Arabic */
-@import url('https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400&family=Cairo:wght@300;400;600;700;900&display=swap');
+/* Arabic typography — Thmanyah-style fallback via IBM Plex Sans Arabic (geometric, modern) + Amiri for display serif */
+@import url('https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700&display=swap');
 
 @theme inline {
-  --font-display: 'Amiri', 'Cairo', serif;
-  --font-body: 'Cairo', system-ui, sans-serif;
+  --font-display: 'Amiri', 'IBM Plex Sans Arabic', serif;
+  --font-body: 'IBM Plex Sans Arabic', system-ui, sans-serif;
 
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
@@ -41,42 +41,48 @@
 :root {
   --radius: 0.75rem;
 
-  /* Warm, light, joyful palette — cream paper, deep ink, terracotta + amber accents */
-  --background: oklch(0.985 0.012 85);          /* warm cream */
-  --foreground: oklch(0.20 0.020 50);           /* deep ink — high contrast */
+  /* Emerald green base · Burgundy CTAs · Matte gold typography */
+  --background: oklch(0.26 0.045 165);            /* deep emerald */
+  --foreground: oklch(0.92 0.055 85);             /* matte gold cream — high contrast on emerald */
 
-  --card: oklch(1 0 0);                          /* pure white cards on cream */
-  --card-foreground: oklch(0.20 0.020 50);
+  --card: oklch(0.31 0.05 165);                   /* slightly lighter emerald for cards */
+  --card-foreground: oklch(0.94 0.05 85);
 
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.20 0.020 50);
+  --popover: oklch(0.31 0.05 165);
+  --popover-foreground: oklch(0.94 0.05 85);
 
-  --primary: oklch(0.58 0.18 38);                /* warm terracotta */
-  --primary-foreground: oklch(0.99 0.008 85);
+  /* Burgundy — primary actions */
+  --primary: oklch(0.50 0.14 25);
+  --primary-foreground: oklch(0.96 0.04 85);
 
-  --secondary: oklch(0.95 0.020 80);
-  --secondary-foreground: oklch(0.25 0.020 50);
+  --secondary: oklch(0.34 0.05 165);
+  --secondary-foreground: oklch(0.92 0.05 85);
 
-  --muted: oklch(0.94 0.015 80);
-  --muted-foreground: oklch(0.38 0.025 55);      /* dark enough to be readable */
+  --muted: oklch(0.34 0.04 165);
+  --muted-foreground: oklch(0.78 0.06 85);        /* readable matte gold on emerald */
 
-  --accent: oklch(0.72 0.16 65);                 /* amber */
-  --accent-foreground: oklch(0.20 0.020 50);
+  /* Matte gold — accent highlights */
+  --accent: oklch(0.74 0.10 82);
+  --accent-foreground: oklch(0.22 0.04 165);
 
   --destructive: oklch(0.55 0.20 25);
-  --destructive-foreground: oklch(0.99 0.008 85);
+  --destructive-foreground: oklch(0.96 0.04 85);
 
-  --border: oklch(0.86 0.018 75);
-  --input: oklch(0.98 0.010 80);
-  --ring: oklch(0.58 0.18 38);
+  --border: oklch(0.42 0.05 165);
+  --input: oklch(0.30 0.045 165);
+  --ring: oklch(0.74 0.10 82);
 
-  --gold: oklch(0.65 0.15 60);
-  --sepia: oklch(0.55 0.10 50);
+  --gold: oklch(0.78 0.10 82);                    /* matte gold */
+  --sepia: oklch(0.55 0.08 50);
 
-  --gradient-warm: linear-gradient(135deg, oklch(0.58 0.18 38) 0%, oklch(0.72 0.16 65) 100%);
-  --gradient-dark: linear-gradient(180deg, oklch(0.985 0.012 85 / 0) 0%, oklch(0.985 0.012 85 / 0.85) 75%, oklch(0.985 0.012 85) 100%);
-  --shadow-glow: 0 18px 50px -18px oklch(0.58 0.18 38 / 0.45);
-  --shadow-deep: 0 24px 60px -28px oklch(0.30 0.05 50 / 0.25);
+  --gradient-warm: linear-gradient(135deg, oklch(0.50 0.14 25) 0%, oklch(0.62 0.13 35) 100%);
+  --gradient-gold: linear-gradient(135deg, oklch(0.78 0.10 82) 0%, oklch(0.86 0.08 85) 100%);
+  --gradient-dark: linear-gradient(180deg, oklch(0.26 0.045 165 / 0) 0%, oklch(0.22 0.04 165 / 0.85) 75%, oklch(0.20 0.035 165) 100%);
+  --shadow-glow: 0 18px 50px -18px oklch(0.50 0.14 25 / 0.55);
+  --shadow-deep: 0 24px 60px -28px oklch(0.10 0.02 165 / 0.55);
+
+  /* Subtle Islamic 8-point star geometric pattern, very low opacity */
+  --pattern-geo: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='80' height='80' viewBox='0 0 80 80'><g fill='none' stroke='%23d4af7a' stroke-width='0.6' opacity='0.10'><polygon points='40,8 48,32 72,40 48,48 40,72 32,48 8,40 32,32'/><polygon points='40,18 45,35 62,40 45,45 40,62 35,45 18,40 35,35'/><circle cx='40' cy='40' r='3'/></g></svg>");
 }
 
 @layer base {
@@ -86,6 +92,8 @@
 
   body {
     background-color: var(--color-background);
+    background-image: var(--pattern-geo);
+    background-repeat: repeat;
     color: var(--color-foreground);
     font-family: var(--font-body);
     font-feature-settings: "kern", "liga";
@@ -104,13 +112,30 @@
 
 @layer utilities {
   .text-gradient-gold {
-    background: var(--gradient-warm);
+    background: var(--gradient-gold);
     -webkit-background-clip: text;
     background-clip: text;
     color: transparent;
   }
   .bg-gradient-warm { background: var(--gradient-warm); }
+  .bg-gradient-gold { background: var(--gradient-gold); }
   .shadow-glow { box-shadow: var(--shadow-glow); }
   .shadow-deep { box-shadow: var(--shadow-deep); }
   .font-display { font-family: var(--font-display); }
+
+  /* Arch shape — Islamic architecture inspired */
+  .arch-top {
+    border-top-left-radius: 9999px;
+    border-top-right-radius: 9999px;
+  }
+  .arch-frame {
+    border-radius: 9999px 9999px 1rem 1rem;
+    overflow: hidden;
+  }
+  .arch-mask {
+    -webkit-mask-image: radial-gradient(ellipse 100% 70% at 50% 70%, #000 60%, transparent 62%);
+            mask-image: radial-gradient(ellipse 100% 70% at 50% 70%, #000 60%, transparent 62%);
+  }
+
+  .pattern-geo { background-image: var(--pattern-geo); }
 }
