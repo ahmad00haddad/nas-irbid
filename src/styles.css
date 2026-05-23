@@ -4,7 +4,7 @@
 
 @custom-variant dark (&:is(.dark *));
 
-/* Arabic typography — Thmanyah-style fallback via IBM Plex Sans Arabic (geometric, modern) + Amiri for display serif */
+/* Thmanyah-style Arabic — geometric modern (IBM Plex) + display serif (Amiri) */
 @import url('https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700&display=swap');
 
 @theme inline {
@@ -41,48 +41,49 @@
 :root {
   --radius: 0.75rem;
 
-  /* Emerald green base · Burgundy CTAs · Matte gold typography */
-  --background: oklch(0.26 0.045 165);            /* deep emerald */
-  --foreground: oklch(0.92 0.055 85);             /* matte gold cream — high contrast on emerald */
+  /* Nafeesa-inspired palette: matte gold cream dominant · burgundy CTA · emerald deep accent */
+  --background: oklch(0.91 0.055 88);             /* warm matte gold cream */
+  --foreground: oklch(0.20 0.04 25);              /* deep burgundy-ink — strong solid text */
 
-  --card: oklch(0.31 0.05 165);                   /* slightly lighter emerald for cards */
-  --card-foreground: oklch(0.94 0.05 85);
+  --card: oklch(0.95 0.04 88);                    /* lighter cream for cards */
+  --card-foreground: oklch(0.20 0.04 25);
 
-  --popover: oklch(0.31 0.05 165);
-  --popover-foreground: oklch(0.94 0.05 85);
+  --popover: oklch(0.95 0.04 88);
+  --popover-foreground: oklch(0.20 0.04 25);
 
-  /* Burgundy — primary actions */
-  --primary: oklch(0.50 0.14 25);
-  --primary-foreground: oklch(0.96 0.04 85);
+  /* Burgundy — primary brand & CTAs */
+  --primary: oklch(0.42 0.16 25);
+  --primary-foreground: oklch(0.96 0.04 88);
 
-  --secondary: oklch(0.34 0.05 165);
-  --secondary-foreground: oklch(0.92 0.05 85);
+  --secondary: oklch(0.86 0.06 88);
+  --secondary-foreground: oklch(0.22 0.04 25);
 
-  --muted: oklch(0.34 0.04 165);
-  --muted-foreground: oklch(0.78 0.06 85);        /* readable matte gold on emerald */
+  --muted: oklch(0.86 0.05 88);
+  --muted-foreground: oklch(0.38 0.06 25);        /* readable burgundy-brown on cream */
 
-  /* Matte gold — accent highlights */
-  --accent: oklch(0.74 0.10 82);
-  --accent-foreground: oklch(0.22 0.04 165);
+  /* Emerald — deep accent (sparingly: borders, small highlights) */
+  --accent: oklch(0.32 0.06 165);
+  --accent-foreground: oklch(0.95 0.04 88);
 
-  --destructive: oklch(0.55 0.20 25);
-  --destructive-foreground: oklch(0.96 0.04 85);
+  --destructive: oklch(0.50 0.20 25);
+  --destructive-foreground: oklch(0.96 0.04 88);
 
-  --border: oklch(0.42 0.05 165);
-  --input: oklch(0.30 0.045 165);
-  --ring: oklch(0.74 0.10 82);
+  --border: oklch(0.78 0.06 88);
+  --input: oklch(0.93 0.04 88);
+  --ring: oklch(0.42 0.16 25);
 
-  --gold: oklch(0.78 0.10 82);                    /* matte gold */
+  --gold: oklch(0.78 0.10 82);
   --sepia: oklch(0.55 0.08 50);
 
-  --gradient-warm: linear-gradient(135deg, oklch(0.50 0.14 25) 0%, oklch(0.62 0.13 35) 100%);
-  --gradient-gold: linear-gradient(135deg, oklch(0.78 0.10 82) 0%, oklch(0.86 0.08 85) 100%);
-  --gradient-dark: linear-gradient(180deg, oklch(0.26 0.045 165 / 0) 0%, oklch(0.22 0.04 165 / 0.85) 75%, oklch(0.20 0.035 165) 100%);
-  --shadow-glow: 0 18px 50px -18px oklch(0.50 0.14 25 / 0.55);
-  --shadow-deep: 0 24px 60px -28px oklch(0.10 0.02 165 / 0.55);
+  /* Gradients kept for backgrounds/buttons (solid-color CTA emphasis, no text gradients) */
+  --gradient-warm: linear-gradient(135deg, oklch(0.42 0.16 25) 0%, oklch(0.50 0.17 25) 100%);
+  --gradient-gold: linear-gradient(135deg, oklch(0.86 0.08 85) 0%, oklch(0.92 0.06 88) 100%);
+  --gradient-dark: linear-gradient(180deg, oklch(0.91 0.055 88 / 0) 0%, oklch(0.88 0.06 88 / 0.85) 75%, oklch(0.86 0.06 88) 100%);
+  --shadow-glow: 0 18px 50px -18px oklch(0.42 0.16 25 / 0.45);
+  --shadow-deep: 0 24px 60px -28px oklch(0.20 0.04 25 / 0.30);
 
-  /* Subtle Islamic 8-point star geometric pattern, very low opacity */
-  --pattern-geo: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='80' height='80' viewBox='0 0 80 80'><g fill='none' stroke='%23d4af7a' stroke-width='0.6' opacity='0.10'><polygon points='40,8 48,32 72,40 48,48 40,72 32,48 8,40 32,32'/><polygon points='40,18 45,35 62,40 45,45 40,62 35,45 18,40 35,35'/><circle cx='40' cy='40' r='3'/></g></svg>");
+  /* Subtle Islamic 8-point star pattern, very low opacity */
+  --pattern-geo: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='80' height='80' viewBox='0 0 80 80'><g fill='none' stroke='%234a1a1f' stroke-width='0.6' opacity='0.08'><polygon points='40,8 48,32 72,40 48,48 40,72 32,48 8,40 32,32'/><polygon points='40,18 45,35 62,40 45,45 40,62 35,45 18,40 35,35'/><circle cx='40' cy='40' r='3'/></g></svg>");
 }
 
 @layer base {
@@ -111,11 +112,12 @@
 }
 
 @layer utilities {
+  /* Single solid burgundy — no gradient on text, ever. Class name kept for compatibility. */
   .text-gradient-gold {
-    background: var(--gradient-gold);
-    -webkit-background-clip: text;
-    background-clip: text;
-    color: transparent;
+    color: var(--color-primary);
+    background: none;
+    -webkit-background-clip: initial;
+    background-clip: initial;
   }
   .bg-gradient-warm { background: var(--gradient-warm); }
   .bg-gradient-gold { background: var(--gradient-gold); }
@@ -123,7 +125,7 @@
   .shadow-deep { box-shadow: var(--shadow-deep); }
   .font-display { font-family: var(--font-display); }
 
-  /* Arch shape — Islamic architecture inspired */
+  /* Arch — Islamic architecture inspired */
   .arch-top {
     border-top-left-radius: 9999px;
     border-top-right-radius: 9999px;
