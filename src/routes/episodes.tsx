@@ -83,9 +83,9 @@ function EpisodesPage() {
               key={ep.id}
               to="/episodes/$slug"
               params={{ slug: ep.slug }}
-              className="group rounded-2xl bg-card border border-border/60 overflow-hidden hover:border-primary/40 transition hover:-translate-y-1"
+              className="group bg-card border border-accent/20 overflow-hidden hover:border-accent/60 transition hover:-translate-y-1 arch-frame"
             >
-              <div className="aspect-video bg-background/60 relative overflow-hidden">
+              <div className="aspect-[3/4] bg-background/40 relative overflow-hidden arch-top">
                 {ep.cover_image_url ? (
                   <img src={ep.cover_image_url} alt={ep.title} className="w-full h-full object-cover group-hover:scale-105 transition duration-700" />
                 ) : ep.youtube_id ? (
