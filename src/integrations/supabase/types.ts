@@ -161,48 +161,6 @@ export type Database = {
         }
         Relationships: []
       }
-      memories: {
-        Row: {
-          approved: boolean
-          body: string
-          contributor_email: string | null
-          contributor_name: string | null
-          created_at: string
-          decade: string | null
-          featured: boolean
-          id: string
-          neighborhood: string | null
-          photo_url: string | null
-          title: string | null
-        }
-        Insert: {
-          approved?: boolean
-          body: string
-          contributor_email?: string | null
-          contributor_name?: string | null
-          created_at?: string
-          decade?: string | null
-          featured?: boolean
-          id?: string
-          neighborhood?: string | null
-          photo_url?: string | null
-          title?: string | null
-        }
-        Update: {
-          approved?: boolean
-          body?: string
-          contributor_email?: string | null
-          contributor_name?: string | null
-          created_at?: string
-          decade?: string | null
-          featured?: boolean
-          id?: string
-          neighborhood?: string | null
-          photo_url?: string | null
-          title?: string | null
-        }
-        Relationships: []
-      }
       questions: {
         Row: {
           created_at: string
