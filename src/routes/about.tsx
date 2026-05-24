@@ -169,7 +169,7 @@ function AboutPage() {
               <p className="text-sm text-muted-foreground leading-relaxed mb-7">{s.desc}</p>
               <a
 
-                href="mailto:hello@nas-irbid.jo?subject=أرغب بدعم حلقة"
+                href="mailto:ahmad000haddad@gmail.com?subject=أرغب بدعم حلقة"
                 className="block text-center w-full py-3 rounded-full bg-gradient-warm text-primary-foreground text-sm font-bold shadow-glow hover:opacity-90"
               >
                 تواصل معنا
@@ -222,7 +222,7 @@ function AboutPage() {
                 <div className="flex-1">
                   <h3 className="font-display text-xl text-foreground mb-2">{p.title}</h3>
                   <p className="text-sm text-muted-foreground leading-relaxed mb-4">{p.desc}</p>
-                  <a href="mailto:hello@nas-irbid.jo" className="text-sm font-bold text-primary hover:underline inline-flex items-center gap-1">
+                  <a href="mailto:ahmad000haddad@gmail.com" className="text-sm font-bold text-primary hover:underline inline-flex items-center gap-1">
                     تواصل معنا <ArrowLeft size={14} />
                   </a>
                 </div>
@@ -325,7 +325,7 @@ function AboutPage() {
             ونحن نرتّب معك أنسب طريقة — حسب وقتك وإمكانياتك.
           </p>
           <a
-            href="mailto:hello@nas-irbid.jo?subject=بدّي أساهم في ناس إربد"
+            href="mailto:ahmad000haddad@gmail.com?subject=بدّي أساهم في ناس إربد"
             className="inline-flex items-center gap-2 px-8 py-3.5 rounded-full bg-background text-foreground text-sm font-bold hover:bg-background/90 transition"
           >
             <Heart size={16} fill="currentColor" className="text-primary" />

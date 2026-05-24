@@ -131,7 +131,7 @@ function AdminEpisodes() {
                   )}
                 </div>
                 <div className="font-display text-base text-foreground truncate">{ep.title}</div>
-                <div className="text-xs text-muted-foreground truncate">{ep.character_name} · {ep.neighborhood}</div>
+                <div className="text-xs text-muted-foreground truncate">{ep.character_name}</div>
               </div>
               <div className="flex items-center gap-1">
                 <button onClick={() => togglePublish.mutate(ep)} className="p-2 rounded-lg hover:bg-background/60 text-muted-foreground" title={ep.published ? "إلغاء النشر" : "نشر"}>
@@ -191,9 +191,9 @@ function EpisodeEditor({
             <Input label="المهنة" value={v.profession ?? ""} onChange={(e) => set("profession", e.target.value)} />
           </div>
           <div className="grid sm:grid-cols-2 gap-4">
-            <Input label="الحي" value={v.neighborhood ?? ""} onChange={(e) => set("neighborhood", e.target.value)} />
             <Input label="العقد الزمني" placeholder="٧٠s, ٨٠s..." value={v.decade ?? ""} onChange={(e) => set("decade", e.target.value)} />
           </div>
+
 
           <Input label="معرّف فيديو يوتيوب (YouTube ID)" placeholder="dQw4w9WgXcQ" value={v.youtube_id ?? ""} onChange={(e) => set("youtube_id", e.target.value)} />
           <p className="text-[11px] text-muted-foreground -mt-3">انسخ فقط الجزء بعد ?v= من رابط الفيديو على يوتيوب</p>

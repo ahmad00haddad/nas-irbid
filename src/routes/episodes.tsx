@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { useState, useMemo } from "react";
+
 import { supabase } from "@/integrations/supabase/client";
 import { Play, MapPin } from "lucide-react";
 
@@ -17,8 +17,6 @@ export const Route = createFileRoute("/episodes")({
 });
 
 function EpisodesPage() {
-  const [filter, setFilter] = useState<string>("الكل");
-
   const { data: episodes = [], isLoading } = useQuery({
     queryKey: ["public-episodes"],
     queryFn: async () => {
@@ -30,18 +28,10 @@ function EpisodesPage() {
     },
   });
 
-  const neighborhoods = useMemo(() => {
-    const set = new Set<string>();
-    episodes.forEach((e: any) => e.neighborhood && set.add(e.neighborhood));
-    return ["الكل", ...Array.from(set)];
-  }, [episodes]);
-
-  const filtered = filter === "الكل" ? episodes : episodes.filter((e: any) => e.neighborhood === filter);
-
   return (
     <div className="container mx-auto px-6 py-20">
       <header className="max-w-3xl mb-14">
-        <span className="text-xs font-bold text-primary tracking-widest">الأرشيف</span>
+        <span className="text-xs font-bold accent-emerald tracking-widest divider-emerald">الأرشيف</span>
         <h1 className="font-display text-5xl md:text-6xl mt-3 mb-5 text-foreground">
           أرشيف <span className="text-gradient-gold">الحلقات</span>
         </h1>
@@ -51,34 +41,16 @@ function EpisodesPage() {
         </p>
       </header>
 
-      {neighborhoods.length > 1 && (
-        <div className="flex flex-wrap gap-2 mb-12">
-          {neighborhoods.map((f) => (
-            <button
-              key={f}
-              onClick={() => setFilter(f)}
-              className={
-                f === filter
-                  ? "px-4 py-2 rounded-full text-sm font-semibold bg-gradient-warm text-primary-foreground"
-                  : "px-4 py-2 rounded-full text-sm font-semibold border border-border text-muted-foreground hover:border-primary/40 hover:text-foreground transition"
-              }
-            >
-              {f}
-            </button>
-          ))}
-        </div>
-      )}
-
       {isLoading ? (
         <p className="text-center text-muted-foreground">جاري التحميل…</p>
-      ) : filtered.length === 0 ? (
+      ) : episodes.length === 0 ? (
         <div className="text-center p-16 rounded-2xl bg-card border border-dashed border-border max-w-xl mx-auto">
           <p className="font-display text-xl text-foreground mb-2">قريباً جداً</p>
           <p className="text-sm text-muted-foreground">حلقات الموسم الأول قيد التصوير. تابعنا لتكون أول من يشاهد.</p>
         </div>
       ) : (
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filtered.map((ep: any) => (
+          {episodes.map((ep: any) => (
             <Link
               key={ep.id}
               to="/episodes/$slug"
