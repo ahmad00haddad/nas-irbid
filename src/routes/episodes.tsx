@@ -31,7 +31,7 @@ function EpisodesPage() {
   return (
     <div className="container mx-auto px-6 py-20">
       <header className="max-w-3xl mb-14">
-        <span className="text-xs font-bold text-primary tracking-widest">الأرشيف</span>
+        <span className="text-xs font-bold accent-emerald tracking-widest divider-emerald">الأرشيف</span>
         <h1 className="font-display text-5xl md:text-6xl mt-3 mb-5 text-foreground">
           أرشيف <span className="text-gradient-gold">الحلقات</span>
         </h1>
