@@ -16,7 +16,7 @@ import { Route as AdminRouteImport } from './routes/admin'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
-import { Route as EpisodesSlugRouteImport } from './routes/episodes.$slug'
+import { Route as EpisodesSlugRouteImport } from './routes/episodes_.$slug'
 import { Route as AdminSuggestionsRouteImport } from './routes/admin.suggestions'
 import { Route as AdminQuestionsRouteImport } from './routes/admin.questions'
 import { Route as AdminMessagesRouteImport } from './routes/admin.messages'
@@ -58,9 +58,9 @@ const AdminIndexRoute = AdminIndexRouteImport.update({
   getParentRoute: () => AdminRoute,
 } as any)
 const EpisodesSlugRoute = EpisodesSlugRouteImport.update({
-  id: '/$slug',
-  path: '/$slug',
-  getParentRoute: () => EpisodesRoute,
+  id: '/episodes_/$slug',
+  path: '/episodes/$slug',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const AdminSuggestionsRoute = AdminSuggestionsRouteImport.update({
   id: '/suggestions',
@@ -88,7 +88,7 @@ export interface FileRoutesByFullPath {
   '/about': typeof AboutRoute
   '/admin': typeof AdminRouteWithChildren
   '/auth': typeof AuthRoute
-  '/episodes': typeof EpisodesRouteWithChildren
+  '/episodes': typeof EpisodesRoute
   '/suggest': typeof SuggestRoute
   '/admin/episodes': typeof AdminEpisodesRoute
   '/admin/messages': typeof AdminMessagesRoute
@@ -101,7 +101,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/auth': typeof AuthRoute
-  '/episodes': typeof EpisodesRouteWithChildren
+  '/episodes': typeof EpisodesRoute
   '/suggest': typeof SuggestRoute
   '/admin/episodes': typeof AdminEpisodesRoute
   '/admin/messages': typeof AdminMessagesRoute
@@ -116,13 +116,13 @@ export interface FileRoutesById {
   '/about': typeof AboutRoute
   '/admin': typeof AdminRouteWithChildren
   '/auth': typeof AuthRoute
-  '/episodes': typeof EpisodesRouteWithChildren
+  '/episodes': typeof EpisodesRoute
   '/suggest': typeof SuggestRoute
   '/admin/episodes': typeof AdminEpisodesRoute
   '/admin/messages': typeof AdminMessagesRoute
   '/admin/questions': typeof AdminQuestionsRoute
   '/admin/suggestions': typeof AdminSuggestionsRoute
-  '/episodes/$slug': typeof EpisodesSlugRoute
+  '/episodes_/$slug': typeof EpisodesSlugRoute
   '/admin/': typeof AdminIndexRoute
 }
 export interface FileRouteTypes {
@@ -165,7 +165,7 @@ export interface FileRouteTypes {
     | '/admin/messages'
     | '/admin/questions'
     | '/admin/suggestions'
-    | '/episodes/$slug'
+    | '/episodes_/$slug'
     | '/admin/'
   fileRoutesById: FileRoutesById
 }
@@ -174,8 +174,9 @@ export interface RootRouteChildren {
   AboutRoute: typeof AboutRoute
   AdminRoute: typeof AdminRouteWithChildren
   AuthRoute: typeof AuthRoute
-  EpisodesRoute: typeof EpisodesRouteWithChildren
+  EpisodesRoute: typeof EpisodesRoute
   SuggestRoute: typeof SuggestRoute
+  EpisodesSlugRoute: typeof EpisodesSlugRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -229,12 +230,12 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminIndexRouteImport
       parentRoute: typeof AdminRoute
     }
-    '/episodes/$slug': {
-      id: '/episodes/$slug'
-      path: '/$slug'
+    '/episodes_/$slug': {
+      id: '/episodes_/$slug'
+      path: '/episodes/$slug'
       fullPath: '/episodes/$slug'
       preLoaderRoute: typeof EpisodesSlugRouteImport
-      parentRoute: typeof EpisodesRoute
+      parentRoute: typeof rootRouteImport
     }
     '/admin/suggestions': {
       id: '/admin/suggestions'
@@ -285,25 +286,14 @@ const AdminRouteChildren: AdminRouteChildren = {
 
 const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
 
-interface EpisodesRouteChildren {
-  EpisodesSlugRoute: typeof EpisodesSlugRoute
-}
-
-const EpisodesRouteChildren: EpisodesRouteChildren = {
-  EpisodesSlugRoute: EpisodesSlugRoute,
-}
-
-const EpisodesRouteWithChildren = EpisodesRoute._addFileChildren(
-  EpisodesRouteChildren,
-)
-
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AboutRoute: AboutRoute,
   AdminRoute: AdminRouteWithChildren,
   AuthRoute: AuthRoute,
-  EpisodesRoute: EpisodesRouteWithChildren,
+  EpisodesRoute: EpisodesRoute,
   SuggestRoute: SuggestRoute,
+  EpisodesSlugRoute: EpisodesSlugRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
