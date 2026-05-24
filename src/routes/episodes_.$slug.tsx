@@ -5,7 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { ArrowRight, MapPin, Calendar, User, HelpCircle, Send } from "lucide-react";
 
-export const Route = createFileRoute("/episodes/$slug")({
+export const Route = createFileRoute("/episodes_/$slug")({
   component: EpisodeDetail,
   head: ({ loaderData }) => {
     const ep = loaderData as any;
