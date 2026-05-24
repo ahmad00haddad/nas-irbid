@@ -131,7 +131,7 @@ function AdminEpisodes() {
                   )}
                 </div>
                 <div className="font-display text-base text-foreground truncate">{ep.title}</div>
-                <div className="text-xs text-muted-foreground truncate">{ep.character_name} · {ep.neighborhood}</div>
+                <div className="text-xs text-muted-foreground truncate">{ep.character_name}</div>
               </div>
               <div className="flex items-center gap-1">
                 <button onClick={() => togglePublish.mutate(ep)} className="p-2 rounded-lg hover:bg-background/60 text-muted-foreground" title={ep.published ? "إلغاء النشر" : "نشر"}>
