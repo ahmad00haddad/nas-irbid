@@ -50,10 +50,10 @@ function Index() {
               <span className="w-2 h-2 rounded-full bg-primary animate-pulse" />
               <span className="text-xs font-semibold text-primary tracking-wider">برنامج وثائقي · موسم ٢٠٢٦</span>
             </div>
-            <h1 className="font-display text-5xl md:text-7xl lg:text-8xl leading-[1.05] mb-6 text-foreground">
-              حكاياتُ مدينة
+            <h1 className="font-display text-5xl md:text-7xl lg:text-8xl leading-[1.15] mb-6 text-foreground" style={{ letterSpacing: "0", wordSpacing: "-0.05em" }}>
+              حكايات مدينة
               <br />
-              <span className="text-primary">برواية أهلها.</span>
+              <span className="text-primary">برواية أهلها</span>
             </h1>
             <p className="text-lg md:text-xl text-muted-foreground leading-relaxed max-w-2xl mx-auto mb-10">
               «ناس إربد» برنامج وثائقي إنساني يجمع قصص الناس وذاكرتهم الشفوية،
