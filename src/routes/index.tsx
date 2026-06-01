@@ -2,7 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import introLogo from "@/assets/intro-logo.gif";
-import { ArrowLeft, Users, HelpCircle, Share2, Play, MapPin } from "lucide-react";
+import { ArrowLeft, Users, HelpCircle, Share2, Play } from "lucide-react";
 
 export const Route = createFileRoute("/")({
   component: Index,
@@ -20,8 +20,9 @@ function Index() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("episodes").select("*").eq("published", true)
-        .order("episode_number", { ascending: false, nullsFirst: false })
-        .limit(6);
+        .order("published_at", { ascending: false, nullsFirst: false })
+        .order("created_at", { ascending: false })
+        .limit(4);
       if (error) throw error;
       return data;
     },
@@ -91,7 +92,7 @@ function Index() {
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
           {[
             { icon: Users, title: "رشّح شخصية", text: "تعرف حدا يستاهل حلقة؟ صاحب مهنة قديمة، حكواتي، أو ست بيتٍ بحكاية؟", link: "/suggest", cta: "ابعت ترشيحك" },
-            { icon: HelpCircle, title: "اسأل الضيف", text: "قبل كل تصوير، نفتح بابك لتسأل أنت ما تريد معرفته من ضيف الحلقة.", link: "/suggest", cta: "أرسل سؤالك" },
+            { icon: HelpCircle, title: "اسأل الضيف", text: "اختر شخصية من حلقاتنا واسألها سؤالك — ممكن نطرحه عليها في حلقة قادمة.", link: "/ask", cta: "أرسل سؤالك" },
             { icon: Share2, title: "انشر الحلقة", text: "كل مشاركة بتوصل البرنامج لعائلة جديدة، وحكاية إربد لجمهور أوسع.", link: "/episodes", cta: "شاهد الحلقات" },
           ].map(({ icon: Icon, title, text, link, cta }) => (
             <Link
@@ -126,39 +127,42 @@ function Index() {
               كل الحلقات <ArrowLeft size={16} />
             </Link>
           </div>
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {episodes.map((ep: any) => (
-              <Link
-                key={ep.id}
-                to="/episodes/$slug"
-                params={{ slug: ep.slug }}
-                className="group bg-card border border-border/60 overflow-hidden hover:border-primary/60 transition hover:-translate-y-1 arch-frame shadow-deep"
-              >
-                <div className="aspect-[3/4] bg-secondary relative overflow-hidden arch-top">
-                  {ep.youtube_id && (
-                    <img
-                      src={`https://img.youtube.com/vi/${ep.youtube_id}/hqdefault.jpg`}
-                      alt={ep.title}
-                      className="w-full h-full object-cover group-hover:scale-105 transition duration-700"
-                    />
-                  )}
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <div className="w-14 h-14 rounded-full bg-primary flex items-center justify-center shadow-glow group-hover:scale-110 transition">
-                      <Play size={20} className="text-primary-foreground translate-x-[-2px]" fill="currentColor" />
+          <div className="max-w-6xl mx-auto px-2 md:px-8">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-5">
+              {episodes.map((ep: any) => (
+                <Link
+                  key={ep.id}
+                  to="/episodes/$slug"
+                  params={{ slug: ep.slug }}
+                  className="group bg-card border border-border/60 overflow-hidden hover:border-primary/60 transition hover:-translate-y-1 arch-frame shadow-deep"
+                >
+                  <div className="aspect-[3/4] bg-secondary relative overflow-hidden arch-top">
+                    {ep.youtube_id && (
+                      <img
+                        src={`https://img.youtube.com/vi/${ep.youtube_id}/hqdefault.jpg`}
+                        alt={ep.title}
+                        className="w-full h-full object-cover group-hover:scale-105 transition duration-700"
+                      />
+                    )}
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <div className="w-11 h-11 rounded-full bg-primary flex items-center justify-center shadow-glow group-hover:scale-110 transition">
+                        <Play size={16} className="text-primary-foreground translate-x-[-1px]" fill="currentColor" />
+                      </div>
                     </div>
                   </div>
-                </div>
-                <div className="p-5">
-                  {ep.episode_number && <span className="text-[10px] font-bold text-primary tracking-widest">حلقة {ep.episode_number}</span>}
-                  <h3 className="font-display text-lg text-foreground mt-1 mb-2 line-clamp-2">{ep.title}</h3>
-                  {ep.short_description && <p className="text-sm text-muted-foreground line-clamp-2 leading-relaxed mb-3">{ep.short_description}</p>}
-                  <div className="flex items-center gap-3 text-xs text-muted-foreground">
-                    {ep.character_name && <span>{ep.character_name}</span>}
-                    {ep.neighborhood && <span className="inline-flex items-center gap-1"><MapPin size={11} /> {ep.neighborhood}</span>}
+                  <div className="p-3 md:p-4">
+                    {ep.episode_number && <span className="text-[10px] font-bold accent-emerald tracking-widest">حلقة {ep.episode_number}</span>}
+                    <h3 className="font-display text-sm md:text-base text-foreground mt-1 mb-1 line-clamp-2">{ep.title}</h3>
+                    {ep.character_name && <div className="text-[11px] text-muted-foreground line-clamp-1">{ep.character_name}</div>}
                   </div>
-                </div>
+                </Link>
+              ))}
+            </div>
+            <div className="mt-10 flex justify-center">
+              <Link to="/episodes" className="inline-flex items-center gap-2 px-7 py-3 rounded-full border-2 border-primary/40 text-foreground font-bold hover:bg-primary/10 transition">
+                كل الحلقات <ArrowLeft size={16} />
               </Link>
-            ))}
+            </div>
           </div>
         </section>
       )}
