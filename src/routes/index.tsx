@@ -20,8 +20,9 @@ function Index() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("episodes").select("*").eq("published", true)
-        .order("episode_number", { ascending: false, nullsFirst: false })
-        .limit(6);
+        .order("published_at", { ascending: false, nullsFirst: false })
+        .order("created_at", { ascending: false })
+        .limit(4);
       if (error) throw error;
       return data;
     },
