@@ -92,7 +92,7 @@ function Index() {
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
           {[
             { icon: Users, title: "رشّح شخصية", text: "تعرف حدا يستاهل حلقة؟ صاحب مهنة قديمة، حكواتي، أو ست بيتٍ بحكاية؟", link: "/suggest", cta: "ابعت ترشيحك" },
-            { icon: HelpCircle, title: "اسأل الضيف", text: "قبل كل تصوير، نفتح بابك لتسأل أنت ما تريد معرفته من ضيف الحلقة.", link: "/suggest", cta: "أرسل سؤالك" },
+            { icon: HelpCircle, title: "اسأل الضيف", text: "اختر شخصية من حلقاتنا واسألها سؤالك — ممكن نطرحه عليها في حلقة قادمة.", link: "/ask", cta: "أرسل سؤالك" },
             { icon: Share2, title: "انشر الحلقة", text: "كل مشاركة بتوصل البرنامج لعائلة جديدة، وحكاية إربد لجمهور أوسع.", link: "/episodes", cta: "شاهد الحلقات" },
           ].map(({ icon: Icon, title, text, link, cta }) => (
             <Link
