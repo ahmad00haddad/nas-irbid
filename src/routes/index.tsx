@@ -1,10 +1,8 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import introLogoAsset from "@/assets/intro-logo.gif.asset.json";
+import introLogo from "@/assets/intro-logo.gif";
 import { ArrowLeft, Users, HelpCircle, Share2, Play } from "lucide-react";
-
-const introLogo = introLogoAsset.url;
 
 export const Route = createFileRoute("/")({
   component: Index,
