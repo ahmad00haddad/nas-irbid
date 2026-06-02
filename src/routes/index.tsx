@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import introLogo from "@/assets/intro-logo.gif";
+import introLogo from "@/assets/intro-logo.gif.asset.json";
 import { ArrowLeft, Users, HelpCircle, Share2, Play } from "lucide-react";
 
 export const Route = createFileRoute("/")({
