@@ -36,6 +36,7 @@ function Index() {
           <img
             src={introLogo}
             alt="ناس إربد"
+            style={{ mixBlendMode: "screen" }}
             className="w-full max-w-3xl h-auto object-contain"
           />
         </div>
