@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import introLogo from "@/assets/intro-logo.gif";
+import introLogo from "@/assets/intro-logo.gif.asset.json";
 import { ArrowLeft, Users, HelpCircle, Share2, Play } from "lucide-react";
 
 export const Route = createFileRoute("/")({
@@ -34,7 +34,7 @@ function Index() {
       <section className="relative w-full overflow-hidden">
         <div className="container mx-auto px-6 py-10 md:py-14 flex items-center justify-center">
           <img
-            src={introLogo}
+            src={introLogo.url}
             alt="ناس إربد"
             style={{ mixBlendMode: "screen" }}
             className="w-full max-w-3xl h-auto object-contain"
