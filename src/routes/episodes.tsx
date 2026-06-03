@@ -22,7 +22,8 @@ function EpisodesPage() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("episodes").select("*").eq("published", true)
-        .order("episode_number", { ascending: false, nullsFirst: false });
+        .order("published_at", { ascending: false, nullsFirst: false })
+        .order("created_at", { ascending: false });
       if (error) throw error;
       return data;
     },
@@ -70,7 +71,7 @@ function EpisodesPage() {
                 </div>
               </div>
               <div className="p-5">
-                {ep.episode_number && <span className="text-[10px] font-bold text-primary tracking-widest">حلقة {ep.episode_number}</span>}
+                {ep.episode_number && <span className="text-[10px] font-bold accent-emerald tracking-widest">حلقة {ep.episode_number}</span>}
                 <h3 className="font-display text-lg text-foreground mt-1 mb-2 line-clamp-2">{ep.title}</h3>
                 {ep.short_description && <p className="text-sm text-muted-foreground line-clamp-2 leading-relaxed mb-3">{ep.short_description}</p>}
                 <div className="flex items-center gap-3 text-xs text-muted-foreground">

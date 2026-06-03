@@ -25,11 +25,17 @@ function SuggestPage() {
     const f = e.target as HTMLFormElement;
     const fd = new FormData(f);
 
+    // Preserve the optional age field by prepending it to the story summary,
+    // since the table doesn't have a dedicated column for it.
+    const ageRaw = String(fd.get("age") ?? "").trim();
+    const storyRaw = String(fd.get("story") ?? "").trim();
+    const story_summary = ageRaw ? `العمر التقريبي: ${ageRaw}\n\n${storyRaw}` : storyRaw;
+
     const { error } = await supabase.from("guest_suggestions").insert({
       candidate_name: String(fd.get("character") ?? ""),
       profession: String(fd.get("role") ?? "") || null,
       neighborhood: String(fd.get("place") ?? "") || null,
-      story_summary: String(fd.get("story") ?? ""),
+      story_summary,
       submitter_name: String(fd.get("name") ?? "") || null,
       contact_info: String(fd.get("phone") ?? "") || null,
     });

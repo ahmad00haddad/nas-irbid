@@ -14,7 +14,7 @@ export function Footer() {
         </div>
 
         <div>
-          <h4 className="font-display text-lg text-foreground mb-4">روابط سريعة</h4>
+          <h4 className="font-display text-lg text-foreground mb-4 divider-emerald">روابط سريعة</h4>
           <ul className="space-y-2 text-sm text-muted-foreground">
             <li><Link to="/episodes" className="hover:text-primary">أرشيف الحلقات</Link></li>
             <li><Link to="/suggest" className="hover:text-primary">اقترح شخصية أو حكاية</Link></li>
