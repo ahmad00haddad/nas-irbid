@@ -100,30 +100,36 @@ function AboutPage() {
             { icon: Camera, name: "بثمن شريط ذكريات", amount: "١٥ JOD", note: "تكفي لتغطية تنقّلات يوم تصوير في حيٍّ قديم.", featured: true },
             { icon: Mic2, name: "حكاية كاملة", amount: "٥٠ JOD", note: "تساهم في تفريغ وتوثيق مقابلة كاملة مع شخصية." },
             { icon: Sparkles, name: "حدّد المبلغ", amount: "أنت تختار", note: "أي مبلغ، بأيّ تكرار — مرّة واحدة أو متى ما أردت.", custom: true },
-          ].map((t) => (
-            <div
-              key={t.name}
-              className={`relative p-7 rounded-2xl bg-card border transition hover:-translate-y-1 ${
-                t.featured ? "border-primary/60 shadow-glow" : "border-border/60"
-              }`}
-            >
-              <div className="w-12 h-12 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center mb-5">
-                <t.icon size={22} className="text-primary" />
-              </div>
-              <div className="font-display text-xl text-foreground">{t.name}</div>
-              <div className="font-display text-3xl text-gradient-gold mt-1 mb-4">{t.amount}</div>
-              <p className="text-sm text-muted-foreground leading-relaxed mb-6 min-h-[3rem]">{t.note}</p>
-              <button
-                className={`w-full py-2.5 rounded-full text-sm font-bold transition ${
-                  t.featured
-                    ? "bg-gradient-warm text-primary-foreground shadow-glow hover:opacity-90"
-                    : "border border-border text-foreground hover:border-primary"
+          ].map((t) => {
+            const mailto = `mailto:ahmad000haddad@gmail.com?subject=${encodeURIComponent(
+              t.custom ? "أرغب بالمساهمة في ناس إربد" : `مساهمة ${t.amount} · ناس إربد`,
+            )}`;
+            return (
+              <div
+                key={t.name}
+                className={`relative p-7 rounded-2xl bg-card border transition hover:-translate-y-1 ${
+                  t.featured ? "border-primary/60 shadow-glow" : "border-border/60"
                 }`}
               >
-                {t.custom ? "ساهم بمبلغ مفتوح" : `ساهم بـ ${t.amount}`}
-              </button>
-            </div>
-          ))}
+                <div className="w-12 h-12 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center mb-5">
+                  <t.icon size={22} className="text-primary" />
+                </div>
+                <div className="font-display text-xl text-foreground">{t.name}</div>
+                <div className="font-display text-3xl text-gradient-gold mt-1 mb-4">{t.amount}</div>
+                <p className="text-sm text-muted-foreground leading-relaxed mb-6 min-h-[3rem]">{t.note}</p>
+                <a
+                  href={mailto}
+                  className={`block text-center w-full py-2.5 rounded-full text-sm font-bold transition ${
+                    t.featured
+                      ? "bg-gradient-warm text-primary-foreground shadow-glow hover:opacity-90"
+                      : "border border-border text-foreground hover:border-primary"
+                  }`}
+                >
+                  {t.custom ? "ساهم بمبلغ مفتوح" : `ساهم بـ ${t.amount}`}
+                </a>
+              </div>
+            );
+          })}
         </div>
 
         <p className="text-center text-xs text-muted-foreground mt-8 max-w-2xl mx-auto">
