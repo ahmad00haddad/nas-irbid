@@ -9,15 +9,18 @@ export const Route = createFileRoute("/episodes_/$slug")({
   component: EpisodeDetail,
   head: ({ loaderData }) => {
     const ep = loaderData as any;
-    return {
-      meta: ep ? [
-        { title: `${ep.title} · ناس إربد` },
-        { name: "description", content: ep.short_description ?? ep.title },
-        { property: "og:title", content: ep.title },
-        { property: "og:description", content: ep.short_description ?? "" },
-        { property: "og:image", content: ep.cover_image_url ?? (ep.youtube_id ? `https://img.youtube.com/vi/${ep.youtube_id}/maxresdefault.jpg` : "") },
-      ] : [{ title: "حلقة · ناس إربد" }],
-    };
+    if (!ep) return { meta: [{ title: "حلقة · ناس إربد" }] };
+    const ogImage =
+      ep.cover_image_url ??
+      (ep.youtube_id ? `https://img.youtube.com/vi/${ep.youtube_id}/maxresdefault.jpg` : null);
+    const meta: Array<{ title?: string; name?: string; property?: string; content?: string }> = [
+      { title: `${ep.title} · ناس إربد` },
+      { name: "description", content: ep.short_description ?? ep.title },
+      { property: "og:title", content: ep.title },
+      { property: "og:description", content: ep.short_description ?? "" },
+    ];
+    if (ogImage) meta.push({ property: "og:image", content: ogImage });
+    return { meta };
   },
   loader: async ({ params }) => {
     const { data, error } = await supabase
