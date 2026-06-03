@@ -41,11 +41,13 @@ function AboutPage() {
       <section id="support" className="relative scroll-mt-24 border-y border-border/60 bg-card/30 py-20">
         <div className="container mx-auto px-6">
           <div className="max-w-3xl mx-auto text-center">
-            <div className="inline-flex w-16 h-16 rounded-2xl bg-gradient-warm items-center justify-center shadow-glow mb-6">
+            <div className="mx-auto inline-flex w-16 h-16 rounded-2xl bg-gradient-warm items-center justify-center shadow-glow mb-8">
               <Heart size={28} className="text-primary-foreground" fill="currentColor" />
             </div>
-            <span className="text-xs font-bold text-primary tracking-widest">مسؤوليّتنا الجماعية</span>
-            <h2 className="font-display text-4xl md:text-6xl mt-3 mb-6 text-foreground">
+            <div className="block">
+              <span className="inline-block text-xs font-bold text-primary tracking-widest">مسؤوليّتنا الجماعية</span>
+            </div>
+            <h2 className="font-display text-4xl md:text-6xl mt-4 mb-6 text-foreground">
               ذاكرة إربد <span className="text-gradient-gold">أمانة بإيدينا</span>
             </h2>
           </div>
