@@ -7,6 +7,7 @@ const navItems = [
   { to: "/", label: "الرئيسية" },
   { to: "/episodes", label: "الحلقات" },
   { to: "/suggest", label: "اقترح حكاية" },
+  { to: "/ask", label: "اسأل الضيف" },
   { to: "/about", label: "عن البرنامج" },
 ] as const;
 
