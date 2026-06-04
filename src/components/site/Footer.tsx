@@ -1,7 +1,12 @@
 import { Link } from "@tanstack/react-router";
 import { Instagram, Youtube, Mail } from "lucide-react";
+import { useSiteSettings, DEFAULT_SETTINGS } from "@/lib/site-settings";
 
 export function Footer() {
+  const { data: s } = useSiteSettings();
+  const settings = s ?? DEFAULT_SETTINGS;
+  const igUrl = `https://instagram.com/${settings.instagram_handle.replace(/^@/, "")}`;
+
   return (
     <footer className="border-t border-border/60 bg-card/30 mt-24">
       <div className="container mx-auto px-6 py-14 grid md:grid-cols-3 gap-10">
@@ -26,15 +31,15 @@ export function Footer() {
         <div>
           <h4 className="font-display text-lg text-foreground mb-4">تابعنا</h4>
           <div className="flex gap-3">
-            <a href="https://instagram.com/ahmad00haddad" target="_blank" rel="noreferrer" aria-label="انستغرام"
+            <a href={igUrl} target="_blank" rel="noreferrer" aria-label="انستغرام"
                className="w-10 h-10 rounded-full border border-border flex items-center justify-center text-muted-foreground hover:border-primary hover:text-primary transition">
               <Instagram size={18} />
             </a>
-            <a href="https://www.youtube.com/watch?v=jBTSEPj5GyI&list=PL2kh_LOeNn-cakuboTWXV3kxhrqTsYRLS" target="_blank" rel="noreferrer" aria-label="يوتيوب"
+            <a href={settings.youtube_url} target="_blank" rel="noreferrer" aria-label="يوتيوب"
                className="w-10 h-10 rounded-full border border-border flex items-center justify-center text-muted-foreground hover:border-primary hover:text-primary transition">
               <Youtube size={18} />
             </a>
-            <a href="mailto:ahmad000haddad@gmail.com" aria-label="بريد"
+            <a href={`mailto:${settings.contact_email}`} aria-label="بريد"
                className="w-10 h-10 rounded-full border border-border flex items-center justify-center text-muted-foreground hover:border-primary hover:text-primary transition">
               <Mail size={18} />
             </a>
