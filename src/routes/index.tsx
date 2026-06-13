@@ -5,6 +5,7 @@ import introLogo from "@/assets/intro-logo.gif.asset.json";
 import { ArrowLeft, Users, HelpCircle, Share2, Play, MapPin } from "lucide-react";
 import { PublicEpisodeCard, type PublicEpisode } from "@/components/site/PublicEpisodeCard";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useSiteSettings } from "@/lib/site-settings";
 
 export const Route = createFileRoute("/")({
   component: Index,
@@ -19,13 +20,14 @@ export const Route = createFileRoute("/")({
 });
 
 function Index() {
+  const { data: settings } = useSiteSettings();
   const { data: episodes = [], isLoading } = useQuery({
     queryKey: ["home-episodes"],
     queryFn: async () => {
       const { data, error } = await supabase
         .from("episodes").select("*").eq("published", true)
         .order("published_at", { ascending: false, nullsFirst: false })
-        .order("created_at", { ascending: false })
+        .order("episode_number", { ascending: false, nullsFirst: false })
         .limit(4);
       if (error) throw error;
       return data;
@@ -55,13 +57,10 @@ function Index() {
               <span className="text-xs font-semibold text-primary tracking-wider">برنامج وثائقي · موسم ٢٠٢٦</span>
             </div>
             <h1 className="font-display text-5xl md:text-7xl lg:text-8xl leading-[1.15] mb-6 text-foreground" style={{ letterSpacing: "0", wordSpacing: "-0.05em" }}>
-              حكايات مدينة
-              <br />
-              <span className="text-primary">برواية أهلها</span>
+              {settings?.hero_title ?? "نوثّقُ إربد بصوت أهلها"}
             </h1>
             <p className="text-lg md:text-xl text-muted-foreground leading-relaxed max-w-2xl mx-auto mb-10">
-              «ناس إربد» برنامج وثائقي إنساني يجمع قصص الناس وذاكرتهم الشفوية،
-              ويوثّق المهن القديمة والحكايات الشعبية قبل أن يطويها النسيان.
+              {settings?.hero_subtitle ?? "برنامج وثائقي مستقل يحفظ ذاكرة المدينة وحكايات ناسها"}
             </p>
             <div className="flex flex-wrap gap-4 justify-center">
               <Link
@@ -140,7 +139,7 @@ function Index() {
           <div className="max-w-6xl mx-auto">
             <Link to="/episodes/$slug" params={{ slug: episodes[0].slug }} className="group mb-7 grid overflow-hidden rounded-3xl border border-primary/30 bg-card shadow-deep transition hover:border-primary/70 md:grid-cols-[1.35fr_1fr]">
               <div className="relative min-h-72 overflow-hidden bg-secondary md:min-h-[25rem]">
-                <img src={episodes[0].cover_image_url ?? `https://img.youtube.com/vi/${episodes[0].youtube_id}/maxresdefault.jpg`} alt={`صورة الحلقة المميزة ${episodes[0].title}`} className="h-full w-full object-cover transition duration-700 group-hover:scale-105" />
+                <img src={episodes[0].cover_image_url ?? `https://img.youtube.com/vi/${episodes[0].youtube_id}/hqdefault.jpg`} alt={`صورة الحلقة المميزة ${episodes[0].title}`} className="h-full w-full object-cover transition duration-700 group-hover:scale-105" />
                 <div className="absolute inset-0 bg-gradient-to-t from-foreground/60 via-transparent to-transparent" />
                 <div className="absolute bottom-6 right-6 flex h-14 w-14 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-glow"><Play size={20} fill="currentColor" /></div>
               </div>

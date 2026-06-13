@@ -5,7 +5,7 @@ import { LayoutDashboard, Film, Users, MessageSquare, HelpCircle, LogOut, Settin
 
 export const Route = createFileRoute("/admin")({
   component: AdminLayout,
-  head: () => ({ meta: [{ title: "لوحة الإدارة · ناس إربد" }] }),
+  head: () => ({ meta: [{ title: "لوحة الإدارة · ناس إربد" }, { name: "robots", content: "noindex, nofollow" }] }),
 });
 
 const adminNav: { to: string; label: string; icon: typeof LayoutDashboard; exact?: boolean }[] = [
