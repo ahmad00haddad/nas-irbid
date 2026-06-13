@@ -13,7 +13,9 @@ export const Route = createFileRoute("/ask")({
       { name: "description", content: "اختر شخصية من ضيوف ناس إربد واسألها سؤالك الخاص." },
       { property: "og:title", content: "اسأل الضيف · ناس إربد" },
       { property: "og:description", content: "أرسل سؤالك لأحد ضيوف البرنامج لنطرحه في حلقة لاحقة." },
+      { property: "og:url", content: "https://nas-irbid.lovable.app/ask" },
     ],
+    links: [{ rel: "canonical", href: "https://nas-irbid.lovable.app/ask" }],
   }),
 });
 
@@ -21,7 +23,7 @@ function AskPage() {
   const [submitting, setSubmitting] = useState(false);
   const [episodeId, setEpisodeId] = useState<string>("");
 
-  const { data: episodes = [] } = useQuery({
+  const { data: episodes = [], isLoading, isError, refetch } = useQuery({
     queryKey: ["ask-episodes"],
     queryFn: async () => {
       const { data, error } = await supabase
@@ -43,7 +45,7 @@ function AskPage() {
 
     const { error } = await supabase.from("questions").insert({
       episode_id: episodeId || null,
-      target_character: selected?.character_name ?? String(fd.get("custom_target") ?? "") ?? null,
+      target_character: selected?.character_name ?? (String(fd.get("custom_target") ?? "") || null),
       question_text: String(fd.get("question") ?? ""),
       submitter_name: String(fd.get("name") ?? "") || null,
       submitter_email: String(fd.get("email") ?? "") || null,
@@ -93,7 +95,9 @@ function AskPage() {
                 </option>
               ))}
             </select>
-            {episodes.length === 0 && (
+            {isLoading && <span className="block text-xs text-muted-foreground mt-2">جاري تحميل الضيوف…</span>}
+            {isError && <button type="button" onClick={() => refetch()} className="mt-2 text-xs font-bold text-primary hover:underline">تعذّر التحميل — حاول مجدداً</button>}
+            {!isLoading && !isError && episodes.length === 0 && (
               <span className="block text-xs text-muted-foreground mt-2">
                 لا توجد حلقات منشورة بعد. تابعنا قريباً.
               </span>

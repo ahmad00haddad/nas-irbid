@@ -1,9 +1,10 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/lib/auth";
 import { useState } from "react";
 import { toast } from "sonner";
-import { Plus, Trash2, Pencil, X, Eye, EyeOff } from "lucide-react";
+import { Plus, Trash2, Pencil, X, Eye, EyeOff, AlertTriangle } from "lucide-react";
 
 export const Route = createFileRoute("/admin/episodes")({
   component: AdminEpisodes,
@@ -33,9 +34,47 @@ const empty: Partial<Episode> = {
   behind_the_scenes: "", episode_number: null, season: 1, published: false,
 };
 
+/** Sanitize a slug: lowercase, strip non-alphanumeric (except hyphens), collapse hyphens */
+function sanitizeSlug(raw: string): string {
+  return raw
+    .toLowerCase()
+    .replace(/[\s_]+/g, "-")
+    .replace(/[^a-z0-9\u0600-\u06ff-]/g, "")
+    .replace(/-{2,}/g, "-")
+    .replace(/^-|-$/g, "");
+}
+
+/** Confirm dialog component for destructive actions */
+function ConfirmDialog({
+  title, description, onConfirm, onCancel,
+}: { title: string; description: string; onConfirm: () => void; onCancel: () => void }) {
+  return (
+    <div className="fixed inset-0 z-[60] bg-background/80 backdrop-blur-sm flex items-center justify-center p-4">
+      <div className="bg-card border border-destructive/40 rounded-2xl w-full max-w-sm shadow-deep p-6">
+        <div className="flex items-center gap-3 mb-3">
+          <AlertTriangle size={20} className="text-destructive shrink-0" />
+          <h3 className="font-display text-lg text-foreground">{title}</h3>
+        </div>
+        <p className="text-sm text-muted-foreground mb-6">{description}</p>
+        <div className="flex justify-end gap-2">
+          <button onClick={onCancel} className="px-4 py-2 rounded-full border border-border text-sm">إلغاء</button>
+          <button
+            onClick={onConfirm}
+            className="px-4 py-2 rounded-full bg-destructive text-destructive-foreground text-sm font-bold"
+          >
+            تأكيد الحذف
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function AdminEpisodes() {
   const qc = useQueryClient();
+  const { isAdmin } = useAuth();
   const [editing, setEditing] = useState<Partial<Episode> | null>(null);
+  const [confirmDelete, setConfirmDelete] = useState<Episode | null>(null);
 
   const { data: episodes = [], isLoading } = useQuery({
     queryKey: ["admin-episodes"],
@@ -75,6 +114,7 @@ function AdminEpisodes() {
     },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["admin-episodes"] });
+      setConfirmDelete(null);
       toast.success("تم الحذف");
     },
   });
@@ -134,15 +174,29 @@ function AdminEpisodes() {
                 <div className="text-xs text-muted-foreground truncate">{ep.character_name}</div>
               </div>
               <div className="flex items-center gap-1">
-                <button onClick={() => togglePublish.mutate(ep)} className="p-2 rounded-lg hover:bg-background/60 text-muted-foreground" title={ep.published ? "إلغاء النشر" : "نشر"}>
-                  {ep.published ? <EyeOff size={16} /> : <Eye size={16} />}
-                </button>
+                {/* Publish toggle — admin only */}
+                {isAdmin && (
+                  <button
+                    onClick={() => togglePublish.mutate(ep)}
+                    className="p-2 rounded-lg hover:bg-background/60 text-muted-foreground"
+                    title={ep.published ? "إلغاء النشر" : "نشر"}
+                  >
+                    {ep.published ? <EyeOff size={16} /> : <Eye size={16} />}
+                  </button>
+                )}
                 <button onClick={() => setEditing(ep)} className="p-2 rounded-lg hover:bg-background/60 text-muted-foreground" title="تعديل">
                   <Pencil size={16} />
                 </button>
-                <button onClick={() => confirm("حذف نهائي؟") && remove.mutate(ep.id)} className="p-2 rounded-lg hover:bg-destructive/10 text-destructive" title="حذف">
-                  <Trash2 size={16} />
-                </button>
+                {/* Delete — admin only */}
+                {isAdmin && (
+                  <button
+                    onClick={() => setConfirmDelete(ep)}
+                    className="p-2 rounded-lg hover:bg-destructive/10 text-destructive"
+                    title="حذف"
+                  >
+                    <Trash2 size={16} />
+                  </button>
+                )}
               </div>
             </div>
           ))}
@@ -155,6 +209,15 @@ function AdminEpisodes() {
           onClose={() => setEditing(null)}
           onSave={(v) => save.mutate(v)}
           saving={save.isPending}
+        />
+      )}
+
+      {confirmDelete && (
+        <ConfirmDialog
+          title="حذف الحلقة نهائياً"
+          description={`هل أنت متأكد من حذف حلقة "${confirmDelete.title}"؟ هذا الإجراء لا يمكن التراجع عنه.`}
+          onConfirm={() => remove.mutate(confirmDelete.id)}
+          onCancel={() => setConfirmDelete(null)}
         />
       )}
     </div>
@@ -184,7 +247,18 @@ function EpisodeEditor({
             <Input label="الموسم" type="number" value={v.season ?? 1} onChange={(e) => set("season", Number(e.target.value))} />
           </div>
           <Input label="العنوان *" value={v.title ?? ""} onChange={(e) => set("title", e.target.value)} required />
-          <Input label="المعرّف (slug) — بالإنجليزي *" value={v.slug ?? ""} onChange={(e) => set("slug", e.target.value)} required placeholder="darkal-family" />
+          <div>
+            <Input
+              label="المعرّف (slug) — بالإنجليزي *"
+              value={v.slug ?? ""}
+              onChange={(e) => set("slug", sanitizeSlug(e.target.value))}
+              required
+              placeholder="darkal-family"
+            />
+            <p className="text-[11px] text-muted-foreground mt-1">
+              يُسمح فقط بالأحرف الإنجليزية الصغيرة والأرقام والشرطة (-). يُحوَّل تلقائياً.
+            </p>
+          </div>
 
           <div className="grid sm:grid-cols-2 gap-4">
             <Input label="اسم الشخصية" value={v.character_name ?? ""} onChange={(e) => set("character_name", e.target.value)} />
@@ -193,7 +267,6 @@ function EpisodeEditor({
           <div className="grid sm:grid-cols-2 gap-4">
             <Input label="العقد الزمني" placeholder="٧٠s, ٨٠s..." value={v.decade ?? ""} onChange={(e) => set("decade", e.target.value)} />
           </div>
-
 
           <Input label="معرّف فيديو يوتيوب (YouTube ID)" placeholder="dQw4w9WgXcQ" value={v.youtube_id ?? ""} onChange={(e) => set("youtube_id", e.target.value)} />
           <p className="text-[11px] text-muted-foreground -mt-3">انسخ فقط الجزء بعد ?v= من رابط الفيديو على يوتيوب</p>
@@ -214,7 +287,9 @@ function EpisodeEditor({
           <button onClick={onClose} className="px-5 py-2.5 rounded-full border border-border text-sm">إلغاء</button>
           <button
             onClick={() => {
-              if (!v.title || !v.slug) { toast.error("العنوان والمعرّف مطلوبان"); return; }
+              if (!v.title?.trim()) { toast.error("العنوان مطلوب"); return; }
+              if (!v.slug?.trim()) { toast.error("المعرّف (slug) مطلوب"); return; }
+              if (!/^[a-z0-9\u0600-\u06ff-]+$/.test(v.slug)) { toast.error("المعرّف يحتوي على أحرف غير مسموح بها"); return; }
               onSave(v);
             }}
             disabled={saving}

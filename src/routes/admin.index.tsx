@@ -11,7 +11,7 @@ export const Route = createFileRoute("/admin/")({
 });
 
 function AdminHome() {
-  const { data } = useQuery({
+  const { data, isLoading, isError, refetch } = useQuery({
     queryKey: ["admin-dashboard"],
     queryFn: async () => {
       const [
@@ -52,6 +52,10 @@ function AdminHome() {
     { label: "أسئلة في البنك", value: data?.qsAll ?? "—", sub: "للاستخدام بالحلقات", icon: HelpCircle, href: "/admin/questions" },
   ];
 
+  if (isError) {
+    return <div className="rounded-2xl border border-destructive/30 bg-card p-10 text-center"><h1 className="font-display text-2xl text-foreground">تعذّر تحميل لوحة الإدارة</h1><p className="mt-2 text-sm text-muted-foreground">لم نتمكن من قراءة أحدث البيانات.</p><button onClick={() => refetch()} className="mt-5 rounded-full bg-primary px-5 py-2.5 text-sm font-bold text-primary-foreground">إعادة المحاولة</button></div>;
+  }
+
   return (
     <div>
       <div className="flex items-start justify-between mb-8 flex-wrap gap-4">
@@ -79,7 +83,7 @@ function AdminHome() {
               <c.icon size={20} className={c.urgent ? "text-primary" : "text-muted-foreground"} />
               {c.urgent && <span className="text-[10px] font-bold text-primary tracking-widest">جديد</span>}
             </div>
-            <div className="font-display text-3xl text-foreground">{c.value}</div>
+            <div className="font-display text-3xl text-foreground">{isLoading ? "…" : c.value}</div>
             <div className="text-xs text-muted-foreground mt-1">{c.label}</div>
             <div className="text-[11px] text-muted-foreground/70 mt-2 pt-2 border-t border-border/40">{c.sub}</div>
           </Link>

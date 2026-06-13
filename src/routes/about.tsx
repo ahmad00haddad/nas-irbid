@@ -13,7 +13,9 @@ export const Route = createFileRoute("/about")({
       { name: "description", content: "تعرّف على رؤية ناس إربد، وكيف يمكنك أن تكون جزءاً من حماية ذاكرة المدينة." },
       { property: "og:title", content: "عن البرنامج · ناس إربد" },
       { property: "og:description", content: "الدعم مسؤولية مجتمعية، لا خدمة بمقابل." },
+      { property: "og:url", content: "https://nas-irbid.lovable.app/about" },
     ],
+    links: [{ rel: "canonical", href: "https://nas-irbid.lovable.app/about" }],
   }),
 });
 

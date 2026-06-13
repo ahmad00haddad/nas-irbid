@@ -1,20 +1,28 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useSiteSettings, SETTINGS_SCHEMA, DEFAULT_SETTINGS } from "@/lib/site-settings";
+import { useAuth } from "@/lib/auth";
 import { toast } from "sonner";
-import { Save, RotateCcw } from "lucide-react";
+import { Save, RotateCcw, ShieldAlert } from "lucide-react";
 
 export const Route = createFileRoute("/admin/settings")({
   component: AdminSettings,
 });
 
 function AdminSettings() {
+  const { isAdmin } = useAuth();
+  const navigate = useNavigate();
   const { data, isLoading } = useSiteSettings();
   const qc = useQueryClient();
   const [values, setValues] = useState<Record<string, string>>({});
   const [saving, setSaving] = useState(false);
+
+  // Hard redirect non-admins away — belt-and-suspenders on top of hidden nav link
+  useEffect(() => {
+    if (!isLoading && !isAdmin) navigate({ to: "/admin" });
+  }, [isAdmin, isLoading, navigate]);
 
   useEffect(() => {
     if (data) setValues(data);
@@ -25,10 +33,7 @@ function AdminSettings() {
   const onSave = async () => {
     setSaving(true);
     try {
-      const rows = SETTINGS_SCHEMA.map(({ key }) => ({
-        key,
-        value: values[key] ?? "",
-      }));
+      const rows = SETTINGS_SCHEMA.map(({ key }) => ({ key, value: values[key] ?? "" }));
       const { error } = await supabase.from("site_settings").upsert(rows, { onConflict: "key" });
       if (error) throw error;
       toast.success("تم حفظ الإعدادات");
@@ -46,6 +51,15 @@ function AdminSettings() {
   };
 
   if (isLoading) return <p className="text-muted-foreground">جاري التحميل…</p>;
+
+  if (!isAdmin) {
+    return (
+      <div className="text-center py-20">
+        <ShieldAlert size={32} className="text-destructive mx-auto mb-3" />
+        <p className="text-muted-foreground text-sm">هذه الصفحة للمسؤولين فقط.</p>
+      </div>
+    );
+  }
 
   return (
     <div>

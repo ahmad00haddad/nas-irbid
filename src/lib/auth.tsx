@@ -7,6 +7,7 @@ type AuthCtx = {
   session: Session | null;
   isAdmin: boolean;
   isEditor: boolean;
+  /** true until both session AND roles are resolved */
   loading: boolean;
   signOut: () => Promise<void>;
 };
@@ -16,35 +17,47 @@ const Ctx = createContext<AuthCtx>({
   signOut: async () => {},
 });
 
+async function fetchRoles(userId: string): Promise<string[]> {
+  const { data } = await supabase.from("user_roles").select("role").eq("user_id", userId);
+  return (data ?? []).map((r) => r.role);
+}
+
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [session, setSession] = useState<Session | null>(null);
   const [user, setUser] = useState<User | null>(null);
   const [roles, setRoles] = useState<string[]>([]);
-  const [loading, setLoading] = useState(true);
+  // Two-phase loading: session + roles must both resolve before loading=false
+  const [sessionLoading, setSessionLoading] = useState(true);
+  const [rolesLoading, setRolesLoading] = useState(false);
 
   useEffect(() => {
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, s) => {
-      setSession(s);
-      setUser(s?.user ?? null);
-      if (s?.user) {
-        // defer to avoid deadlock
-        setTimeout(async () => {
-          const { data } = await supabase.from("user_roles").select("role").eq("user_id", s.user.id);
-          setRoles((data ?? []).map((r) => r.role));
-        }, 0);
-      } else {
-        setRoles([]);
-      }
-    });
-
+    // Initial session fetch — blocks loading until roles are also fetched
     supabase.auth.getSession().then(async ({ data: { session: s } }) => {
       setSession(s);
       setUser(s?.user ?? null);
       if (s?.user) {
-        const { data } = await supabase.from("user_roles").select("role").eq("user_id", s.user.id);
-        setRoles((data ?? []).map((r) => r.role));
+        setRolesLoading(true);
+        const r = await fetchRoles(s.user.id);
+        setRoles(r);
+        setRolesLoading(false);
       }
-      setLoading(false);
+      setSessionLoading(false);
+    });
+
+    // Subsequent auth state changes (login, logout, token refresh)
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, s) => {
+      setSession(s);
+      setUser(s?.user ?? null);
+      if (s?.user) {
+        setRolesLoading(true);
+        fetchRoles(s.user.id).then((r) => {
+          setRoles(r);
+          setRolesLoading(false);
+        });
+      } else {
+        setRoles([]);
+        setRolesLoading(false);
+      }
     });
 
     return () => subscription.unsubscribe();
@@ -53,7 +66,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   return (
     <Ctx.Provider
       value={{
-        user, session, loading,
+        user, session,
+        loading: sessionLoading || rolesLoading,
         isAdmin: roles.includes("admin"),
         isEditor: roles.includes("editor") || roles.includes("admin"),
         signOut: async () => { await supabase.auth.signOut(); },

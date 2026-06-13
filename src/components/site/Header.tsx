@@ -1,7 +1,8 @@
 import { Link } from "@tanstack/react-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Menu, X, LayoutDashboard } from "lucide-react";
 import { useAuth } from "@/lib/auth";
+import { Button } from "@/components/ui/button";
 
 const navItems = [
   { to: "/", label: "الرئيسية" },
@@ -14,6 +15,15 @@ const navItems = [
 export function Header() {
   const [open, setOpen] = useState(false);
   const { isEditor } = useAuth();
+
+  useEffect(() => {
+    if (!open) return;
+    const closeOnEscape = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setOpen(false);
+    };
+    window.addEventListener("keydown", closeOnEscape);
+    return () => window.removeEventListener("keydown", closeOnEscape);
+  }, [open]);
 
   return (
     <header className="sticky top-0 z-50 backdrop-blur-md bg-background/80 border-b border-border/60">
@@ -57,13 +67,13 @@ export function Header() {
           </Link>
         </div>
 
-        <button className="md:hidden text-foreground" onClick={() => setOpen(!open)} aria-label="القائمة">
+        <Button variant="ghost" size="icon" className="md:hidden" onClick={() => setOpen(!open)} aria-label={open ? "إغلاق القائمة" : "فتح القائمة"} aria-expanded={open}>
           {open ? <X size={24} /> : <Menu size={24} />}
-        </button>
+        </Button>
       </div>
 
       {open && (
-        <div className="md:hidden border-t border-border bg-background">
+        <div className="md:hidden animate-in slide-in-from-top-2 border-t border-border bg-background duration-200">
           <nav className="container mx-auto px-6 py-4 flex flex-col gap-1">
             {navItems.map((item) => (
               <Link
@@ -71,10 +81,28 @@ export function Header() {
                 to={item.to}
                 onClick={() => setOpen(false)}
                 className="px-3 py-3 text-sm font-semibold text-muted-foreground hover:text-primary"
+                activeProps={{ className: "px-3 py-3 text-sm font-bold text-primary" }}
               >
                 {item.label}
               </Link>
             ))}
+            <Link
+              to="/about"
+              hash="support"
+              onClick={() => setOpen(false)}
+              className="mt-3 rounded-full bg-primary px-5 py-3 text-center text-sm font-bold text-primary-foreground"
+            >
+              ادعم البرنامج
+            </Link>
+            {isEditor && (
+              <Link
+                to="/admin"
+                onClick={() => setOpen(false)}
+                className="mt-2 inline-flex items-center justify-center gap-2 rounded-full border border-border px-5 py-3 text-sm font-bold text-foreground"
+              >
+                <LayoutDashboard size={15} /> لوحة الإدارة
+              </Link>
+            )}
           </nav>
         </div>
       )}

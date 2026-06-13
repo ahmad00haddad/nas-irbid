@@ -12,7 +12,9 @@ export const Route = createFileRoute("/suggest")({
       { name: "description", content: "رشّح شخصية، مهنة قديمة، أو حكاية لتظهر في حلقة قادمة من ناس إربد." },
       { property: "og:title", content: "اقترح حكاية · ناس إربد" },
       { property: "og:description", content: "البرنامج يصنعه أهله. رشّح حدا تعرف يستاهل حلقة." },
+      { property: "og:url", content: "https://nas-irbid.lovable.app/suggest" },
     ],
+    links: [{ rel: "canonical", href: "https://nas-irbid.lovable.app/suggest" }],
   }),
 });
 

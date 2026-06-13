@@ -12,6 +12,8 @@ export const DEFAULT_SETTINGS: SettingsMap = {
   hero_subtitle:
     "برنامج وثائقي مستقل يحفظ ذاكرة المدينة وحكايات ناسها",
   about_tagline: "ذاكرة إربد أمانة بإيدينا",
+  facebook_url: "",
+  whatsapp_url: "",
 };
 
 export const SETTINGS_SCHEMA: { key: string; label: string; type: "text" | "textarea" | "email" | "url" }[] = [
@@ -21,6 +23,8 @@ export const SETTINGS_SCHEMA: { key: string; label: string; type: "text" | "text
   { key: "hero_title", label: "عنوان الصفحة الرئيسية", type: "text" },
   { key: "hero_subtitle", label: "وصف الصفحة الرئيسية", type: "textarea" },
   { key: "about_tagline", label: "شعار صفحة الدعم", type: "text" },
+  { key: "facebook_url", label: "رابط صفحة فيسبوك", type: "url" },
+  { key: "whatsapp_url", label: "رابط واتساب", type: "url" },
 ];
 
 export function useSiteSettings() {

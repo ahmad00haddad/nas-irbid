@@ -13,7 +13,6 @@ export const Route = createFileRoute("/auth")({
 function AuthPage() {
   const { user, loading } = useAuth();
   const navigate = useNavigate();
-  const [mode, setMode] = useState<"login" | "signup">("login");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [busy, setBusy] = useState(false);
@@ -26,20 +25,10 @@ function AuthPage() {
     e.preventDefault();
     setBusy(true);
     try {
-      if (mode === "login") {
-        const { error } = await supabase.auth.signInWithPassword({ email, password });
-        if (error) throw error;
-        toast.success("أهلاً وسهلاً");
-        navigate({ to: "/admin" });
-      } else {
-        const { error } = await supabase.auth.signUp({
-          email, password,
-          options: { emailRedirectTo: `${window.location.origin}/admin` },
-        });
-        if (error) throw error;
-        toast.success("تم إنشاء الحساب. يمكنك الدخول الآن.");
-        setMode("login");
-      }
+      const { error } = await supabase.auth.signInWithPassword({ email, password });
+      if (error) throw error;
+      toast.success("أهلاً وسهلاً");
+      navigate({ to: "/admin" });
     } catch (err: any) {
       toast.error(err.message ?? "حدث خطأ");
     } finally {
@@ -58,9 +47,7 @@ function AuthPage() {
             <div className="inline-flex w-14 h-14 rounded-2xl bg-gradient-warm items-center justify-center shadow-glow mb-4">
               <Lock size={22} className="text-primary-foreground" />
             </div>
-            <h1 className="font-display text-3xl text-foreground">
-              {mode === "login" ? "تسجيل الدخول" : "حساب جديد"}
-            </h1>
+            <h1 className="font-display text-3xl text-foreground">تسجيل الدخول</h1>
             <p className="text-sm text-muted-foreground mt-2">
               لوحة إدارة برنامج ناس إربد
             </p>
@@ -77,7 +64,7 @@ function AuthPage() {
             <label className="block">
               <span className="block text-xs font-semibold text-foreground mb-2">كلمة المرور</span>
               <input
-                type="password" required minLength={6} value={password} onChange={(e) => setPassword(e.target.value)}
+                type="password" required minLength={8} value={password} onChange={(e) => setPassword(e.target.value)}
                 className="w-full px-4 py-3 rounded-lg bg-input border border-border text-foreground focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none"
               />
             </label>
@@ -85,21 +72,14 @@ function AuthPage() {
               type="submit" disabled={busy}
               className="w-full py-3 rounded-full bg-gradient-warm text-primary-foreground font-bold shadow-glow hover:opacity-90 disabled:opacity-60"
             >
-              {busy ? "..." : mode === "login" ? "دخول" : "إنشاء الحساب"}
+              {busy ? "..." : "دخول"}
             </button>
           </form>
-
-          <button
-            onClick={() => setMode(mode === "login" ? "signup" : "login")}
-            className="w-full mt-5 text-center text-sm text-muted-foreground hover:text-primary transition"
-          >
-            {mode === "login" ? "ما عندك حساب؟ سجّل الآن" : "عندك حساب؟ سجّل دخول"}
-          </button>
         </div>
         <p className="text-center text-[11px] text-muted-foreground mt-6 leading-relaxed">
           الوصول للوحة الإدارة محصور بالمسؤولين المعتمدين.
           <br/>
-          أول حساب يُنشأ يحتاج تعيينه كمسؤول من قاعدة البيانات.
+          تواصل مع المسؤول لإنشاء حساب جديد.
         </p>
       </div>
     </div>
