@@ -2,6 +2,7 @@ import { Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { Menu, X, LayoutDashboard } from "lucide-react";
 import { useAuth } from "@/lib/auth";
+import { Button } from "@/components/ui/button";
 
 const navItems = [
   { to: "/", label: "الرئيسية" },
@@ -57,9 +58,9 @@ export function Header() {
           </Link>
         </div>
 
-        <button className="md:hidden text-foreground" onClick={() => setOpen(!open)} aria-label="القائمة">
+        <Button variant="ghost" size="icon" className="md:hidden" onClick={() => setOpen(!open)} aria-label={open ? "إغلاق القائمة" : "فتح القائمة"} aria-expanded={open}>
           {open ? <X size={24} /> : <Menu size={24} />}
-        </button>
+        </Button>
       </div>
 
       {open && (
@@ -75,6 +76,23 @@ export function Header() {
                 {item.label}
               </Link>
             ))}
+            <Link
+              to="/about"
+              hash="support"
+              onClick={() => setOpen(false)}
+              className="mt-3 rounded-full bg-primary px-5 py-3 text-center text-sm font-bold text-primary-foreground"
+            >
+              ادعم البرنامج
+            </Link>
+            {isEditor && (
+              <Link
+                to="/admin"
+                onClick={() => setOpen(false)}
+                className="mt-2 inline-flex items-center justify-center gap-2 rounded-full border border-border px-5 py-3 text-sm font-bold text-foreground"
+              >
+                <LayoutDashboard size={15} /> لوحة الإدارة
+              </Link>
+            )}
           </nav>
         </div>
       )}
