@@ -45,7 +45,7 @@ function AskPage() {
 
     const { error } = await supabase.from("questions").insert({
       episode_id: episodeId || null,
-      target_character: selected?.character_name ?? String(fd.get("custom_target") ?? "") || null,
+      target_character: selected?.character_name ?? (String(fd.get("custom_target") ?? "") || null),
       question_text: String(fd.get("question") ?? ""),
       submitter_name: String(fd.get("name") ?? "") || null,
       submitter_email: String(fd.get("email") ?? "") || null,
