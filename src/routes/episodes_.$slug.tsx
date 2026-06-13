@@ -113,7 +113,7 @@ function EpisodeDetail() {
       {/* Video */}
       {ep.youtube_id && (
         <div className="container mx-auto px-6 py-10">
-          <div className="max-w-5xl mx-auto aspect-video rounded-2xl overflow-hidden bg-black shadow-deep">
+          <div className="max-w-5xl mx-auto aspect-video rounded-2xl overflow-hidden bg-foreground shadow-deep">
             <iframe
               src={`https://www.youtube.com/embed/${ep.youtube_id}`}
               title={ep.title}
@@ -221,9 +221,9 @@ function QuestionForm({ episodeId, target }: { episodeId: string; target: string
           name="name" placeholder="اسمك (اختياري)"
           className="flex-1 px-4 py-3 rounded-lg bg-input border border-border text-foreground focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none"
         />
-        <button disabled={busy} className="px-6 py-3 rounded-full bg-gradient-warm text-primary-foreground text-sm font-bold shadow-glow disabled:opacity-60 inline-flex items-center gap-2">
+        <Button type="submit" disabled={busy} className="rounded-full px-6 py-3 shadow-glow">
           <Send size={14} /> {busy ? "..." : "ابعت"}
-        </button>
+        </Button>
       </div>
     </form>
   );

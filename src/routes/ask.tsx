@@ -13,7 +13,9 @@ export const Route = createFileRoute("/ask")({
       { name: "description", content: "اختر شخصية من ضيوف ناس إربد واسألها سؤالك الخاص." },
       { property: "og:title", content: "اسأل الضيف · ناس إربد" },
       { property: "og:description", content: "أرسل سؤالك لأحد ضيوف البرنامج لنطرحه في حلقة لاحقة." },
+      { property: "og:url", content: "https://nas-irbid.lovable.app/ask" },
     ],
+    links: [{ rel: "canonical", href: "https://nas-irbid.lovable.app/ask" }],
   }),
 });
 

@@ -1,15 +1,40 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { Star, Trash2 } from "lucide-react";
+import { useAuth } from "@/lib/auth";
+import { useState } from "react";
+import { Star, Trash2, AlertTriangle } from "lucide-react";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/admin/questions")({
   component: AdminQuestions,
 });
 
+function ConfirmDialog({ title, description, onConfirm, onCancel }: {
+  title: string; description: string; onConfirm: () => void; onCancel: () => void;
+}) {
+  return (
+    <div className="fixed inset-0 z-[60] bg-background/80 backdrop-blur-sm flex items-center justify-center p-4">
+      <div className="bg-card border border-destructive/40 rounded-2xl w-full max-w-sm shadow-deep p-6">
+        <div className="flex items-center gap-3 mb-3">
+          <AlertTriangle size={20} className="text-destructive shrink-0" />
+          <h3 className="font-display text-lg text-foreground">{title}</h3>
+        </div>
+        <p className="text-sm text-muted-foreground mb-6">{description}</p>
+        <div className="flex justify-end gap-2">
+          <button onClick={onCancel} className="px-4 py-2 rounded-full border border-border text-sm">إلغاء</button>
+          <button onClick={onConfirm} className="px-4 py-2 rounded-full bg-destructive text-destructive-foreground text-sm font-bold">تأكيد الحذف</button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function AdminQuestions() {
   const qc = useQueryClient();
+  const { isAdmin } = useAuth();
+  const [confirmDelete, setConfirmDelete] = useState<any>(null);
+
   const { data = [], isLoading } = useQuery({
     queryKey: ["admin-questions"],
     queryFn: async () => {
@@ -33,7 +58,7 @@ function AdminQuestions() {
       if (error) throw error;
       toast.success("تم الحذف");
     },
-    onSuccess: () => qc.invalidateQueries({ queryKey: ["admin-questions"] }),
+    onSuccess: () => { qc.invalidateQueries({ queryKey: ["admin-questions"] }); setConfirmDelete(null); },
   });
 
   return (
@@ -60,12 +85,23 @@ function AdminQuestions() {
                   — {q.submitter_name ?? "مجهول"} · {new Date(q.created_at).toLocaleDateString("ar-JO")}
                 </div>
               </div>
-              <button onClick={() => confirm("حذف؟") && remove.mutate(q.id)} className="p-2 rounded-lg text-muted-foreground hover:bg-destructive/10 hover:text-destructive">
-                <Trash2 size={14} />
-              </button>
+              {isAdmin && (
+                <button onClick={() => setConfirmDelete(q)} className="p-2 rounded-lg text-muted-foreground hover:bg-destructive/10 hover:text-destructive">
+                  <Trash2 size={14} />
+                </button>
+              )}
             </div>
           ))}
         </div>
+      )}
+
+      {confirmDelete && (
+        <ConfirmDialog
+          title="حذف السؤال"
+          description={`هل أنت متأكد من حذف هذا السؤال؟ لا يمكن التراجع عن هذا الإجراء.`}
+          onConfirm={() => remove.mutate(confirmDelete.id)}
+          onCancel={() => setConfirmDelete(null)}
+        />
       )}
     </div>
   );
