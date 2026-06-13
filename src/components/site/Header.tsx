@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Menu, X, LayoutDashboard } from "lucide-react";
 import { useAuth } from "@/lib/auth";
 import { Button } from "@/components/ui/button";
@@ -15,6 +15,15 @@ const navItems = [
 export function Header() {
   const [open, setOpen] = useState(false);
   const { isEditor } = useAuth();
+
+  useEffect(() => {
+    if (!open) return;
+    const closeOnEscape = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setOpen(false);
+    };
+    window.addEventListener("keydown", closeOnEscape);
+    return () => window.removeEventListener("keydown", closeOnEscape);
+  }, [open]);
 
   return (
     <header className="sticky top-0 z-50 backdrop-blur-md bg-background/80 border-b border-border/60">
@@ -64,7 +73,7 @@ export function Header() {
       </div>
 
       {open && (
-        <div className="md:hidden border-t border-border bg-background">
+        <div className="md:hidden animate-in slide-in-from-top-2 border-t border-border bg-background duration-200">
           <nav className="container mx-auto px-6 py-4 flex flex-col gap-1">
             {navItems.map((item) => (
               <Link
@@ -72,6 +81,7 @@ export function Header() {
                 to={item.to}
                 onClick={() => setOpen(false)}
                 className="px-3 py-3 text-sm font-semibold text-muted-foreground hover:text-primary"
+                activeProps={{ className: "px-3 py-3 text-sm font-bold text-primary" }}
               >
                 {item.label}
               </Link>

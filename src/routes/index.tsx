@@ -21,7 +21,7 @@ export const Route = createFileRoute("/")({
 
 function Index() {
   const { data: settings } = useSiteSettings();
-  const { data: episodes = [], isLoading } = useQuery({
+  const { data: episodes = [], isLoading, isError, refetch } = useQuery({
     queryKey: ["home-episodes"],
     queryFn: async () => {
       const { data, error } = await supabase
@@ -38,12 +38,12 @@ function Index() {
     <>
       {/* GIF INTRO BAND — blended onto the page background (no black box) */}
       <section className="relative w-full overflow-hidden">
-        <div className="container mx-auto px-6 py-5 md:py-8 flex items-center justify-center">
+        <div className="container mx-auto flex h-32 items-center justify-center overflow-hidden px-6 md:h-40">
           <img
             src={introLogo.url}
             alt="ناس إربد"
             style={{ mixBlendMode: "screen" }}
-            className="w-full max-w-xl h-auto object-contain"
+            className="h-52 w-auto max-w-full object-contain md:h-64"
           />
         </div>
       </section>
@@ -122,6 +122,14 @@ function Index() {
         <section className="container mx-auto px-6 py-16">
           <Skeleton className="mb-10 h-14 w-72" />
           <div className="grid gap-6 md:grid-cols-2"><Skeleton className="aspect-video rounded-3xl" /><Skeleton className="aspect-video rounded-3xl" /></div>
+        </section>
+      ) : isError ? (
+        <section className="container mx-auto px-6 py-16 text-center">
+          <div className="mx-auto max-w-xl rounded-2xl border border-destructive/30 bg-card p-10">
+            <h2 className="font-display text-2xl text-foreground">تعذّر تحميل أحدث الحلقات</h2>
+            <p className="mt-2 text-sm text-muted-foreground">يمكنك متابعة الصفحة أو المحاولة مرة أخرى.</p>
+            <button onClick={() => refetch()} className="mt-5 rounded-full bg-primary px-5 py-2.5 text-sm font-bold text-primary-foreground">إعادة المحاولة</button>
+          </div>
         </section>
       ) : episodes.length > 0 && (
         <section className="container mx-auto px-6 py-16">
