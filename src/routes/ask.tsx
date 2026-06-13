@@ -21,7 +21,7 @@ function AskPage() {
   const [submitting, setSubmitting] = useState(false);
   const [episodeId, setEpisodeId] = useState<string>("");
 
-  const { data: episodes = [] } = useQuery({
+  const { data: episodes = [], isLoading, isError, refetch } = useQuery({
     queryKey: ["ask-episodes"],
     queryFn: async () => {
       const { data, error } = await supabase
@@ -93,7 +93,9 @@ function AskPage() {
                 </option>
               ))}
             </select>
-            {episodes.length === 0 && (
+            {isLoading && <span className="block text-xs text-muted-foreground mt-2">جاري تحميل الضيوف…</span>}
+            {isError && <button type="button" onClick={() => refetch()} className="mt-2 text-xs font-bold text-primary hover:underline">تعذّر التحميل — حاول مجدداً</button>}
+            {!isLoading && !isError && episodes.length === 0 && (
               <span className="block text-xs text-muted-foreground mt-2">
                 لا توجد حلقات منشورة بعد. تابعنا قريباً.
               </span>
