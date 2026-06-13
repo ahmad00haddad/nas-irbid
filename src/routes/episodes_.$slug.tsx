@@ -3,7 +3,9 @@ import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { ArrowRight, MapPin, Calendar, User, HelpCircle, Send } from "lucide-react";
+import { ArrowRight, MapPin, Calendar, User, HelpCircle, Send, Share2, Link2, MessageCircle } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { PublicEpisodeCard, type PublicEpisode } from "@/components/site/PublicEpisodeCard";
 
 export const Route = createFileRoute("/episodes_/$slug")({
   component: EpisodeDetail,
@@ -18,9 +20,26 @@ export const Route = createFileRoute("/episodes_/$slug")({
       { name: "description", content: ep.short_description ?? ep.title },
       { property: "og:title", content: ep.title },
       { property: "og:description", content: ep.short_description ?? "" },
+      { property: "og:url", content: `https://nas-irbid.lovable.app/episodes/${ep.slug}` },
+      { property: "og:type", content: "article" },
     ];
     if (ogImage) meta.push({ property: "og:image", content: ogImage });
-    return { meta };
+    return {
+      meta,
+      links: [{ rel: "canonical", href: `https://nas-irbid.lovable.app/episodes/${ep.slug}` }],
+      scripts: [{
+        type: "application/ld+json",
+        children: JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "VideoObject",
+          name: ep.title,
+          description: ep.short_description ?? ep.title,
+          thumbnailUrl: ogImage ? [ogImage] : undefined,
+          uploadDate: ep.published_at ?? ep.created_at,
+          embedUrl: ep.youtube_id ? `https://www.youtube.com/embed/${ep.youtube_id}` : undefined,
+        }),
+      }],
+    };
   },
   loader: async ({ params }) => {
     const { data, error } = await supabase
@@ -47,6 +66,19 @@ export const Route = createFileRoute("/episodes_/$slug")({
 
 function EpisodeDetail() {
   const ep = Route.useLoaderData();
+  const { data: related = [] } = useQuery({
+    queryKey: ["related-episodes", ep.id, ep.neighborhood],
+    queryFn: async () => {
+      let request = supabase.from("episodes").select("*").eq("published", true).neq("id", ep.id).limit(3);
+      if (ep.neighborhood) request = request.eq("neighborhood", ep.neighborhood);
+      const { data, error } = await request;
+      if (error) throw error;
+      if (data.length > 0 || !ep.neighborhood) return data;
+      const fallback = await supabase.from("episodes").select("*").eq("published", true).neq("id", ep.id).limit(3);
+      if (fallback.error) throw fallback.error;
+      return fallback.data;
+    },
+  });
 
   return (
     <article>
@@ -64,8 +96,19 @@ function EpisodeDetail() {
             {ep.neighborhood && <span className="inline-flex items-center gap-1.5"><MapPin size={14} /> {ep.neighborhood}</span>}
             {ep.decade && <span className="inline-flex items-center gap-1.5"><Calendar size={14} /> {ep.decade}</span>}
           </div>
+          <ShareActions title={ep.title} slug={ep.slug} />
         </div>
       </div>
+
+      {related.length > 0 && (
+        <section className="container mx-auto border-t border-border/60 px-6 py-16">
+          <div className="mb-8 flex items-end justify-between gap-4">
+            <div><span className="text-xs font-bold tracking-widest text-primary">تابع الحكاية</span><h2 className="mt-2 font-display text-3xl text-foreground">حلقات قد تعجبك</h2></div>
+            <Link to="/episodes" className="text-sm font-bold text-primary">كل الأرشيف</Link>
+          </div>
+          <div className="grid gap-6 md:grid-cols-3">{related.map((item) => <PublicEpisodeCard key={item.id} episode={item as PublicEpisode} />)}</div>
+        </section>
+      )}
 
       {/* Video */}
       {ep.youtube_id && (
@@ -122,6 +165,26 @@ function EpisodeDetail() {
         </div>
       </div>
     </article>
+  );
+}
+
+function ShareActions({ title, slug }: { title: string; slug: string }) {
+  const url = `https://nas-irbid.lovable.app/episodes/${slug}`;
+  const copy = async () => {
+    await navigator.clipboard.writeText(url);
+    toast.success("تم نسخ رابط الحلقة");
+  };
+  const share = async () => {
+    if (navigator.share) await navigator.share({ title, url });
+    else await copy();
+  };
+
+  return (
+    <div className="mt-7 flex flex-wrap gap-2" aria-label="مشاركة الحلقة">
+      <Button variant="outline" className="rounded-full" onClick={share}><Share2 size={15} /> مشاركة</Button>
+      <Button variant="outline" className="rounded-full" onClick={copy}><Link2 size={15} /> نسخ الرابط</Button>
+      <Button asChild variant="outline" className="rounded-full"><a href={`https://wa.me/?text=${encodeURIComponent(`${title} — ${url}`)}`} target="_blank" rel="noreferrer"><MessageCircle size={15} /> واتساب</a></Button>
+    </div>
   );
 }
 

@@ -2,7 +2,9 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import introLogo from "@/assets/intro-logo.gif.asset.json";
-import { ArrowLeft, Users, HelpCircle, Share2, Play } from "lucide-react";
+import { ArrowLeft, Users, HelpCircle, Share2, Play, MapPin } from "lucide-react";
+import { PublicEpisodeCard, type PublicEpisode } from "@/components/site/PublicEpisodeCard";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export const Route = createFileRoute("/")({
   component: Index,
@@ -10,12 +12,14 @@ export const Route = createFileRoute("/")({
     meta: [
       { title: "ناس إربد · حكايات أهل المدينة" },
       { name: "description", content: "برنامج وثائقي يوثّق قصص أهل إربد ومهنهم القديمة وذاكرتهم الشفوية." },
+      { property: "og:url", content: "https://nas-irbid.lovable.app/" },
     ],
+    links: [{ rel: "canonical", href: "https://nas-irbid.lovable.app/" }],
   }),
 });
 
 function Index() {
-  const { data: episodes = [] } = useQuery({
+  const { data: episodes = [], isLoading } = useQuery({
     queryKey: ["home-episodes"],
     queryFn: async () => {
       const { data, error } = await supabase
@@ -32,19 +36,19 @@ function Index() {
     <>
       {/* GIF INTRO BAND — blended onto the page background (no black box) */}
       <section className="relative w-full overflow-hidden">
-        <div className="container mx-auto px-6 py-10 md:py-14 flex items-center justify-center">
+        <div className="container mx-auto px-6 py-5 md:py-8 flex items-center justify-center">
           <img
             src={introLogo.url}
             alt="ناس إربد"
             style={{ mixBlendMode: "screen" }}
-            className="w-full max-w-3xl h-auto object-contain"
+            className="w-full max-w-xl h-auto object-contain"
           />
         </div>
       </section>
 
       {/* HERO TEXT */}
       <section className="relative overflow-hidden border-b border-border/60">
-        <div className="container mx-auto px-6 py-20 md:py-28">
+        <div className="container mx-auto px-6 py-14 md:py-20">
           <div className="max-w-3xl mx-auto text-center">
             <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary/10 border border-primary/30 mb-6">
               <span className="w-2 h-2 rounded-full bg-primary animate-pulse" />
@@ -115,7 +119,12 @@ function Index() {
       </section>
 
       {/* LATEST EPISODES */}
-      {episodes.length > 0 && (
+      {isLoading ? (
+        <section className="container mx-auto px-6 py-16">
+          <Skeleton className="mb-10 h-14 w-72" />
+          <div className="grid gap-6 md:grid-cols-2"><Skeleton className="aspect-video rounded-3xl" /><Skeleton className="aspect-video rounded-3xl" /></div>
+        </section>
+      ) : episodes.length > 0 && (
         <section className="container mx-auto px-6 py-16">
           <div className="flex items-end justify-between mb-12">
             <div>
@@ -128,36 +137,26 @@ function Index() {
               كل الحلقات <ArrowLeft size={16} />
             </Link>
           </div>
-          <div className="max-w-6xl mx-auto px-2 md:px-8">
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-5">
-              {episodes.map((ep: any) => (
-                <Link
-                  key={ep.id}
-                  to="/episodes/$slug"
-                  params={{ slug: ep.slug }}
-                  className="group bg-card border border-border/60 overflow-hidden hover:border-primary/60 transition hover:-translate-y-1 arch-frame shadow-deep"
-                >
-                  <div className="aspect-[3/4] bg-secondary relative overflow-hidden arch-top">
-                    {ep.youtube_id && (
-                      <img
-                        src={`https://img.youtube.com/vi/${ep.youtube_id}/hqdefault.jpg`}
-                        alt={ep.title}
-                        className="w-full h-full object-cover group-hover:scale-105 transition duration-700"
-                      />
-                    )}
-                    <div className="absolute inset-0 flex items-center justify-center">
-                      <div className="w-11 h-11 rounded-full bg-primary flex items-center justify-center shadow-glow group-hover:scale-110 transition">
-                        <Play size={16} className="text-primary-foreground translate-x-[-1px]" fill="currentColor" />
-                      </div>
-                    </div>
-                  </div>
-                  <div className="p-3 md:p-4">
-                    {ep.episode_number && <span className="text-[10px] font-bold accent-emerald tracking-widest">حلقة {ep.episode_number}</span>}
-                    <h3 className="font-display text-sm md:text-base text-foreground mt-1 mb-1 line-clamp-2">{ep.title}</h3>
-                    {ep.character_name && <div className="text-[11px] text-muted-foreground line-clamp-1">{ep.character_name}</div>}
-                  </div>
-                </Link>
-              ))}
+          <div className="max-w-6xl mx-auto">
+            <Link to="/episodes/$slug" params={{ slug: episodes[0].slug }} className="group mb-7 grid overflow-hidden rounded-3xl border border-primary/30 bg-card shadow-deep transition hover:border-primary/70 md:grid-cols-[1.35fr_1fr]">
+              <div className="relative min-h-72 overflow-hidden bg-secondary md:min-h-[25rem]">
+                <img src={episodes[0].cover_image_url ?? `https://img.youtube.com/vi/${episodes[0].youtube_id}/maxresdefault.jpg`} alt={`صورة الحلقة المميزة ${episodes[0].title}`} className="h-full w-full object-cover transition duration-700 group-hover:scale-105" />
+                <div className="absolute inset-0 bg-gradient-to-t from-foreground/60 via-transparent to-transparent" />
+                <div className="absolute bottom-6 right-6 flex h-14 w-14 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-glow"><Play size={20} fill="currentColor" /></div>
+              </div>
+              <div className="flex flex-col justify-center p-7 md:p-10">
+                <span className="text-xs font-bold tracking-widest text-primary">الحلقة المميزة · {episodes[0].episode_number ? `رقم ${episodes[0].episode_number}` : "الأحدث"}</span>
+                <h3 className="mt-3 font-display text-3xl leading-tight text-foreground md:text-4xl">{episodes[0].title}</h3>
+                {episodes[0].short_description && <p className="mt-4 leading-relaxed text-muted-foreground">{episodes[0].short_description}</p>}
+                <div className="mt-6 flex flex-wrap gap-4 text-sm text-muted-foreground">
+                  {episodes[0].character_name && <strong className="text-foreground">{episodes[0].character_name}</strong>}
+                  {episodes[0].neighborhood && <span className="inline-flex items-center gap-1"><MapPin size={14} />{episodes[0].neighborhood}</span>}
+                </div>
+                <span className="mt-8 inline-flex items-center gap-2 font-bold text-primary">شاهد الحكاية <ArrowLeft size={16} /></span>
+              </div>
+            </Link>
+            <div className="grid gap-6 md:grid-cols-3">
+              {episodes.slice(1).map((ep) => <PublicEpisodeCard key={ep.id} episode={ep as PublicEpisode} />)}
             </div>
             <div className="mt-10 flex justify-center">
               <Link to="/episodes" className="inline-flex items-center gap-2 px-7 py-3 rounded-full border-2 border-primary/40 text-foreground font-bold hover:bg-primary/10 transition">

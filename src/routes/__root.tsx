@@ -73,6 +73,17 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
       { rel: "stylesheet", href: "https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700&display=swap" },
     ],
+    scripts: [{
+      type: "application/ld+json",
+      children: JSON.stringify({
+        "@context": "https://schema.org",
+        "@type": "WebSite",
+        name: "ناس إربد",
+        url: "https://nas-irbid.lovable.app",
+        inLanguage: "ar",
+        description: "برنامج وثائقي إنساني يوثّق قصص أهل إربد وذاكرتهم الشفوية.",
+      }),
+    }],
   }),
   shellComponent: RootShell,
   component: RootComponent,
