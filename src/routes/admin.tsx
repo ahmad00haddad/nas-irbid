@@ -1,11 +1,19 @@
-import { createFileRoute, useNavigate, Outlet, Link } from "@tanstack/react-router";
-import { useEffect } from "react";
+import { createFileRoute, Outlet, Link, redirect } from "@tanstack/react-router";
 import { useAuth } from "@/lib/auth";
+import { supabase } from "@/integrations/supabase/client";
 import { LayoutDashboard, Film, Users, MessageSquare, HelpCircle, LogOut, Settings, ShieldAlert } from "lucide-react";
 
 export const Route = createFileRoute("/admin")({
+  // Client-only render so the admin shell never appears in server HTML — no SSR flash.
+  ssr: false,
+  // Auth gate runs before children mount; unauthenticated users go straight to /auth.
+  beforeLoad: async () => {
+    const { data, error } = await supabase.auth.getUser();
+    if (error || !data.user) throw redirect({ to: "/auth" });
+    return { user: data.user };
+  },
   component: AdminLayout,
-  head: () => ({ meta: [{ title: "لوحة الإدارة · ناس إربد" }] }),
+  head: () => ({ meta: [{ title: "لوحة الإدارة · ناس إربد" }, { name: "robots", content: "noindex" }] }),
 });
 
 // Nav items visible to all editors (admin + editor role)
@@ -24,11 +32,6 @@ const adminOnlyNav: { to: string; label: string; icon: typeof LayoutDashboard }[
 
 function AdminLayout() {
   const { user, loading, isEditor, isAdmin, signOut } = useAuth();
-  const navigate = useNavigate();
-
-  useEffect(() => {
-    if (!loading && !user) navigate({ to: "/auth" });
-  }, [user, loading, navigate]);
 
   if (loading) return <div className="container mx-auto px-6 py-20 text-center text-muted-foreground">جاري التحميل…</div>;
   if (!user) return null;

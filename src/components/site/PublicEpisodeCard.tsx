@@ -43,7 +43,7 @@ export function PublicEpisodeCard({ episode }: { episode: PublicEpisode }) {
         )}
       </div>
       <div className="p-5">
-        <h3 className="font-display text-xl leading-tight text-foreground transition-colors group-hover:text-primary">{episode.title}</h3>
+        <h2 className="font-display text-xl leading-tight text-foreground transition-colors group-hover:text-primary">{episode.title}</h2>
         {episode.short_description && <p className="mt-2 line-clamp-2 text-sm leading-relaxed text-muted-foreground">{episode.short_description}</p>}
         <div className="mt-4 flex flex-wrap gap-x-4 gap-y-2 border-t border-border/50 pt-4 text-xs text-muted-foreground">
           {episode.character_name && <span className="font-semibold text-foreground">{episode.character_name}</span>}

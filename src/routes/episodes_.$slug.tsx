@@ -100,17 +100,7 @@ function EpisodeDetail() {
         </div>
       </div>
 
-      {related.length > 0 && (
-        <section className="container mx-auto border-t border-border/60 px-6 py-16">
-          <div className="mb-8 flex items-end justify-between gap-4">
-            <div><span className="text-xs font-bold tracking-widest text-primary">تابع الحكاية</span><h2 className="mt-2 font-display text-3xl text-foreground">حلقات قد تعجبك</h2></div>
-            <Link to="/episodes" className="text-sm font-bold text-primary">كل الأرشيف</Link>
-          </div>
-          <div className="grid gap-6 md:grid-cols-3">{related.map((item) => <PublicEpisodeCard key={item.id} episode={item as PublicEpisode} />)}</div>
-        </section>
-      )}
-
-      {/* Video */}
+      {/* Video — main content, right after hero */}
       {ep.youtube_id && (
         <div className="container mx-auto px-6 py-10">
           <div className="max-w-5xl mx-auto aspect-video rounded-2xl overflow-hidden bg-foreground shadow-deep">
@@ -148,6 +138,17 @@ function EpisodeDetail() {
           )}
         </div>
       </div>
+
+      {/* Related episodes — moved AFTER the story so the main content leads the page */}
+      {related.length > 0 && (
+        <section className="container mx-auto border-t border-border/60 px-6 py-16">
+          <div className="mb-8 flex items-end justify-between gap-4">
+            <div><span className="text-xs font-bold tracking-widest text-primary">تابع الحكاية</span><h2 className="mt-2 font-display text-3xl text-foreground">حلقات قد تعجبك</h2></div>
+            <Link to="/episodes" className="text-sm font-bold text-primary">كل الأرشيف</Link>
+          </div>
+          <div className="grid gap-6 md:grid-cols-3">{related.map((item) => <PublicEpisodeCard key={item.id} episode={item as PublicEpisode} />)}</div>
+        </section>
+      )}
 
       {/* Question bank */}
       <div className="container mx-auto px-6 py-16 border-t border-border/60">
