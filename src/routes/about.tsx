@@ -267,7 +267,7 @@ function AboutPage() {
                 <div className="w-11 h-11 rounded-lg bg-primary/10 border border-primary/20 flex items-center justify-center mb-4">
                   <item.icon size={18} className="text-primary" />
                 </div>
-                <h4 className="font-display text-lg text-foreground mb-1.5">{item.title}</h4>
+                <h3 className="font-display text-lg text-foreground mb-1.5">{item.title}</h3>
                 <p className="text-sm text-muted-foreground leading-relaxed">{item.desc}</p>
               </>
             );
@@ -299,7 +299,7 @@ function AboutPage() {
 
           <div className="mt-12">
             <div className="p-8 rounded-2xl bg-card border border-border/60 shadow-deep max-w-2xl mx-auto">
-              <h4 className="font-display text-xl text-foreground mb-5">توزيع تكلفة الحلقة الواحدة</h4>
+              <h3 className="font-display text-xl text-foreground mb-5">توزيع تكلفة الحلقة الواحدة</h3>
               <div className="space-y-4">
                 {[
                   { l: "التصوير والعدسات السينمائية (إيجار + فريق + خبرة)", v: 38 },
