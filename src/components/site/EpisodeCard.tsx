@@ -9,6 +9,8 @@ export function EpisodeCard({ ep }: { ep: Episode }) {
           src={ep.image}
           alt={ep.title}
           loading="lazy"
+          width={480}
+          height={640}
           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-card via-card/20 to-transparent" />
