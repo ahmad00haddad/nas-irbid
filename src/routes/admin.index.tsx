@@ -112,7 +112,7 @@ function AdminHome() {
           empty="لا توجد اقتراحات بعد"
           items={(data?.recentSugs ?? []).map((s: any) => ({
             id: s.id,
-            primary: s.full_name,
+            primary: s.candidate_name,
             secondary: s.status === "new" ? "بانتظار المراجعة" : s.status,
             time: s.created_at,
             badge: s.status === "new" ? "جديد" : null,
