@@ -26,7 +26,7 @@ export function PublicEpisodeCard({ episode }: { episode: PublicEpisode }) {
     >
       <div className="relative aspect-[4/3] overflow-hidden bg-secondary">
         {image ? (
-          <img src={image} alt={`صورة حلقة ${episode.title}`} loading="lazy" className="h-full w-full object-cover transition duration-700 group-hover:scale-105" />
+          <img src={image} alt={`صورة حلقة ${episode.title}`} loading="lazy" width={480} height={360} className="h-full w-full object-cover transition duration-700 group-hover:scale-105" />
         ) : (
           <div className="flex h-full items-center justify-center pattern-geo" aria-hidden="true">
             <Play className="text-primary/50" size={36} />
