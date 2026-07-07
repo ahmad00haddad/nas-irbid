@@ -3,7 +3,14 @@ import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { Send, HelpCircle } from "lucide-react";
+import { z } from "zod";
 import { supabase } from "@/integrations/supabase/client";
+
+const askSchema = z.object({
+  question: z.string().trim().min(3, "السؤال قصير جداً").max(1000, "السؤال طويل جداً (الحد 1000 حرف)"),
+  name: z.string().trim().max(100, "الاسم طويل جداً").optional().or(z.literal("")),
+  email: z.string().trim().email("بريد إلكتروني غير صالح").max(255).optional().or(z.literal("")),
+});
 
 export const Route = createFileRoute("/ask")({
   component: AskPage,
@@ -40,15 +47,24 @@ function AskPage() {
 
   const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setSubmitting(true);
     const fd = new FormData(e.target as HTMLFormElement);
+    const parsed = askSchema.safeParse({
+      question: String(fd.get("question") ?? ""),
+      name: String(fd.get("name") ?? ""),
+      email: String(fd.get("email") ?? ""),
+    });
+    if (!parsed.success) {
+      toast.error("تعذّر الإرسال", { description: parsed.error.issues[0]?.message });
+      return;
+    }
 
+    setSubmitting(true);
     const { error } = await supabase.from("questions").insert({
       episode_id: episodeId || null,
       target_character: selected?.character_name ?? selected?.title ?? null,
-      question_text: String(fd.get("question") ?? ""),
-      submitter_name: String(fd.get("name") ?? "") || null,
-      submitter_email: String(fd.get("email") ?? "") || null,
+      question_text: parsed.data.question,
+      submitter_name: parsed.data.name || null,
+      submitter_email: parsed.data.email || null,
     });
 
     setSubmitting(false);
@@ -135,14 +151,19 @@ function AskPage() {
             </label>
           </div>
 
-          <button
-            type="submit"
-            disabled={submitting || !episodeId}
-            className="w-full md:w-auto inline-flex items-center justify-center gap-2 px-8 py-4 rounded-full bg-gradient-warm text-primary-foreground font-bold shadow-glow hover:opacity-90 transition disabled:opacity-60"
-          >
-            <Send size={18} />
-            {submitting ? "جاري الإرسال…" : "ابعت سؤالك"}
-          </button>
+          <div className="space-y-2">
+            <button
+              type="submit"
+              disabled={submitting || !episodeId}
+              className="w-full md:w-auto inline-flex items-center justify-center gap-2 px-8 py-4 rounded-full bg-gradient-warm text-primary-foreground font-bold shadow-glow hover:opacity-90 transition disabled:opacity-60"
+            >
+              <Send size={18} />
+              {submitting ? "جاري الإرسال…" : "ابعت سؤالك"}
+            </button>
+            {!episodeId && (
+              <p className="text-xs text-muted-foreground">اختر حلقة / ضيف أولاً لتفعيل الإرسال.</p>
+            )}
+          </div>
         </form>
       </div>
     </div>

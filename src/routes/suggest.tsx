@@ -2,7 +2,18 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { toast } from "sonner";
 import { Send, Sparkles } from "lucide-react";
+import { z } from "zod";
 import { supabase } from "@/integrations/supabase/client";
+
+const suggestSchema = z.object({
+  character: z.string().trim().min(2, "اسم الشخصية قصير جداً").max(120),
+  role: z.string().trim().max(120).optional().or(z.literal("")),
+  place: z.string().trim().min(2, "الحي أو المكان مطلوب").max(120),
+  age: z.string().trim().max(40).optional().or(z.literal("")),
+  story: z.string().trim().min(5, "الحكاية قصيرة جداً").max(2000, "الحكاية طويلة (الحد 2000 حرف)"),
+  name: z.string().trim().min(2, "اسمك مطلوب").max(100),
+  phone: z.string().trim().min(6, "رقم غير صالح").max(30, "رقم طويل جداً"),
+});
 
 export const Route = createFileRoute("/suggest")({
   component: SuggestPage,
@@ -23,23 +34,36 @@ function SuggestPage() {
 
   const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setSubmitting(true);
     const f = e.target as HTMLFormElement;
     const fd = new FormData(f);
 
+    const parsed = suggestSchema.safeParse({
+      character: String(fd.get("character") ?? ""),
+      role: String(fd.get("role") ?? ""),
+      place: String(fd.get("place") ?? ""),
+      age: String(fd.get("age") ?? ""),
+      story: String(fd.get("story") ?? ""),
+      name: String(fd.get("name") ?? ""),
+      phone: String(fd.get("phone") ?? ""),
+    });
+    if (!parsed.success) {
+      toast.error("تعذّر الإرسال", { description: parsed.error.issues[0]?.message });
+      return;
+    }
+    const d = parsed.data;
+
+    setSubmitting(true);
     // Preserve the optional age field by prepending it to the story summary,
     // since the table doesn't have a dedicated column for it.
-    const ageRaw = String(fd.get("age") ?? "").trim();
-    const storyRaw = String(fd.get("story") ?? "").trim();
-    const story_summary = ageRaw ? `العمر التقريبي: ${ageRaw}\n\n${storyRaw}` : storyRaw;
+    const story_summary = d.age ? `العمر التقريبي: ${d.age}\n\n${d.story}` : d.story;
 
     const { error } = await supabase.from("guest_suggestions").insert({
-      candidate_name: String(fd.get("character") ?? ""),
-      profession: String(fd.get("role") ?? "") || null,
-      neighborhood: String(fd.get("place") ?? "") || null,
+      candidate_name: d.character,
+      profession: d.role || null,
+      neighborhood: d.place || null,
       story_summary,
-      submitter_name: String(fd.get("name") ?? "") || null,
-      contact_info: String(fd.get("phone") ?? "") || null,
+      submitter_name: d.name || null,
+      contact_info: d.phone || null,
     });
 
     setSubmitting(false);
