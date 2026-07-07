@@ -151,14 +151,19 @@ function AskPage() {
             </label>
           </div>
 
-          <button
-            type="submit"
-            disabled={submitting || !episodeId}
-            className="w-full md:w-auto inline-flex items-center justify-center gap-2 px-8 py-4 rounded-full bg-gradient-warm text-primary-foreground font-bold shadow-glow hover:opacity-90 transition disabled:opacity-60"
-          >
-            <Send size={18} />
-            {submitting ? "جاري الإرسال…" : "ابعت سؤالك"}
-          </button>
+          <div className="space-y-2">
+            <button
+              type="submit"
+              disabled={submitting || !episodeId}
+              className="w-full md:w-auto inline-flex items-center justify-center gap-2 px-8 py-4 rounded-full bg-gradient-warm text-primary-foreground font-bold shadow-glow hover:opacity-90 transition disabled:opacity-60"
+            >
+              <Send size={18} />
+              {submitting ? "جاري الإرسال…" : "ابعت سؤالك"}
+            </button>
+            {!episodeId && (
+              <p className="text-xs text-muted-foreground">اختر حلقة / ضيف أولاً لتفعيل الإرسال.</p>
+            )}
+          </div>
         </form>
       </div>
     </div>
