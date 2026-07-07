@@ -2,7 +2,18 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { toast } from "sonner";
 import { Send, Sparkles } from "lucide-react";
+import { z } from "zod";
 import { supabase } from "@/integrations/supabase/client";
+
+const suggestSchema = z.object({
+  character: z.string().trim().min(2, "اسم الشخصية قصير جداً").max(120),
+  role: z.string().trim().max(120).optional().or(z.literal("")),
+  place: z.string().trim().min(2, "الحي أو المكان مطلوب").max(120),
+  age: z.string().trim().max(40).optional().or(z.literal("")),
+  story: z.string().trim().min(5, "الحكاية قصيرة جداً").max(2000, "الحكاية طويلة (الحد 2000 حرف)"),
+  name: z.string().trim().min(2, "اسمك مطلوب").max(100),
+  phone: z.string().trim().min(6, "رقم غير صالح").max(30, "رقم طويل جداً"),
+});
 
 export const Route = createFileRoute("/suggest")({
   component: SuggestPage,
