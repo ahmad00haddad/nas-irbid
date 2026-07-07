@@ -26,7 +26,7 @@ function AdminHome() {
         supabase.from("contact_messages").select("id", { count: "exact", head: true }),
         supabase.from("questions").select("id", { count: "exact", head: true }),
         supabase.from("contact_messages").select("id, name, subject, created_at, handled").order("created_at", { ascending: false }).limit(5),
-        supabase.from("guest_suggestions").select("id, full_name, created_at, status").order("created_at", { ascending: false }).limit(5),
+        supabase.from("guest_suggestions").select("id, candidate_name, created_at, status").order("created_at", { ascending: false }).limit(5),
         supabase.from("episodes").select("id, title, slug, published, created_at").order("created_at", { ascending: false }).limit(5),
       ]);
       return {
@@ -112,7 +112,7 @@ function AdminHome() {
           empty="لا توجد اقتراحات بعد"
           items={(data?.recentSugs ?? []).map((s: any) => ({
             id: s.id,
-            primary: s.full_name,
+            primary: s.candidate_name,
             secondary: s.status === "new" ? "بانتظار المراجعة" : s.status,
             time: s.created_at,
             badge: s.status === "new" ? "جديد" : null,
