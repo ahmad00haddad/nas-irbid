@@ -47,15 +47,24 @@ function AskPage() {
 
   const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setSubmitting(true);
     const fd = new FormData(e.target as HTMLFormElement);
+    const parsed = askSchema.safeParse({
+      question: String(fd.get("question") ?? ""),
+      name: String(fd.get("name") ?? ""),
+      email: String(fd.get("email") ?? ""),
+    });
+    if (!parsed.success) {
+      toast.error("تعذّر الإرسال", { description: parsed.error.issues[0]?.message });
+      return;
+    }
 
+    setSubmitting(true);
     const { error } = await supabase.from("questions").insert({
       episode_id: episodeId || null,
       target_character: selected?.character_name ?? selected?.title ?? null,
-      question_text: String(fd.get("question") ?? ""),
-      submitter_name: String(fd.get("name") ?? "") || null,
-      submitter_email: String(fd.get("email") ?? "") || null,
+      question_text: parsed.data.question,
+      submitter_name: parsed.data.name || null,
+      submitter_email: parsed.data.email || null,
     });
 
     setSubmitting(false);
