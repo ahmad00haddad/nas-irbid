@@ -26,7 +26,7 @@ function AdminHome() {
         supabase.from("contact_messages").select("id", { count: "exact", head: true }),
         supabase.from("questions").select("id", { count: "exact", head: true }),
         supabase.from("contact_messages").select("id, name, subject, created_at, handled").order("created_at", { ascending: false }).limit(5),
-        supabase.from("guest_suggestions").select("id, full_name, created_at, status").order("created_at", { ascending: false }).limit(5),
+        supabase.from("guest_suggestions").select("id, candidate_name, created_at, status").order("created_at", { ascending: false }).limit(5),
         supabase.from("episodes").select("id, title, slug, published, created_at").order("created_at", { ascending: false }).limit(5),
       ]);
       return {
