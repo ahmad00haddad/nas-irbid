@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as SuggestRouteImport } from './routes/suggest'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
+import { Route as InstallRouteImport } from './routes/install'
 import { Route as EpisodesRouteImport } from './routes/episodes'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AskRouteImport } from './routes/ask'
@@ -33,6 +34,11 @@ const SuggestRoute = SuggestRouteImport.update({
 const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
   id: '/sitemap.xml',
   path: '/sitemap.xml',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const InstallRoute = InstallRouteImport.update({
+  id: '/install',
+  path: '/install',
   getParentRoute: () => rootRouteImport,
 } as any)
 const EpisodesRoute = EpisodesRouteImport.update({
@@ -108,6 +114,7 @@ export interface FileRoutesByFullPath {
   '/ask': typeof AskRoute
   '/auth': typeof AuthRoute
   '/episodes': typeof EpisodesRoute
+  '/install': typeof InstallRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/suggest': typeof SuggestRoute
   '/admin/episodes': typeof AdminEpisodesRoute
@@ -124,6 +131,7 @@ export interface FileRoutesByTo {
   '/ask': typeof AskRoute
   '/auth': typeof AuthRoute
   '/episodes': typeof EpisodesRoute
+  '/install': typeof InstallRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/suggest': typeof SuggestRoute
   '/admin/episodes': typeof AdminEpisodesRoute
@@ -142,6 +150,7 @@ export interface FileRoutesById {
   '/ask': typeof AskRoute
   '/auth': typeof AuthRoute
   '/episodes': typeof EpisodesRoute
+  '/install': typeof InstallRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/suggest': typeof SuggestRoute
   '/admin/episodes': typeof AdminEpisodesRoute
@@ -161,6 +170,7 @@ export interface FileRouteTypes {
     | '/ask'
     | '/auth'
     | '/episodes'
+    | '/install'
     | '/sitemap.xml'
     | '/suggest'
     | '/admin/episodes'
@@ -177,6 +187,7 @@ export interface FileRouteTypes {
     | '/ask'
     | '/auth'
     | '/episodes'
+    | '/install'
     | '/sitemap.xml'
     | '/suggest'
     | '/admin/episodes'
@@ -194,6 +205,7 @@ export interface FileRouteTypes {
     | '/ask'
     | '/auth'
     | '/episodes'
+    | '/install'
     | '/sitemap.xml'
     | '/suggest'
     | '/admin/episodes'
@@ -212,6 +224,7 @@ export interface RootRouteChildren {
   AskRoute: typeof AskRoute
   AuthRoute: typeof AuthRoute
   EpisodesRoute: typeof EpisodesRoute
+  InstallRoute: typeof InstallRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   SuggestRoute: typeof SuggestRoute
   EpisodesSlugRoute: typeof EpisodesSlugRoute
@@ -231,6 +244,13 @@ declare module '@tanstack/react-router' {
       path: '/sitemap.xml'
       fullPath: '/sitemap.xml'
       preLoaderRoute: typeof SitemapDotxmlRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/install': {
+      id: '/install'
+      path: '/install'
+      fullPath: '/install'
+      preLoaderRoute: typeof InstallRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/episodes': {
@@ -354,6 +374,7 @@ const rootRouteChildren: RootRouteChildren = {
   AskRoute: AskRoute,
   AuthRoute: AuthRoute,
   EpisodesRoute: EpisodesRoute,
+  InstallRoute: InstallRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   SuggestRoute: SuggestRoute,
   EpisodesSlugRoute: EpisodesSlugRoute,
