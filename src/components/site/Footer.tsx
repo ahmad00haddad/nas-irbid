@@ -24,6 +24,7 @@ export function Footer() {
             <li><Link to="/episodes" className="hover:text-primary">أرشيف الحلقات</Link></li>
             <li><Link to="/suggest" className="hover:text-primary">اقترح شخصية أو حكاية</Link></li>
             <li><Link to="/about" className="hover:text-primary">عن البرنامج وفريقه</Link></li>
+            <li><Link to="/install" className="hover:text-primary">ثبّت التطبيق على جهازك</Link></li>
             <li><Link to="/about" hash="support" className="hover:text-primary">ادعم البرنامج</Link></li>
           </ul>
         </div>
