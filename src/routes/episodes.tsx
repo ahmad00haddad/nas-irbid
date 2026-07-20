@@ -30,6 +30,7 @@ function EpisodesPage() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("episodes").select("*").eq("published", true)
+        .order("episode_number", { ascending: false, nullsFirst: false })
         .order("published_at", { ascending: false, nullsFirst: false })
         .order("created_at", { ascending: false });
       if (error) throw error;
