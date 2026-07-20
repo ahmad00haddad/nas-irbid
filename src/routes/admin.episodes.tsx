@@ -141,7 +141,10 @@ function AdminEpisodes() {
           <p className="text-sm text-muted-foreground mt-1">إدارة أرشيف حلقات البرنامج.</p>
         </div>
         <button
-          onClick={() => setEditing({ ...empty })}
+          onClick={() => {
+            const maxNum = episodes.reduce((m, e) => Math.max(m, e.episode_number ?? 0), 0);
+            setEditing({ ...empty, episode_number: maxNum + 1 });
+          }}
           className="inline-flex items-center gap-2 px-4 py-2.5 rounded-full bg-gradient-warm text-primary-foreground text-sm font-bold shadow-glow hover:opacity-90"
         >
           <Plus size={16} /> حلقة جديدة
