@@ -15,6 +15,7 @@ import { Header } from "@/components/site/Header";
 import { Footer } from "@/components/site/Footer";
 import { Toaster } from "@/components/ui/sonner";
 import { AuthProvider } from "@/lib/auth";
+import { Cursor } from "@/components/ui/cursor";
 
 function NotFoundComponent() {
   return (
@@ -139,6 +140,7 @@ function RootComponent() {
           </AnimatePresence>
           <Footer />
         </div>
+        <Cursor />
         <Toaster position="top-center" richColors />
       </AuthProvider>
     </QueryClientProvider>

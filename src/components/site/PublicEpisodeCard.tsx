@@ -28,6 +28,7 @@ export function PublicEpisodeCard({ episode }: { episode: PublicEpisode }) {
       whileHover={{ y: -6 }}
       whileTap={{ scale: 0.97 }}
       transition={{ type: "spring", stiffness: 400, damping: 25 }}
+      data-cursor-text="شاهد"
       className="group block overflow-hidden rounded-2xl border border-border/70 bg-card shadow-deep transition-colors duration-300 hover:border-primary/60"
     >
       <div className="relative aspect-[4/3] overflow-hidden bg-secondary">
