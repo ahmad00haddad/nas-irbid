@@ -1,13 +1,13 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { useMemo, useState } from "react";
+import { useDeferredValue, useMemo, useState } from "react";
 
 import { supabase } from "@/integrations/supabase/client";
-import { Search, RotateCcw } from "lucide-react";
+import { Search, RotateCcw, X } from "lucide-react";
 import { PublicEpisodeCard, type PublicEpisode } from "@/components/site/PublicEpisodeCard";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
-import { FadeIn, StaggerContainer, StaggerItem } from "@/components/ui/fade-in";
+import { FadeIn } from "@/components/ui/fade-in";
 
 export const Route = createFileRoute("/episodes")({
   component: EpisodesPage,
