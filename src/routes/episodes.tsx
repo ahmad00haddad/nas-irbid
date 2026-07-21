@@ -71,19 +71,41 @@ function EpisodesPage() {
         </p>
       </FadeIn>
 
-      <FadeIn delay={0.1} className="mb-10 grid gap-3 rounded-2xl border border-border/70 bg-card/70 p-4 md:grid-cols-[1fr_auto]">
+      <FadeIn delay={0.1} className="mb-10 space-y-3">
         <label className="relative block">
           <Search className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground" size={17} />
           <span className="sr-only">ابحث في الحلقات</span>
           <input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="ابحث باسم الشخصية، المهنة، الحي أو الحكاية…" className="min-h-12 w-full rounded-xl border border-border bg-input py-3 pl-4 pr-11 text-sm text-foreground outline-none focus:border-primary focus:ring-2 focus:ring-primary/20" />
         </label>
-        <label>
-          <span className="sr-only">تصفية حسب الحي</span>
-          <select value={neighborhood} onChange={(event) => setNeighborhood(event.target.value)} className="min-h-12 w-full rounded-xl border border-border bg-input px-4 text-sm text-foreground outline-none focus:border-primary md:w-52">
-            <option value="all">كل الأحياء</option>
-            {neighborhoods.map((item) => <option key={item} value={item}>{item}</option>)}
-          </select>
-        </label>
+        {neighborhoods.length > 0 && (
+          <div className="flex flex-wrap gap-2" role="group" aria-label="تصفية حسب الحي">
+            <button
+              type="button"
+              onClick={() => setNeighborhood("all")}
+              className={`px-4 py-1.5 rounded-full text-sm font-semibold border transition-all ${
+                neighborhood === "all"
+                  ? "bg-primary text-primary-foreground border-primary shadow-glow"
+                  : "bg-card border-border/60 text-muted-foreground hover:border-primary/50 hover:text-foreground"
+              }`}
+            >
+              كل الأحياء
+            </button>
+            {neighborhoods.map((n) => (
+              <button
+                key={n}
+                type="button"
+                onClick={() => setNeighborhood(n === neighborhood ? "all" : n)}
+                className={`px-4 py-1.5 rounded-full text-sm font-semibold border transition-all ${
+                  neighborhood === n
+                    ? "bg-primary text-primary-foreground border-primary shadow-glow"
+                    : "bg-card border-border/60 text-muted-foreground hover:border-primary/50 hover:text-foreground"
+                }`}
+              >
+                {n}
+              </button>
+            ))}
+          </div>
+        )}
       </FadeIn>
 
       {isLoading ? (

@@ -1,9 +1,10 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { toast } from "sonner";
-import { Send, Sparkles } from "lucide-react";
+import { Send, Sparkles, CheckCircle2, Loader2 } from "lucide-react";
 import { z } from "zod";
 import { supabase } from "@/integrations/supabase/client";
+import { motion, AnimatePresence } from "framer-motion";
 
 const suggestSchema = z.object({
   character: z.string().trim().min(2, "اسم الشخصية قصير جداً").max(120),
@@ -31,6 +32,7 @@ export const Route = createFileRoute("/suggest")({
 
 function SuggestPage() {
   const [submitting, setSubmitting] = useState(false);
+  const [submitted, setSubmitted] = useState(false);
 
   const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -80,10 +82,7 @@ function SuggestPage() {
     }
 
     localStorage.setItem("lastSuggestSubmit", Date.now().toString());
-    toast.success("وصلنا اقتراحك — شكراً إلك!", {
-      description: "رح نراجعه ونرد عليك في حال احتجنا تفاصيل أكثر.",
-    });
-    f.reset();
+    setSubmitted(true);
   };
 
   return (
@@ -102,7 +101,37 @@ function SuggestPage() {
           </p>
         </header>
 
-        <form onSubmit={onSubmit} className="bg-card border border-border/60 rounded-2xl p-8 md:p-10 shadow-deep space-y-6">
+        <AnimatePresence mode="wait">
+          {submitted ? (
+            <motion.div
+              key="success"
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+              className="bg-card border border-primary/30 rounded-3xl p-12 text-center shadow-deep"
+            >
+              <div className="inline-flex w-20 h-20 rounded-full bg-primary/10 border-2 border-primary/30 items-center justify-center mb-6">
+                <CheckCircle2 size={40} className="text-primary" />
+              </div>
+              <h2 className="font-display text-4xl text-foreground mb-4">وصلنا اقتراحك!</h2>
+              <p className="text-muted-foreground leading-relaxed mb-8">
+                شكراً إلك. رح نراجع الترشيح ونتواصل معك بخصوصه قريباً.
+              </p>
+              <button
+                onClick={() => setSubmitted(false)}
+                className="inline-flex items-center gap-2 px-7 py-3 rounded-full border-2 border-primary/40 text-foreground font-bold hover:bg-primary/10 transition"
+              >
+                اقترح شخصية ثانية
+              </button>
+            </motion.div>
+          ) : (
+            <motion.form
+              key="form"
+              onSubmit={onSubmit}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              className="bg-card border border-border/60 rounded-2xl p-8 md:p-10 shadow-deep space-y-6"
+            >
           <div className="grid md:grid-cols-2 gap-5">
             <Field label="اسم الشخصية المقترحة *" name="character" placeholder="مثال: أبو سامي العطار" required />
             <Field label="المهنة / الدور" name="role" placeholder="عطار، إسكافي، خبّاز…" />
@@ -136,12 +165,17 @@ function SuggestPage() {
           <button
             type="submit"
             disabled={submitting}
-            className="w-full md:w-auto inline-flex items-center justify-center gap-2 px-8 py-4 rounded-full bg-gradient-warm text-primary-foreground font-bold shadow-glow hover:opacity-90 transition disabled:opacity-60"
+            className="w-full md:w-auto inline-flex items-center justify-center gap-2 px-8 py-4 rounded-full bg-gradient-warm text-primary-foreground font-bold shadow-glow hover:opacity-90 transition disabled:opacity-60 text-base"
           >
-            <Send size={18} />
-            {submitting ? "جاري الإرسال…" : "ابعت الترشيح"}
+            {submitting ? (
+              <><Loader2 size={18} className="animate-spin" /> جاري الإرسال…</>
+            ) : (
+              <><Send size={18} /> ابعت الترشيح</>
+            )}
           </button>
-        </form>
+            </motion.form>
+          )}
+        </AnimatePresence>
 
         <p className="text-center text-xs text-muted-foreground mt-6">
           خصوصيتك مهمة عنّا. معلوماتك ما رح تنحفظ إلا لغرض التواصل بخصوص هذا الترشيح.
@@ -157,7 +191,7 @@ function Field({ label, ...props }: { label: string } & React.InputHTMLAttribute
       <span className="block text-sm font-semibold text-foreground mb-2">{label}</span>
       <input
         {...props}
-        className="w-full px-4 py-3 rounded-lg bg-input border border-border text-foreground placeholder:text-muted-foreground/60 focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition"
+        className="w-full px-4 py-3 rounded-lg bg-input border border-border text-foreground placeholder:text-muted-foreground/60 focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition text-base"
       />
     </label>
   );
@@ -169,7 +203,7 @@ function TextArea({ label, ...props }: { label: string } & React.TextareaHTMLAtt
       <span className="block text-sm font-semibold text-foreground mb-2">{label}</span>
       <textarea
         {...props}
-        className="w-full px-4 py-3 rounded-lg bg-input border border-border text-foreground placeholder:text-muted-foreground/60 focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition resize-none"
+        className="w-full px-4 py-3 rounded-lg bg-input border border-border text-foreground placeholder:text-muted-foreground/60 focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition resize-none text-base"
       />
     </label>
   );
