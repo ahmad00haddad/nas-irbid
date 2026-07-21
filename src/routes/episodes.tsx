@@ -75,17 +75,35 @@ function EpisodesPage() {
         </p>
       </FadeIn>
 
-      <FadeIn delay={0.1} className="mb-10">
+      <FadeIn delay={0.1} className="mb-6">
         <label className="relative block">
-          <Search className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground" size={17} />
+          <Search className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none" size={17} />
           <span className="sr-only">ابحث في الحلقات</span>
           <input
+            type="search"
             value={query}
             onChange={(event) => setQuery(event.target.value)}
             placeholder="ابحث باسم الشخصية، المهنة، الحي أو الحكاية…"
-            className="min-h-12 w-full rounded-xl border border-border bg-input py-3 pl-4 pr-11 text-sm text-foreground outline-none focus:border-primary focus:ring-2 focus:ring-primary/20"
+            className="min-h-12 w-full rounded-xl border border-border bg-input py-3 pl-11 pr-11 text-sm text-foreground outline-none focus:border-primary focus:ring-2 focus:ring-primary/20"
           />
+          {query && (
+            <button
+              type="button"
+              onClick={() => setQuery("")}
+              aria-label="مسح البحث"
+              className="absolute left-3 top-1/2 -translate-y-1/2 rounded-full p-1.5 text-muted-foreground hover:bg-secondary hover:text-foreground transition-colors"
+            >
+              <X size={15} />
+            </button>
+          )}
         </label>
+        {query.trim() && !isLoading && (
+          <p className="mt-3 text-xs text-muted-foreground">
+            {filtered.length > 0
+              ? `${filtered.length} من ${episodes.length} حلقة`
+              : "لا توجد نتائج"}
+          </p>
+        )}
       </FadeIn>
 
       {isLoading ? (
@@ -110,13 +128,11 @@ function EpisodesPage() {
           <Button variant="outline" className="mt-5 rounded-full" onClick={() => setQuery("")}><RotateCcw size={15} /> مسح البحث</Button>
         </div>
       ) : (
-        <StaggerContainer className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filtered.map((ep) => (
-            <StaggerItem key={ep.id}>
-              <PublicEpisodeCard episode={ep as PublicEpisode} />
-            </StaggerItem>
+            <PublicEpisodeCard key={ep.id} episode={ep as PublicEpisode} />
           ))}
-        </StaggerContainer>
+        </div>
       )}
     </div>
   );
