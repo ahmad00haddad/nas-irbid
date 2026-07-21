@@ -35,7 +35,7 @@ export function TextReveal({
     },
   };
 
-  const item = {
+  const item: Variants = {
     hidden: { y: "110%", opacity: 0, rotate: 2 },
     show: {
       y: "0%",
@@ -43,10 +43,11 @@ export function TextReveal({
       rotate: 0,
       transition: {
         duration: 0.65,
-        ease: [0.22, 1, 0.36, 1],
+        ease: [0.22, 1, 0.36, 1] as [number, number, number, number],
       },
     },
   };
+
 
   return (
     <Tag className={className} ref={ref} aria-label={children}>
