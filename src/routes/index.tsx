@@ -171,7 +171,7 @@ function Index() {
           </div>
           <div className="max-w-6xl mx-auto">
             <FadeIn delay={0.1}>
-              <MotionLink to="/episodes/$slug" params={{ slug: episodes[0].slug }} whileHover={{ y: -8 }} whileTap={{ scale: 0.98 }} data-cursor-text="شاهد" className="group mb-7 block overflow-hidden rounded-3xl border border-primary/30 bg-card shadow-deep transition-colors hover:border-primary/70">
+              <MotionLink to="/episodes/$slug" params={{ slug: episodes[0].slug } as never} whileHover={{ y: -8 }} whileTap={{ scale: 0.98 }} data-cursor-text="شاهد" className="group mb-7 block overflow-hidden rounded-3xl border border-primary/30 bg-card shadow-deep transition-colors hover:border-primary/70">
                 <div className="grid md:grid-cols-[1.35fr_1fr]">
                   <div className="relative min-h-72 overflow-hidden bg-secondary md:min-h-[25rem]">
                     <img src={episodes[0].cover_image_url ?? `https://img.youtube.com/vi/${episodes[0].youtube_id}/hqdefault.jpg`} alt={`صورة الحلقة المميزة ${episodes[0].title}`} className="h-full w-full object-cover transition duration-700 group-hover:scale-105" />
