@@ -63,8 +63,8 @@ export function Cursor() {
         }}
         initial={{ width: 0, height: 0, opacity: 0 }}
         animate={{
-          width: isHovered ? (hoverText ? 72 : 44) : 16,
-          height: isHovered ? (hoverText ? 72 : 44) : 16,
+          width: isHovered ? (hoverText ? 56 : 32) : 10,
+          height: isHovered ? (hoverText ? 56 : 32) : 10,
           opacity: 1,
         }}
         transition={{ type: "spring", stiffness: 400, damping: 25 }}
