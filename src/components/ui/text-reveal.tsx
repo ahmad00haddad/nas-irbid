@@ -1,4 +1,5 @@
-import { useRef, useEffect, ReactNode } from "react";
+import { useRef, ReactNode } from "react";
+import type { Variants } from "framer-motion";
 import { motion, useInView } from "framer-motion";
 
 interface TextRevealProps {
