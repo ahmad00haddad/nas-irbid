@@ -8,6 +8,8 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { useSiteSettings } from "@/lib/site-settings";
 import { FadeIn, StaggerContainer, StaggerItem } from "@/components/ui/fade-in";
 import { Magnetic } from "@/components/ui/magnetic";
+import { TextReveal } from "@/components/ui/text-reveal";
+import { HorizontalScroll } from "@/components/ui/horizontal-scroll";
 import { motion } from "framer-motion";
 
 const MotionLink = motion.create(Link);
@@ -62,9 +64,14 @@ function Index() {
               <span className="w-2 h-2 rounded-full bg-primary animate-pulse" />
               <span className="text-xs font-semibold text-primary tracking-wider">برنامج وثائقي · موسم ٢٠٢٦</span>
             </div>
-            <h1 className="font-display text-5xl md:text-7xl lg:text-8xl leading-[1.15] mb-6 text-foreground" style={{ letterSpacing: "0", wordSpacing: "-0.05em" }}>
+            <TextReveal
+              as="h1"
+              by="word"
+              delay={0.3}
+              className="font-display text-5xl md:text-7xl lg:text-8xl leading-[1.15] mb-6 text-foreground"
+            >
               {settings?.hero_title ?? "نوثّقُ إربد بصوت أهلها"}
-            </h1>
+            </TextReveal>
             <p className="text-lg md:text-xl text-muted-foreground leading-relaxed max-w-2xl mx-auto mb-10">
               {settings?.hero_subtitle ?? "برنامج وثائقي مستقل يحفظ ذاكرة المدينة وحكايات ناسها"}
             </p>
@@ -184,9 +191,18 @@ function Index() {
                 </div>
               </MotionLink>
             </FadeIn>
-            <StaggerContainer className="grid gap-6 md:grid-cols-3">
+            <StaggerContainer className="hidden md:flex gap-5 pb-2">
               {episodes.slice(1).map((ep) => <StaggerItem key={ep.id}><PublicEpisodeCard episode={ep as PublicEpisode} /></StaggerItem>)}
             </StaggerContainer>
+            <div className="md:hidden">
+              <HorizontalScroll>
+                {episodes.slice(1).map((ep) => (
+                  <div key={ep.id} className="min-w-[280px]">
+                    <PublicEpisodeCard episode={ep as PublicEpisode} />
+                  </div>
+                ))}
+              </HorizontalScroll>
+            </div>
             <FadeIn direction="up" delay={0.2} className="mt-10 flex justify-center">
               <MotionLink whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} to="/episodes" className="inline-flex items-center gap-2 px-7 py-3 rounded-full border-2 border-primary/40 text-foreground font-bold hover:bg-primary/10 transition">
                 كل الحلقات <ArrowLeft size={16} />
@@ -198,16 +214,19 @@ function Index() {
 
       {/* QUOTE */}
       <section className="container mx-auto px-6 py-24">
-        <div className="max-w-4xl mx-auto text-center">
-          <div className="font-display text-6xl text-primary mb-6 leading-none">❝</div>
-          <p className="font-display text-2xl md:text-4xl text-foreground leading-relaxed italic">
-            «المدينةُ ليست حجراً ولا أسفلتاً، المدينةُ ناسُها.
-            <br />
-            وحكاياتُهم هي ما يجعلها تستحقُّ أن تُذكر».
-          </p>
+        <FadeIn className="max-w-4xl mx-auto text-center">
+          <div className="font-display text-6xl text-primary mb-6 leading-none">❬</div>
+          <TextReveal
+            as="p"
+            by="word"
+            delay={0.1}
+            className="font-display text-2xl md:text-4xl text-foreground leading-relaxed italic"
+          >
+            {"«المدينةُ ليست حجرًا ولا أسفلتًا، المدينةُ ناسُها. وحكاياتُهم هي ما يجعلها تستحقُّ أن تُذكر»."}
+          </TextReveal>
           <div className="mt-8 inline-block w-16 h-px bg-primary" />
           <div className="mt-4 text-sm text-muted-foreground tracking-widest">فريق ناس إربد</div>
-        </div>
+        </FadeIn>
       </section>
 
       {/* CTA */}

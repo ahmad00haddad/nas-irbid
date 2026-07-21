@@ -6,6 +6,9 @@ import { toast } from "sonner";
 import { ArrowRight, MapPin, Calendar, User, HelpCircle, Send, Share2, Link2, MessageCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { PublicEpisodeCard, type PublicEpisode } from "@/components/site/PublicEpisodeCard";
+import { ReadingProgressBar } from "@/components/ui/reading-progress";
+import { TextReveal } from "@/components/ui/text-reveal";
+import { FadeIn } from "@/components/ui/fade-in";
 
 export const Route = createFileRoute("/episodes_/$slug")({
   component: EpisodeDetail,
@@ -82,6 +85,7 @@ function EpisodeDetail() {
 
   return (
     <article>
+      <ReadingProgressBar />
       {/* Hero */}
       <div className="container mx-auto px-6 pt-10 pb-6">
         <Link to="/episodes" className="text-xs text-muted-foreground hover:text-primary inline-flex items-center gap-1 mb-6">
@@ -89,8 +93,15 @@ function EpisodeDetail() {
         </Link>
         <div className="max-w-4xl">
           {ep.episode_number && <span className="text-xs font-bold text-primary tracking-widest">حلقة {ep.episode_number} · الموسم {ep.season ?? 1}</span>}
-          <h1 className="font-display text-4xl md:text-6xl mt-3 mb-5 text-foreground leading-tight">{ep.title}</h1>
-          {ep.short_description && <p className="text-lg text-muted-foreground leading-relaxed">{ep.short_description}</p>}
+          <TextReveal
+            as="h1"
+            by="word"
+            delay={0.1}
+            className="font-display text-4xl md:text-6xl mt-3 mb-5 text-foreground leading-tight"
+          >
+            {ep.title}
+          </TextReveal>
+          {ep.short_description && <FadeIn delay={0.4}><p className="text-lg text-muted-foreground leading-relaxed">{ep.short_description}</p></FadeIn>}
           <div className="flex flex-wrap gap-4 mt-6 text-sm text-muted-foreground">
             {ep.character_name && <span className="inline-flex items-center gap-1.5"><User size={14} /> {ep.character_name}</span>}
             {ep.neighborhood && <span className="inline-flex items-center gap-1.5"><MapPin size={14} /> {ep.neighborhood}</span>}

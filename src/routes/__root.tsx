@@ -16,6 +16,7 @@ import { Footer } from "@/components/site/Footer";
 import { Toaster } from "@/components/ui/sonner";
 import { AuthProvider } from "@/lib/auth";
 import { Cursor } from "@/components/ui/cursor";
+import { RippleEffect } from "@/components/ui/ripple-effect";
 
 function NotFoundComponent() {
   return (
@@ -141,6 +142,7 @@ function RootComponent() {
           <Footer />
         </div>
         <Cursor />
+        <RippleEffect />
         <Toaster position="top-center" richColors />
       </AuthProvider>
     </QueryClientProvider>
