@@ -6,7 +6,9 @@ import {
   useRouter,
   HeadContent,
   Scripts,
+  useLocation,
 } from "@tanstack/react-router";
+import { AnimatePresence, motion } from "framer-motion";
 
 import appCss from "../styles.css?url";
 import { Header } from "@/components/site/Header";
@@ -116,14 +118,25 @@ function RootShell({ children }: { children: React.ReactNode }) {
 
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
+  const location = useLocation();
+
   return (
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
         <div className="min-h-screen flex flex-col relative z-[2]">
           <Header />
-          <main className="flex-1">
-            <Outlet />
-          </main>
+          <AnimatePresence mode="wait">
+            <motion.main
+              key={location.pathname}
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -12 }}
+              transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+              className="flex-1"
+            >
+              <Outlet />
+            </motion.main>
+          </AnimatePresence>
           <Footer />
         </div>
         <Toaster position="top-center" richColors />

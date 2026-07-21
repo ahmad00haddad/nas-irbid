@@ -1,6 +1,7 @@
 import { Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { Menu, X, LayoutDashboard } from "lucide-react";
+import { motion, useScroll, useMotionValueEvent } from "framer-motion";
 import { useAuth } from "@/lib/auth";
 import { Button } from "@/components/ui/button";
 
@@ -14,7 +15,19 @@ const navItems = [
 
 export function Header() {
   const [open, setOpen] = useState(false);
+  const [hidden, setHidden] = useState(false);
   const { isEditor } = useAuth();
+  const { scrollY } = useScroll();
+
+  useMotionValueEvent(scrollY, "change", (latest) => {
+    const previous = scrollY.getPrevious() ?? 0;
+    if (latest > previous && latest > 150) {
+      setHidden(true);
+      setOpen(false);
+    } else {
+      setHidden(false);
+    }
+  });
 
   useEffect(() => {
     if (!open) return;
@@ -26,7 +39,12 @@ export function Header() {
   }, [open]);
 
   return (
-    <header className="sticky top-0 z-50 backdrop-blur-md bg-background/80 border-b border-border/60">
+    <motion.header 
+      variants={{ visible: { y: 0 }, hidden: { y: "-100%" } }}
+      animate={hidden ? "hidden" : "visible"}
+      transition={{ duration: 0.35, ease: "easeInOut" }}
+      className="sticky top-0 z-50 backdrop-blur-md bg-background/80 border-b border-border/60"
+    >
       <div className="container mx-auto px-6 h-20 flex items-center justify-between">
         <Link to="/" className="flex items-center gap-3 group">
           <div className="w-11 h-11 rounded-full bg-gradient-warm flex items-center justify-center shadow-glow group-hover:scale-105 transition-transform">
@@ -106,6 +124,6 @@ export function Header() {
           </nav>
         </div>
       )}
-    </header>
+    </motion.header>
   );
 }

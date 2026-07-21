@@ -6,6 +6,10 @@ import { ArrowLeft, Users, HelpCircle, Share2, Play, MapPin } from "lucide-react
 import { PublicEpisodeCard, type PublicEpisode } from "@/components/site/PublicEpisodeCard";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useSiteSettings } from "@/lib/site-settings";
+import { FadeIn, StaggerContainer, StaggerItem } from "@/components/ui/fade-in";
+import { motion } from "framer-motion";
+
+const MotionLink = motion.create(Link);
 
 export const Route = createFileRoute("/")({
   component: Index,
@@ -52,7 +56,7 @@ function Index() {
       {/* HERO TEXT */}
       <section className="relative overflow-hidden border-b border-border/60">
         <div className="container mx-auto px-6 py-14 md:py-20">
-          <div className="max-w-3xl mx-auto text-center">
+          <FadeIn delay={0.2} className="max-w-3xl mx-auto text-center">
             <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary/10 border border-primary/30 mb-6">
               <span className="w-2 h-2 rounded-full bg-primary animate-pulse" />
               <span className="text-xs font-semibold text-primary tracking-wider">برنامج وثائقي · موسم ٢٠٢٦</span>
@@ -64,27 +68,31 @@ function Index() {
               {settings?.hero_subtitle ?? "برنامج وثائقي مستقل يحفظ ذاكرة المدينة وحكايات ناسها"}
             </p>
             <div className="flex flex-wrap gap-4 justify-center">
-              <Link
+              <MotionLink
                 to="/episodes"
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
                 className="inline-flex items-center gap-2 px-7 py-4 rounded-full bg-primary text-primary-foreground font-bold shadow-glow hover:opacity-90 transition"
               >
                 شاهد الحلقات
                 <ArrowLeft size={18} />
-              </Link>
-              <Link
+              </MotionLink>
+              <MotionLink
                 to="/suggest"
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
                 className="inline-flex items-center gap-2 px-7 py-4 rounded-full border-2 border-primary/40 text-foreground font-bold hover:bg-primary/10 transition"
               >
                 اقترح شخصية للحلقة الجاية
-              </Link>
+              </MotionLink>
             </div>
-          </div>
+          </FadeIn>
         </div>
       </section>
 
       {/* PARTICIPATION GRID */}
       <section className="container mx-auto px-6 py-24">
-        <div className="text-center max-w-2xl mx-auto mb-16">
+        <FadeIn className="text-center max-w-2xl mx-auto mb-16">
           <span className="text-xs font-bold text-primary tracking-widest">شاركنا الحكاية</span>
           <h2 className="font-display text-4xl md:text-5xl mt-3 mb-4 text-foreground">
             البرنامج <span className="text-primary">يصنعه أهله</span>
@@ -92,30 +100,33 @@ function Index() {
           <p className="text-muted-foreground leading-relaxed">
             رأيك واقتراحاتك جزء من كل حلقة. اختر كيف تريد أن تشارك:
           </p>
-        </div>
+        </FadeIn>
 
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <StaggerContainer className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
           {[
             { icon: Users, title: "رشّح شخصية", text: "تعرف حدا يستاهل حلقة؟ صاحب مهنة قديمة، حكواتي، أو ست بيتٍ بحكاية؟", link: "/suggest", cta: "ابعت ترشيحك" },
             { icon: HelpCircle, title: "اسأل الضيف", text: "اختر شخصية من حلقاتنا واسألها سؤالك — ممكن نطرحه عليها في حلقة قادمة.", link: "/ask", cta: "أرسل سؤالك" },
             { icon: Share2, title: "انشر الحلقة", text: "كل مشاركة بتوصل البرنامج لعائلة جديدة، وحكاية إربد لجمهور أوسع.", link: "/episodes", cta: "شاهد الحلقات" },
           ].map(({ icon: Icon, title, text, link, cta }) => (
-            <Link
-              key={title}
-              to={link}
-              className="group p-7 rounded-2xl bg-card border border-border/60 hover:border-primary/60 transition-all hover:-translate-y-1 shadow-deep"
-            >
-              <div className="w-12 h-12 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center mb-5 group-hover:bg-primary group-hover:border-primary transition">
-                <Icon size={22} className="text-primary group-hover:text-primary-foreground transition" />
-              </div>
-              <h3 className="font-display text-xl text-foreground mb-2">{title}</h3>
-              <p className="text-sm text-muted-foreground leading-relaxed mb-4">{text}</p>
-              <span className="text-sm font-bold text-primary inline-flex items-center gap-1">
-                {cta} <ArrowLeft size={14} className="group-hover:-translate-x-1 transition-transform" />
-              </span>
-            </Link>
+            <StaggerItem key={title}>
+              <MotionLink
+                to={link}
+                whileHover={{ y: -5 }}
+                whileTap={{ scale: 0.98 }}
+                className="group block p-7 rounded-2xl bg-card border border-border/60 hover:border-primary/60 transition-colors shadow-deep"
+              >
+                <div className="w-12 h-12 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center mb-5 group-hover:bg-primary group-hover:border-primary transition">
+                  <Icon size={22} className="text-primary group-hover:text-primary-foreground transition" />
+                </div>
+                <h3 className="font-display text-xl text-foreground mb-2">{title}</h3>
+                <p className="text-sm text-muted-foreground leading-relaxed mb-4">{text}</p>
+                <span className="text-sm font-bold text-primary inline-flex items-center gap-1">
+                  {cta} <ArrowLeft size={14} className="group-hover:-translate-x-1 transition-transform" />
+                </span>
+              </MotionLink>
+            </StaggerItem>
           ))}
-        </div>
+        </StaggerContainer>
       </section>
 
       {/* LATEST EPISODES */}
@@ -146,31 +157,35 @@ function Index() {
             </Link>
           </div>
           <div className="max-w-6xl mx-auto">
-            <Link to="/episodes/$slug" params={{ slug: episodes[0].slug }} className="group mb-7 grid overflow-hidden rounded-3xl border border-primary/30 bg-card shadow-deep transition hover:border-primary/70 md:grid-cols-[1.35fr_1fr]">
-              <div className="relative min-h-72 overflow-hidden bg-secondary md:min-h-[25rem]">
-                <img src={episodes[0].cover_image_url ?? `https://img.youtube.com/vi/${episodes[0].youtube_id}/hqdefault.jpg`} alt={`صورة الحلقة المميزة ${episodes[0].title}`} className="h-full w-full object-cover transition duration-700 group-hover:scale-105" />
-                <div className="absolute inset-0 bg-gradient-to-t from-foreground/60 via-transparent to-transparent" />
-                <div className="absolute bottom-6 right-6 flex h-14 w-14 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-glow"><Play size={20} fill="currentColor" /></div>
-              </div>
-              <div className="flex flex-col justify-center p-7 md:p-10">
-                <span className="text-xs font-bold tracking-widest text-primary">الحلقة المميزة · {episodes[0].episode_number ? `رقم ${episodes[0].episode_number}` : "الأحدث"}</span>
-                <h3 className="mt-3 font-display text-3xl leading-tight text-foreground md:text-4xl">{episodes[0].title}</h3>
-                {episodes[0].short_description && <p className="mt-4 leading-relaxed text-muted-foreground">{episodes[0].short_description}</p>}
-                <div className="mt-6 flex flex-wrap gap-4 text-sm text-muted-foreground">
-                  {episodes[0].character_name && <strong className="text-foreground">{episodes[0].character_name}</strong>}
-                  {episodes[0].neighborhood && <span className="inline-flex items-center gap-1"><MapPin size={14} />{episodes[0].neighborhood}</span>}
+            <FadeIn delay={0.1}>
+              <MotionLink to="/episodes/$slug" params={{ slug: episodes[0].slug }} whileHover={{ y: -8 }} whileTap={{ scale: 0.98 }} className="group mb-7 block overflow-hidden rounded-3xl border border-primary/30 bg-card shadow-deep transition-colors hover:border-primary/70">
+                <div className="grid md:grid-cols-[1.35fr_1fr]">
+                  <div className="relative min-h-72 overflow-hidden bg-secondary md:min-h-[25rem]">
+                    <img src={episodes[0].cover_image_url ?? `https://img.youtube.com/vi/${episodes[0].youtube_id}/hqdefault.jpg`} alt={`صورة الحلقة المميزة ${episodes[0].title}`} className="h-full w-full object-cover transition duration-700 group-hover:scale-105" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-foreground/60 via-transparent to-transparent" />
+                    <div className="absolute bottom-6 right-6 flex h-14 w-14 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-glow transition group-hover:scale-110"><Play size={20} fill="currentColor" /></div>
+                  </div>
+                  <div className="flex flex-col justify-center p-7 md:p-10">
+                    <span className="text-xs font-bold tracking-widest text-primary">الحلقة المميزة · {episodes[0].episode_number ? `رقم ${episodes[0].episode_number}` : "الأحدث"}</span>
+                    <h3 className="mt-3 font-display text-3xl leading-tight text-foreground md:text-4xl">{episodes[0].title}</h3>
+                    {episodes[0].short_description && <p className="mt-4 leading-relaxed text-muted-foreground">{episodes[0].short_description}</p>}
+                    <div className="mt-6 flex flex-wrap gap-4 text-sm text-muted-foreground">
+                      {episodes[0].character_name && <strong className="text-foreground">{episodes[0].character_name}</strong>}
+                      {episodes[0].neighborhood && <span className="inline-flex items-center gap-1"><MapPin size={14} />{episodes[0].neighborhood}</span>}
+                    </div>
+                    <span className="mt-8 inline-flex items-center gap-2 font-bold text-primary">شاهد الحكاية <ArrowLeft size={16} /></span>
+                  </div>
                 </div>
-                <span className="mt-8 inline-flex items-center gap-2 font-bold text-primary">شاهد الحكاية <ArrowLeft size={16} /></span>
-              </div>
-            </Link>
-            <div className="grid gap-6 md:grid-cols-3">
-              {episodes.slice(1).map((ep) => <PublicEpisodeCard key={ep.id} episode={ep as PublicEpisode} />)}
-            </div>
-            <div className="mt-10 flex justify-center">
-              <Link to="/episodes" className="inline-flex items-center gap-2 px-7 py-3 rounded-full border-2 border-primary/40 text-foreground font-bold hover:bg-primary/10 transition">
+              </MotionLink>
+            </FadeIn>
+            <StaggerContainer className="grid gap-6 md:grid-cols-3">
+              {episodes.slice(1).map((ep) => <StaggerItem key={ep.id}><PublicEpisodeCard episode={ep as PublicEpisode} /></StaggerItem>)}
+            </StaggerContainer>
+            <FadeIn direction="up" delay={0.2} className="mt-10 flex justify-center">
+              <MotionLink whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} to="/episodes" className="inline-flex items-center gap-2 px-7 py-3 rounded-full border-2 border-primary/40 text-foreground font-bold hover:bg-primary/10 transition">
                 كل الحلقات <ArrowLeft size={16} />
-              </Link>
-            </div>
+              </MotionLink>
+            </FadeIn>
           </div>
         </section>
       )}
@@ -191,29 +206,33 @@ function Index() {
 
       {/* CTA */}
       <section className="container mx-auto px-6 pb-24">
-        <div className="relative overflow-hidden rounded-3xl p-12 md:p-16 bg-card border border-primary/20 shadow-deep">
-          <div className="relative grid md:grid-cols-2 gap-10 items-center">
-            <div>
-              <h2 className="font-display text-3xl md:text-5xl text-foreground leading-tight mb-4">
-                ساعدنا نُكمل <span className="text-primary">الحكاية</span>
-              </h2>
-              <p className="text-muted-foreground leading-relaxed">
-                البرنامج إنتاج مستقل يصنعه فريق صغير بشغف كبير. دعمك — مهما كان بسيطاً —
-                يساعدنا في توثيق المزيد من قصص إربد قبل أن تضيع.
-              </p>
-            </div>
-            <div className="flex md:justify-end">
-              <Link
-                to="/about"
-                hash="support"
-                className="inline-flex items-center gap-2 px-8 py-4 rounded-full bg-primary text-primary-foreground font-bold shadow-glow hover:opacity-90 transition"
-              >
-                طرق الدعم
-                <ArrowLeft size={18} />
-              </Link>
+        <FadeIn direction="up">
+          <div className="relative overflow-hidden rounded-3xl p-12 md:p-16 bg-card border border-primary/20 shadow-deep">
+            <div className="relative grid md:grid-cols-2 gap-10 items-center">
+              <div>
+                <h2 className="font-display text-3xl md:text-5xl text-foreground leading-tight mb-4">
+                  ساعدنا نُكمل <span className="text-primary">الحكاية</span>
+                </h2>
+                <p className="text-muted-foreground leading-relaxed">
+                  البرنامج إنتاج مستقل يصنعه فريق صغير بشغف كبير. دعمك — مهما كان بسيطاً —
+                  يساعدنا في توثيق المزيد من قصص إربد قبل أن تضيع.
+                </p>
+              </div>
+              <div className="flex md:justify-end">
+                <MotionLink
+                  to="/about"
+                  hash="support"
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  className="inline-flex items-center gap-2 px-8 py-4 rounded-full bg-primary text-primary-foreground font-bold shadow-glow hover:opacity-90 transition"
+                >
+                  طرق الدعم
+                  <ArrowLeft size={18} />
+                </MotionLink>
+              </div>
             </div>
           </div>
-        </div>
+        </FadeIn>
       </section>
     </>
   );

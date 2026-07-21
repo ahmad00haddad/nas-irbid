@@ -8,6 +8,7 @@ import { Search, RotateCcw } from "lucide-react";
 import { PublicEpisodeCard, type PublicEpisode } from "@/components/site/PublicEpisodeCard";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
+import { FadeIn, StaggerContainer, StaggerItem } from "@/components/ui/fade-in";
 
 const searchSchema = z.object({
   q: z.string().optional().catch(""),
@@ -59,7 +60,7 @@ function EpisodesPage() {
 
   return (
     <div className="container mx-auto px-6 py-20">
-      <header className="max-w-3xl mb-14">
+      <FadeIn className="max-w-3xl mb-14">
         <span className="text-xs font-bold accent-emerald tracking-widest divider-emerald">الأرشيف</span>
         <h1 className="font-display text-5xl md:text-6xl mt-3 mb-5 text-foreground">
           أرشيف <span className="text-gradient-gold">الحلقات</span>
@@ -68,9 +69,9 @@ function EpisodesPage() {
           كل حلقات «ناس إربد» في مكان واحد. شاهدها بجودة عالية، اقرأ ملخصها التاريخي،
           واكتشف ما لم يظهر في المونتاج.
         </p>
-      </header>
+      </FadeIn>
 
-      <section aria-label="البحث في الأرشيف" className="mb-10 grid gap-3 rounded-2xl border border-border/70 bg-card/70 p-4 md:grid-cols-[1fr_auto]">
+      <FadeIn delay={0.1} className="mb-10 grid gap-3 rounded-2xl border border-border/70 bg-card/70 p-4 md:grid-cols-[1fr_auto]">
         <label className="relative block">
           <Search className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground" size={17} />
           <span className="sr-only">ابحث في الحلقات</span>
@@ -83,7 +84,7 @@ function EpisodesPage() {
             {neighborhoods.map((item) => <option key={item} value={item}>{item}</option>)}
           </select>
         </label>
-      </section>
+      </FadeIn>
 
       {isLoading ? (
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3" aria-label="جاري تحميل الحلقات">
@@ -107,9 +108,13 @@ function EpisodesPage() {
           <Button variant="outline" className="mt-5 rounded-full" onClick={() => { setQuery(""); setNeighborhood("all"); }}><RotateCcw size={15} /> مسح البحث</Button>
         </div>
       ) : (
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filtered.map((ep) => <PublicEpisodeCard key={ep.id} episode={ep as PublicEpisode} />)}
-        </div>
+        <StaggerContainer className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {filtered.map((ep) => (
+            <StaggerItem key={ep.id}>
+              <PublicEpisodeCard episode={ep as PublicEpisode} />
+            </StaggerItem>
+          ))}
+        </StaggerContainer>
       )}
     </div>
   );

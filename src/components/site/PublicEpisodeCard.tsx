@@ -1,5 +1,8 @@
 import { Link } from "@tanstack/react-router";
 import { BriefcaseBusiness, CalendarDays, MapPin, Play } from "lucide-react";
+import { motion } from "framer-motion";
+
+const MotionLink = motion.create(Link);
 
 export type PublicEpisode = {
   id: string;
@@ -19,10 +22,13 @@ export function PublicEpisodeCard({ episode }: { episode: PublicEpisode }) {
   const image = episode.cover_image_url ?? (episode.youtube_id ? `https://img.youtube.com/vi/${episode.youtube_id}/hqdefault.jpg` : null);
 
   return (
-    <Link
+    <MotionLink
       to="/episodes/$slug"
       params={{ slug: episode.slug }}
-      className="group overflow-hidden rounded-2xl border border-border/70 bg-card shadow-deep transition duration-300 hover:-translate-y-1 hover:border-primary/60"
+      whileHover={{ y: -6 }}
+      whileTap={{ scale: 0.97 }}
+      transition={{ type: "spring", stiffness: 400, damping: 25 }}
+      className="group block overflow-hidden rounded-2xl border border-border/70 bg-card shadow-deep transition-colors duration-300 hover:border-primary/60"
     >
       <div className="relative aspect-[4/3] overflow-hidden bg-secondary">
         {image ? (
@@ -52,6 +58,6 @@ export function PublicEpisodeCard({ episode }: { episode: PublicEpisode }) {
           {episode.published_at && <span className="inline-flex items-center gap-1"><CalendarDays size={12} />{new Date(episode.published_at).toLocaleDateString("ar-JO", { year: "numeric", month: "short" })}</span>}
         </div>
       </div>
-    </Link>
+    </MotionLink>
   );
 }
