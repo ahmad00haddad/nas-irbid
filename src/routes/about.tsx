@@ -4,6 +4,7 @@ import {
   Share2, MessageCircle, MapPin, Lightbulb, Handshake, GraduationCap,
   Landmark, Sparkles, ArrowLeft, Quote
 } from "lucide-react";
+import { useSiteSettings } from "@/lib/site-settings";
 
 export const Route = createFileRoute("/about")({
   component: AboutPage,
@@ -20,6 +21,8 @@ export const Route = createFileRoute("/about")({
 });
 
 function AboutPage() {
+  const { data: settings } = useSiteSettings();
+  const contactEmail = settings?.contact_email ?? "ahmad000haddad@gmail.com";
   return (
     <div>
       {/* ============ Vision ============ */}
@@ -335,7 +338,7 @@ function AboutPage() {
             ونحن نرتّب معك أنسب طريقة — حسب وقتك وإمكانياتك.
           </p>
           <a
-            href="mailto:ahmad000haddad@gmail.com?subject=بدّي أساهم في ناس إربد"
+            href={`mailto:${contactEmail}?subject=بدّي أساهم في ناس إربد`}
             className="inline-flex items-center gap-2 px-8 py-3.5 rounded-full bg-background text-foreground text-sm font-bold hover:bg-background/90 transition"
           >
             <Heart size={16} fill="currentColor" className="text-primary" />

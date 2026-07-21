@@ -9,6 +9,7 @@ import { PublicEpisodeCard, type PublicEpisode } from "@/components/site/PublicE
 import { ReadingProgressBar } from "@/components/ui/reading-progress";
 import { TextReveal } from "@/components/ui/text-reveal";
 import { FadeIn } from "@/components/ui/fade-in";
+import { ErrorState } from "@/components/ui/error-state";
 
 export const Route = createFileRoute("/episodes_/$slug")({
   component: EpisodeDetail,
@@ -53,16 +54,23 @@ export const Route = createFileRoute("/episodes_/$slug")({
     return data;
   },
   notFoundComponent: () => (
-    <div className="container mx-auto px-6 py-20 text-center">
-      <h1 className="font-display text-3xl text-foreground">الحلقة غير موجودة</h1>
-      <Link to="/episodes" className="mt-6 inline-flex px-5 py-2.5 rounded-full bg-gradient-warm text-primary-foreground text-sm font-bold">
-        العودة للأرشيف
-      </Link>
+    <div className="container mx-auto px-6 py-20">
+      <ErrorState
+        title="الحلقة غير موجودة"
+        description="يبدو أن هذه الحلقة تم حذفها أو أن الرابط غير صحيح."
+        variant="notfound"
+        backTo={{ to: "/episodes", label: "العودة للأرشيف" }}
+      />
     </div>
   ),
   errorComponent: () => (
-    <div className="container mx-auto px-6 py-20 text-center">
-      <p className="text-muted-foreground">حدث خطأ.</p>
+    <div className="container mx-auto px-6 py-20">
+      <ErrorState
+        title="تعذّر تحميل الحلقة"
+        description="حدث خطأ غير متوقع أثناء تحميل البيانات."
+        variant="generic"
+        action={{ label: "إعادة المحاولة", onClick: () => window.location.reload() }}
+      />
     </div>
   ),
 });

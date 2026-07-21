@@ -10,6 +10,7 @@ const navItems = [
   { to: "/episodes", label: "الحلقات" },
   { to: "/suggest", label: "اقترح حكاية" },
   { to: "/ask", label: "اسأل الضيف" },
+  { to: "/contact", label: "تواصل معنا" },
   { to: "/about", label: "عن البرنامج" },
 ] as const;
 

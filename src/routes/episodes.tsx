@@ -8,6 +8,7 @@ import { PublicEpisodeCard, type PublicEpisode } from "@/components/site/PublicE
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 import { FadeIn } from "@/components/ui/fade-in";
+import { ErrorState } from "@/components/ui/error-state";
 
 export const Route = createFileRoute("/episodes")({
   component: EpisodesPage,
@@ -111,10 +112,14 @@ function EpisodesPage() {
           {Array.from({ length: 6 }).map((_, index) => <Skeleton key={index} className="aspect-[4/5] rounded-2xl" />)}
         </div>
       ) : isError ? (
-        <div className="mx-auto max-w-xl rounded-2xl border border-destructive/30 bg-card p-10 text-center">
-          <h2 className="font-display text-2xl text-foreground">تعذّر تحميل الأرشيف</h2>
-          <p className="mt-2 text-sm text-muted-foreground">تحقق من اتصالك ثم حاول مرة أخرى.</p>
-          <Button className="mt-5 rounded-full" onClick={() => refetch()}>إعادة المحاولة</Button>
+        <div className="py-8">
+          <ErrorState
+            title="تعذّر تحميل الأرشيف"
+            description="تحقّق من اتصالك بالإنترنت ثم حاول مرة أخرى."
+            variant="network"
+            action={{ label: "إعادة المحاولة", onClick: () => refetch() }}
+            backTo={{ to: "/", label: "الصفحة الرئيسية" }}
+          />
         </div>
       ) : episodes.length === 0 ? (
         <div className="text-center p-16 rounded-2xl bg-card border border-dashed border-border max-w-xl mx-auto">
