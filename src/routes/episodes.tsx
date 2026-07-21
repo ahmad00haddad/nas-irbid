@@ -25,6 +25,7 @@ export const Route = createFileRoute("/episodes")({
 
 function EpisodesPage() {
   const [query, setQuery] = useState("");
+  const deferredQuery = useDeferredValue(query);
 
   const { data: episodes = [], isLoading, isError, refetch } = useQuery({
     queryKey: ["public-episodes"],
@@ -35,19 +36,31 @@ function EpisodesPage() {
         .order("published_at", { ascending: false, nullsFirst: false })
         .order("created_at", { ascending: false });
       if (error) throw error;
-      return data;
+      return data ?? [];
     },
   });
 
+  const normalize = (s: string) =>
+    s.toLocaleLowerCase("ar")
+      .replace(/[\u064B-\u065F\u0670]/g, "") // strip Arabic diacritics
+      .replace(/[إأآا]/g, "ا")
+      .replace(/ى/g, "ي")
+      .replace(/ة/g, "ه")
+      .replace(/\s+/g, " ")
+      .trim();
+
   const filtered = useMemo(() => {
-    const needle = query.trim().toLocaleLowerCase("ar");
+    if (!episodes || episodes.length === 0) return [];
+    const needle = normalize(deferredQuery);
     if (!needle) return episodes;
     return episodes.filter((ep) => {
-      const haystack = [ep.title, ep.character_name, ep.profession, ep.neighborhood, ep.short_description]
-        .filter(Boolean).join(" ").toLocaleLowerCase("ar");
+      const haystack = normalize(
+        [ep.title, ep.character_name, ep.profession, ep.neighborhood, ep.short_description, ep.story]
+          .filter(Boolean).join(" ")
+      );
       return haystack.includes(needle);
     });
-  }, [episodes, query]);
+  }, [episodes, deferredQuery]);
 
   return (
     <div className="container mx-auto px-6 py-20">
