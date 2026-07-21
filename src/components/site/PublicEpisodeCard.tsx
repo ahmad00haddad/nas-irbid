@@ -24,7 +24,7 @@ export function PublicEpisodeCard({ episode }: { episode: PublicEpisode }) {
   return (
     <MotionLink
       to="/episodes/$slug"
-      params={{ slug: episode.slug }}
+      params={{ slug: episode.slug } as never}
       whileHover={{ y: -6 }}
       whileTap={{ scale: 0.97 }}
       transition={{ type: "spring", stiffness: 400, damping: 25 }}
