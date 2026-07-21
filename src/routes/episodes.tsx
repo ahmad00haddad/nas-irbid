@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
+import { z } from "zod";
 
 import { supabase } from "@/integrations/supabase/client";
 import { Search, RotateCcw } from "lucide-react";
@@ -8,7 +9,13 @@ import { PublicEpisodeCard, type PublicEpisode } from "@/components/site/PublicE
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 
+const searchSchema = z.object({
+  q: z.string().optional().catch(""),
+  n: z.string().optional().catch("all"),
+});
+
 export const Route = createFileRoute("/episodes")({
+  validateSearch: searchSchema,
   component: EpisodesPage,
   head: () => ({
     meta: [
@@ -23,8 +30,11 @@ export const Route = createFileRoute("/episodes")({
 });
 
 function EpisodesPage() {
-  const [query, setQuery] = useState("");
-  const [neighborhood, setNeighborhood] = useState("all");
+  const { q: query = "", n: neighborhood = "all" } = Route.useSearch();
+  const navigate = Route.useNavigate();
+
+  const setQuery = (val: string) => navigate({ search: (prev) => ({ ...prev, q: val }), replace: true });
+  const setNeighborhood = (val: string) => navigate({ search: (prev) => ({ ...prev, n: val }), replace: true });
   const { data: episodes = [], isLoading, isError, refetch } = useQuery({
     queryKey: ["public-episodes"],
     queryFn: async () => {

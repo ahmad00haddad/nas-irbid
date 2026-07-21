@@ -52,6 +52,12 @@ function SuggestPage() {
     }
     const d = parsed.data;
 
+    const lastSubmit = localStorage.getItem("lastSuggestSubmit");
+    if (lastSubmit && Date.now() - parseInt(lastSubmit) < 60000) {
+      toast.error("يرجى الانتظار", { description: "عفواً، لا يمكنك إرسال اقتراح آخر بهذه السرعة. جرب بعد دقيقة." });
+      return;
+    }
+
     setSubmitting(true);
     // Preserve the optional age field by prepending it to the story summary,
     // since the table doesn't have a dedicated column for it.
@@ -73,6 +79,7 @@ function SuggestPage() {
       return;
     }
 
+    localStorage.setItem("lastSuggestSubmit", Date.now().toString());
     toast.success("وصلنا اقتراحك — شكراً إلك!", {
       description: "رح نراجعه ونرد عليك في حال احتجنا تفاصيل أكثر.",
     });

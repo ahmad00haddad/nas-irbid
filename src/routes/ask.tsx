@@ -57,6 +57,11 @@ function AskPage() {
       toast.error("تعذّر الإرسال", { description: parsed.error.issues[0]?.message });
       return;
     }
+    const lastSubmit = localStorage.getItem("lastAskSubmit");
+    if (lastSubmit && Date.now() - parseInt(lastSubmit) < 60000) {
+      toast.error("يرجى الانتظار", { description: "عفواً، لا يمكنك إرسال سؤال آخر بهذه السرعة. جرب بعد دقيقة." });
+      return;
+    }
 
     setSubmitting(true);
     const { error } = await supabase.from("questions").insert({
@@ -72,6 +77,8 @@ function AskPage() {
       toast.error("تعذّر الإرسال", { description: error.message });
       return;
     }
+    
+    localStorage.setItem("lastAskSubmit", Date.now().toString());
     toast.success("وصلنا سؤالك — شكراً إلك!", {
       description: "رح نختار أفضل الأسئلة ونطرحها في الحلقات الجاية.",
     });
