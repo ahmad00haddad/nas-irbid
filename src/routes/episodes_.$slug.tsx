@@ -122,7 +122,7 @@ function EpisodeDetail() {
       {/* Video — main content, right after hero */}
       {ep.youtube_id && (
         <div className="container mx-auto px-6 py-10">
-          <div className="max-w-5xl mx-auto aspect-video rounded-2xl overflow-hidden bg-foreground shadow-deep">
+          <div className="mx-auto w-full max-w-md md:max-w-lg lg:max-w-xl aspect-[9/16] max-h-[85vh] rounded-2xl overflow-hidden bg-foreground shadow-deep">
             <iframe
               src={`https://www.youtube.com/embed/${ep.youtube_id}`}
               title={ep.title}
