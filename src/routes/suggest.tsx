@@ -5,6 +5,7 @@ import { Send, Sparkles, CheckCircle2, Loader2 } from "lucide-react";
 import { z } from "zod";
 import { supabase } from "@/integrations/supabase/client";
 import { motion, AnimatePresence } from "framer-motion";
+import { useSpamGuard, HONEYPOT_INPUT_PROPS } from "@/lib/spam-guard";
 
 const suggestSchema = z.object({
   character: z.string().trim().min(2, "اسم الشخصية قصير جداً").max(120),
@@ -33,10 +34,12 @@ export const Route = createFileRoute("/suggest")({
 function SuggestPage() {
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
+  const spam = useSpamGuard();
 
   const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const f = e.target as HTMLFormElement;
+    if (spam.isSpam(f)) { setSubmitted(true); return; }
     const fd = new FormData(f);
 
     const parsed = suggestSchema.safeParse({
@@ -160,6 +163,10 @@ function SuggestPage() {
             <label htmlFor="contact-ok" className="text-sm text-muted-foreground">
               متفق إنه فريق البرنامج يتواصل مع الشخصية المرشحة (بإذنها) لتقييم الحلقة.
             </label>
+          </div>
+
+          <div aria-hidden="true" style={{ position: "absolute", left: "-9999px", width: 1, height: 1, overflow: "hidden" }}>
+            <label>Website<input {...HONEYPOT_INPUT_PROPS} /></label>
           </div>
 
           <button

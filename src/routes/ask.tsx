@@ -6,6 +6,7 @@ import { Send, HelpCircle, CheckCircle2, Loader2, User } from "lucide-react";
 import { z } from "zod";
 import { supabase } from "@/integrations/supabase/client";
 import { motion, AnimatePresence } from "framer-motion";
+import { useSpamGuard, HONEYPOT_INPUT_PROPS } from "@/lib/spam-guard";
 
 const askSchema = z.object({
   question: z.string().trim().min(3, "السؤال قصير جداً").max(1000, "السؤال طويل جداً (الحد 1000 حرف)"),
@@ -31,6 +32,7 @@ function AskPage() {
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [episodeId, setEpisodeId] = useState<string>("");
+  const spam = useSpamGuard();
 
   const { data: episodes = [], isLoading, isError, refetch } = useQuery({
     queryKey: ["ask-episodes"],
@@ -49,7 +51,9 @@ function AskPage() {
 
   const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const fd = new FormData(e.target as HTMLFormElement);
+    const form = e.target as HTMLFormElement;
+    if (spam.isSpam(form)) { setSubmitted(true); return; }
+    const fd = new FormData(form);
     const parsed = askSchema.safeParse({
       question: String(fd.get("question") ?? ""),
       name: String(fd.get("name") ?? ""),
@@ -236,6 +240,9 @@ function AskPage() {
                   />
                 </label>
 
+                <div aria-hidden="true" style={{ position: "absolute", left: "-9999px", width: 1, height: 1, overflow: "hidden" }}>
+                  <label>Website<input {...HONEYPOT_INPUT_PROPS} /></label>
+                </div>
                 <div className="space-y-2">
                   <button
                     type="submit"
