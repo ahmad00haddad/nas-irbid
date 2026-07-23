@@ -32,6 +32,7 @@ function AskPage() {
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [episodeId, setEpisodeId] = useState<string>("");
+  const spam = useSpamGuard();
 
   const { data: episodes = [], isLoading, isError, refetch } = useQuery({
     queryKey: ["ask-episodes"],
