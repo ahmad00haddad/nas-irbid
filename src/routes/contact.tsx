@@ -182,6 +182,10 @@ function ContactPage() {
                 />
               </label>
 
+              <div aria-hidden="true" style={{ position: "absolute", left: "-9999px", width: 1, height: 1, overflow: "hidden" }}>
+                <label>Website<input {...HONEYPOT_INPUT_PROPS} /></label>
+              </div>
+
               <button
                 type="submit"
                 disabled={submitting}
