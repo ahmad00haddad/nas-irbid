@@ -34,10 +34,12 @@ export const Route = createFileRoute("/suggest")({
 function SuggestPage() {
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
+  const spam = useSpamGuard();
 
   const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const f = e.target as HTMLFormElement;
+    if (spam.isSpam(f)) { setSubmitted(true); return; }
     const fd = new FormData(f);
 
     const parsed = suggestSchema.safeParse({

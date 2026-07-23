@@ -7,6 +7,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useSiteSettings } from "@/lib/site-settings";
 import { motion, AnimatePresence } from "framer-motion";
 import { FadeIn } from "@/components/ui/fade-in";
+import { useSpamGuard, HONEYPOT_INPUT_PROPS } from "@/lib/spam-guard";
 
 const contactSchema = z.object({
   name: z.string().trim().min(2, "اسمك قصير جداً").max(100),
@@ -42,10 +43,13 @@ function ContactPage() {
   const [messageType, setMessageType] = useState<string>("general");
   const { data: settings } = useSiteSettings();
   const email = settings?.contact_email ?? "ahmad000haddad@gmail.com";
+  const spam = useSpamGuard();
 
   const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const fd = new FormData(e.target as HTMLFormElement);
+    const form = e.target as HTMLFormElement;
+    if (spam.isSpam(form)) { setSubmitted(true); return; }
+    const fd = new FormData(form);
     const parsed = contactSchema.safeParse({
       name: String(fd.get("name") ?? ""),
       phone: String(fd.get("phone") ?? ""),
