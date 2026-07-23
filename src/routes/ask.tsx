@@ -240,6 +240,9 @@ function AskPage() {
                   />
                 </label>
 
+                <div aria-hidden="true" style={{ position: "absolute", left: "-9999px", width: 1, height: 1, overflow: "hidden" }}>
+                  <label>Website<input {...HONEYPOT_INPUT_PROPS} /></label>
+                </div>
                 <div className="space-y-2">
                   <button
                     type="submit"
