@@ -5,6 +5,7 @@ import { Send, Sparkles, CheckCircle2, Loader2 } from "lucide-react";
 import { z } from "zod";
 import { supabase } from "@/integrations/supabase/client";
 import { motion, AnimatePresence } from "framer-motion";
+import { useSpamGuard, HONEYPOT_INPUT_PROPS } from "@/lib/spam-guard";
 
 const suggestSchema = z.object({
   character: z.string().trim().min(2, "اسم الشخصية قصير جداً").max(120),
