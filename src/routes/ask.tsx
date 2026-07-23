@@ -6,6 +6,7 @@ import { Send, HelpCircle, CheckCircle2, Loader2, User } from "lucide-react";
 import { z } from "zod";
 import { supabase } from "@/integrations/supabase/client";
 import { motion, AnimatePresence } from "framer-motion";
+import { useSpamGuard, HONEYPOT_INPUT_PROPS } from "@/lib/spam-guard";
 
 const askSchema = z.object({
   question: z.string().trim().min(3, "السؤال قصير جداً").max(1000, "السؤال طويل جداً (الحد 1000 حرف)"),
