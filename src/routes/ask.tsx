@@ -51,7 +51,9 @@ function AskPage() {
 
   const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const fd = new FormData(e.target as HTMLFormElement);
+    const form = e.target as HTMLFormElement;
+    if (spam.isSpam(form)) { setSubmitted(true); return; }
+    const fd = new FormData(form);
     const parsed = askSchema.safeParse({
       question: String(fd.get("question") ?? ""),
       name: String(fd.get("name") ?? ""),
