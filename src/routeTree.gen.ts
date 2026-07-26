@@ -9,62 +9,28 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as SuggestRouteImport } from './routes/suggest'
-import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
-import { Route as InstallRouteImport } from './routes/install'
-import { Route as EpisodesRouteImport } from './routes/episodes'
-import { Route as ContactRouteImport } from './routes/contact'
-import { Route as AuthRouteImport } from './routes/auth'
-import { Route as AskRouteImport } from './routes/ask'
-import { Route as AdminRouteImport } from './routes/admin'
-import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AboutRouteImport } from './routes/about'
+import { Route as AdminRouteImport } from './routes/admin'
+import { Route as AskRouteImport } from './routes/ask'
+import { Route as AuthRouteImport } from './routes/auth'
+import { Route as ContactRouteImport } from './routes/contact'
+import { Route as EpisodesRouteImport } from './routes/episodes'
+import { Route as InstallRouteImport } from './routes/install'
+import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
+import { Route as SuggestRouteImport } from './routes/suggest'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
-import { Route as EpisodesSlugRouteImport } from './routes/episodes_.$slug'
-import { Route as AdminSuggestionsRouteImport } from './routes/admin.suggestions'
-import { Route as AdminSettingsRouteImport } from './routes/admin.settings'
-import { Route as AdminQuestionsRouteImport } from './routes/admin.questions'
-import { Route as AdminMessagesRouteImport } from './routes/admin.messages'
+import { Route as AdminAnalyticsRouteImport } from './routes/admin.analytics'
 import { Route as AdminEpisodesRouteImport } from './routes/admin.episodes'
+import { Route as AdminMessagesRouteImport } from './routes/admin.messages'
+import { Route as AdminQuestionsRouteImport } from './routes/admin.questions'
+import { Route as AdminSettingsRouteImport } from './routes/admin.settings'
+import { Route as AdminSuggestionsRouteImport } from './routes/admin.suggestions'
+import { Route as EpisodesSlugRouteImport } from './routes/episodes_.$slug'
 
-const SuggestRoute = SuggestRouteImport.update({
-  id: '/suggest',
-  path: '/suggest',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
-  id: '/sitemap.xml',
-  path: '/sitemap.xml',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const InstallRoute = InstallRouteImport.update({
-  id: '/install',
-  path: '/install',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const EpisodesRoute = EpisodesRouteImport.update({
-  id: '/episodes',
-  path: '/episodes',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ContactRoute = ContactRouteImport.update({
-  id: '/contact',
-  path: '/contact',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AuthRoute = AuthRouteImport.update({
-  id: '/auth',
-  path: '/auth',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AskRoute = AskRouteImport.update({
-  id: '/ask',
-  path: '/ask',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AdminRoute = AdminRouteImport.update({
-  id: '/admin',
-  path: '/admin',
+const IndexRoute = IndexRouteImport.update({
+  id: '/',
+  path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AboutRoute = AboutRouteImport.update({
@@ -72,9 +38,44 @@ const AboutRoute = AboutRouteImport.update({
   path: '/about',
   getParentRoute: () => rootRouteImport,
 } as any)
-const IndexRoute = IndexRouteImport.update({
-  id: '/',
-  path: '/',
+const AdminRoute = AdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AskRoute = AskRouteImport.update({
+  id: '/ask',
+  path: '/ask',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthRoute = AuthRouteImport.update({
+  id: '/auth',
+  path: '/auth',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ContactRoute = ContactRouteImport.update({
+  id: '/contact',
+  path: '/contact',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const EpisodesRoute = EpisodesRouteImport.update({
+  id: '/episodes',
+  path: '/episodes',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const InstallRoute = InstallRouteImport.update({
+  id: '/install',
+  path: '/install',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
+  id: '/sitemap.xml',
+  path: '/sitemap.xml',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SuggestRoute = SuggestRouteImport.update({
+  id: '/suggest',
+  path: '/suggest',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AdminIndexRoute = AdminIndexRouteImport.update({
@@ -82,24 +83,14 @@ const AdminIndexRoute = AdminIndexRouteImport.update({
   path: '/',
   getParentRoute: () => AdminRoute,
 } as any)
-const EpisodesSlugRoute = EpisodesSlugRouteImport.update({
-  id: '/episodes_/$slug',
-  path: '/episodes/$slug',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AdminSuggestionsRoute = AdminSuggestionsRouteImport.update({
-  id: '/suggestions',
-  path: '/suggestions',
+const AdminAnalyticsRoute = AdminAnalyticsRouteImport.update({
+  id: '/analytics',
+  path: '/analytics',
   getParentRoute: () => AdminRoute,
 } as any)
-const AdminSettingsRoute = AdminSettingsRouteImport.update({
-  id: '/settings',
-  path: '/settings',
-  getParentRoute: () => AdminRoute,
-} as any)
-const AdminQuestionsRoute = AdminQuestionsRouteImport.update({
-  id: '/questions',
-  path: '/questions',
+const AdminEpisodesRoute = AdminEpisodesRouteImport.update({
+  id: '/episodes',
+  path: '/episodes',
   getParentRoute: () => AdminRoute,
 } as any)
 const AdminMessagesRoute = AdminMessagesRouteImport.update({
@@ -107,10 +98,25 @@ const AdminMessagesRoute = AdminMessagesRouteImport.update({
   path: '/messages',
   getParentRoute: () => AdminRoute,
 } as any)
-const AdminEpisodesRoute = AdminEpisodesRouteImport.update({
-  id: '/episodes',
-  path: '/episodes',
+const AdminQuestionsRoute = AdminQuestionsRouteImport.update({
+  id: '/questions',
+  path: '/questions',
   getParentRoute: () => AdminRoute,
+} as any)
+const AdminSettingsRoute = AdminSettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminSuggestionsRoute = AdminSuggestionsRouteImport.update({
+  id: '/suggestions',
+  path: '/suggestions',
+  getParentRoute: () => AdminRoute,
+} as any)
+const EpisodesSlugRoute = EpisodesSlugRouteImport.update({
+  id: '/episodes_/$slug',
+  path: '/episodes/$slug',
+  getParentRoute: () => rootRouteImport,
 } as any)
 
 export interface FileRoutesByFullPath {
@@ -124,6 +130,7 @@ export interface FileRoutesByFullPath {
   '/install': typeof InstallRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/suggest': typeof SuggestRoute
+  '/admin/analytics': typeof AdminAnalyticsRoute
   '/admin/episodes': typeof AdminEpisodesRoute
   '/admin/messages': typeof AdminMessagesRoute
   '/admin/questions': typeof AdminQuestionsRoute
@@ -142,6 +149,7 @@ export interface FileRoutesByTo {
   '/install': typeof InstallRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/suggest': typeof SuggestRoute
+  '/admin/analytics': typeof AdminAnalyticsRoute
   '/admin/episodes': typeof AdminEpisodesRoute
   '/admin/messages': typeof AdminMessagesRoute
   '/admin/questions': typeof AdminQuestionsRoute
@@ -162,6 +170,7 @@ export interface FileRoutesById {
   '/install': typeof InstallRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/suggest': typeof SuggestRoute
+  '/admin/analytics': typeof AdminAnalyticsRoute
   '/admin/episodes': typeof AdminEpisodesRoute
   '/admin/messages': typeof AdminMessagesRoute
   '/admin/questions': typeof AdminQuestionsRoute
@@ -183,6 +192,7 @@ export interface FileRouteTypes {
     | '/install'
     | '/sitemap.xml'
     | '/suggest'
+    | '/admin/analytics'
     | '/admin/episodes'
     | '/admin/messages'
     | '/admin/questions'
@@ -201,6 +211,7 @@ export interface FileRouteTypes {
     | '/install'
     | '/sitemap.xml'
     | '/suggest'
+    | '/admin/analytics'
     | '/admin/episodes'
     | '/admin/messages'
     | '/admin/questions'
@@ -220,6 +231,7 @@ export interface FileRouteTypes {
     | '/install'
     | '/sitemap.xml'
     | '/suggest'
+    | '/admin/analytics'
     | '/admin/episodes'
     | '/admin/messages'
     | '/admin/questions'
@@ -245,60 +257,11 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/suggest': {
-      id: '/suggest'
-      path: '/suggest'
-      fullPath: '/suggest'
-      preLoaderRoute: typeof SuggestRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/sitemap.xml': {
-      id: '/sitemap.xml'
-      path: '/sitemap.xml'
-      fullPath: '/sitemap.xml'
-      preLoaderRoute: typeof SitemapDotxmlRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/install': {
-      id: '/install'
-      path: '/install'
-      fullPath: '/install'
-      preLoaderRoute: typeof InstallRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/episodes': {
-      id: '/episodes'
-      path: '/episodes'
-      fullPath: '/episodes'
-      preLoaderRoute: typeof EpisodesRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/contact': {
-      id: '/contact'
-      path: '/contact'
-      fullPath: '/contact'
-      preLoaderRoute: typeof ContactRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/auth': {
-      id: '/auth'
-      path: '/auth'
-      fullPath: '/auth'
-      preLoaderRoute: typeof AuthRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/ask': {
-      id: '/ask'
-      path: '/ask'
-      fullPath: '/ask'
-      preLoaderRoute: typeof AskRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/admin': {
-      id: '/admin'
-      path: '/admin'
-      fullPath: '/admin'
-      preLoaderRoute: typeof AdminRouteImport
+    '/': {
+      id: '/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/about': {
@@ -308,11 +271,60 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AboutRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/': {
-      id: '/'
-      path: '/'
-      fullPath: '/'
-      preLoaderRoute: typeof IndexRouteImport
+    '/admin': {
+      id: '/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AdminRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/ask': {
+      id: '/ask'
+      path: '/ask'
+      fullPath: '/ask'
+      preLoaderRoute: typeof AskRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/auth': {
+      id: '/auth'
+      path: '/auth'
+      fullPath: '/auth'
+      preLoaderRoute: typeof AuthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/contact': {
+      id: '/contact'
+      path: '/contact'
+      fullPath: '/contact'
+      preLoaderRoute: typeof ContactRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/episodes': {
+      id: '/episodes'
+      path: '/episodes'
+      fullPath: '/episodes'
+      preLoaderRoute: typeof EpisodesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/install': {
+      id: '/install'
+      path: '/install'
+      fullPath: '/install'
+      preLoaderRoute: typeof InstallRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/sitemap.xml': {
+      id: '/sitemap.xml'
+      path: '/sitemap.xml'
+      fullPath: '/sitemap.xml'
+      preLoaderRoute: typeof SitemapDotxmlRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/suggest': {
+      id: '/suggest'
+      path: '/suggest'
+      fullPath: '/suggest'
+      preLoaderRoute: typeof SuggestRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/admin/': {
@@ -322,39 +334,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminIndexRouteImport
       parentRoute: typeof AdminRoute
     }
-    '/episodes_/$slug': {
-      id: '/episodes_/$slug'
-      path: '/episodes/$slug'
-      fullPath: '/episodes/$slug'
-      preLoaderRoute: typeof EpisodesSlugRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/admin/suggestions': {
-      id: '/admin/suggestions'
-      path: '/suggestions'
-      fullPath: '/admin/suggestions'
-      preLoaderRoute: typeof AdminSuggestionsRouteImport
-      parentRoute: typeof AdminRoute
-    }
-    '/admin/settings': {
-      id: '/admin/settings'
-      path: '/settings'
-      fullPath: '/admin/settings'
-      preLoaderRoute: typeof AdminSettingsRouteImport
-      parentRoute: typeof AdminRoute
-    }
-    '/admin/questions': {
-      id: '/admin/questions'
-      path: '/questions'
-      fullPath: '/admin/questions'
-      preLoaderRoute: typeof AdminQuestionsRouteImport
-      parentRoute: typeof AdminRoute
-    }
-    '/admin/messages': {
-      id: '/admin/messages'
-      path: '/messages'
-      fullPath: '/admin/messages'
-      preLoaderRoute: typeof AdminMessagesRouteImport
+    '/admin/analytics': {
+      id: '/admin/analytics'
+      path: '/analytics'
+      fullPath: '/admin/analytics'
+      preLoaderRoute: typeof AdminAnalyticsRouteImport
       parentRoute: typeof AdminRoute
     }
     '/admin/episodes': {
@@ -364,10 +348,46 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminEpisodesRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/messages': {
+      id: '/admin/messages'
+      path: '/messages'
+      fullPath: '/admin/messages'
+      preLoaderRoute: typeof AdminMessagesRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/questions': {
+      id: '/admin/questions'
+      path: '/questions'
+      fullPath: '/admin/questions'
+      preLoaderRoute: typeof AdminQuestionsRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/settings': {
+      id: '/admin/settings'
+      path: '/settings'
+      fullPath: '/admin/settings'
+      preLoaderRoute: typeof AdminSettingsRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/suggestions': {
+      id: '/admin/suggestions'
+      path: '/suggestions'
+      fullPath: '/admin/suggestions'
+      preLoaderRoute: typeof AdminSuggestionsRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/episodes_/$slug': {
+      id: '/episodes_/$slug'
+      path: '/episodes/$slug'
+      fullPath: '/episodes/$slug'
+      preLoaderRoute: typeof EpisodesSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 interface AdminRouteChildren {
+  AdminAnalyticsRoute: typeof AdminAnalyticsRoute
   AdminEpisodesRoute: typeof AdminEpisodesRoute
   AdminMessagesRoute: typeof AdminMessagesRoute
   AdminQuestionsRoute: typeof AdminQuestionsRoute
@@ -377,6 +397,7 @@ interface AdminRouteChildren {
 }
 
 const AdminRouteChildren: AdminRouteChildren = {
+  AdminAnalyticsRoute: AdminAnalyticsRoute,
   AdminEpisodesRoute: AdminEpisodesRoute,
   AdminMessagesRoute: AdminMessagesRoute,
   AdminQuestionsRoute: AdminQuestionsRoute,
@@ -403,3 +424,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}

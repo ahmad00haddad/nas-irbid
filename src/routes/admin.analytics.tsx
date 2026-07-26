@@ -1,5 +1,4 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { AdminLayout } from "@/components/admin/AdminLayout";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { BarChart3, Users, MousePointerClick, Activity, Loader2, ArrowUpRight } from "lucide-react";
@@ -53,7 +52,10 @@ function AnalyticsPage() {
   });
 
   return (
-    <AdminLayout title="إحصائيات الموقع">
+    <div className="space-y-6">
+      <div className="flex items-center justify-between mb-8">
+        <h1 className="text-2xl font-display text-foreground">إحصائيات الموقع</h1>
+      </div>
       {isLoading ? (
         <div className="flex items-center justify-center py-20 text-muted-foreground">
           <Loader2 className="animate-spin ml-2" size={24} /> جاري جلب الإحصائيات...
@@ -153,7 +155,7 @@ function AnalyticsPage() {
           </div>
         </div>
       ) : null}
-    </AdminLayout>
+    </div>
   );
 }
 
