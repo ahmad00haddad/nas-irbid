@@ -7,6 +7,7 @@ import { z } from "zod";
 import { supabase } from "@/integrations/supabase/client";
 import { motion, AnimatePresence } from "framer-motion";
 import { useSpamGuard, HONEYPOT_INPUT_PROPS } from "@/lib/spam-guard";
+import { trackSiteEvent } from "@/components/site/AnalyticsTracker";
 
 const askSchema = z.object({
   question: z.string().trim().min(3, "السؤال قصير جداً").max(1000, "السؤال طويل جداً (الحد 1000 حرف)"),
@@ -93,6 +94,7 @@ function AskPage() {
 
     localStorage.setItem("lastAskSubmit", Date.now().toString());
     setSubmitted(true);
+    trackSiteEvent("form_submitted", "/ask", { form: "ask", target: selected?.character_name ?? "General" });
   };
 
   return (

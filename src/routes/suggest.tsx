@@ -6,6 +6,7 @@ import { z } from "zod";
 import { supabase } from "@/integrations/supabase/client";
 import { motion, AnimatePresence } from "framer-motion";
 import { useSpamGuard, HONEYPOT_INPUT_PROPS } from "@/lib/spam-guard";
+import { trackSiteEvent } from "@/components/site/AnalyticsTracker";
 
 const suggestSchema = z.object({
   character: z.string().trim().min(2, "اسم الشخصية قصير جداً").max(120),
@@ -93,6 +94,7 @@ function SuggestPage() {
 
     localStorage.setItem("lastSuggestSubmit", Date.now().toString());
     setSubmitted(true);
+    trackSiteEvent("form_submitted", "/suggest", { form: "suggest", character: d.character });
   };
 
   return (

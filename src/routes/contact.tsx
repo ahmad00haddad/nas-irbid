@@ -8,6 +8,7 @@ import { useSiteSettings } from "@/lib/site-settings";
 import { motion, AnimatePresence } from "framer-motion";
 import { FadeIn } from "@/components/ui/fade-in";
 import { useSpamGuard, HONEYPOT_INPUT_PROPS } from "@/lib/spam-guard";
+import { trackSiteEvent } from "@/components/site/AnalyticsTracker";
 
 const contactSchema = z.object({
   name: z.string().trim().min(2, "اسمك قصير جداً").max(100),
@@ -94,6 +95,7 @@ function ContactPage() {
     }
     localStorage.setItem("lastContactSubmit", Date.now().toString());
     setSubmitted(true);
+    trackSiteEvent("form_submitted", "/contact", { form: "contact", type: d.message_type });
   };
 
   return (

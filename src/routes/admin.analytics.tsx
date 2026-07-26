@@ -1,8 +1,21 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { BarChart3, Users, MousePointerClick, Activity, Loader2, ArrowUpRight } from "lucide-react";
+import {
+  BarChart3,
+  Users,
+  MousePointerClick,
+  Activity,
+  Loader2,
+  ArrowUpRight,
+  Share2,
+  Heart,
+  Trash2,
+  CheckCircle2,
+} from "lucide-react";
 import { motion } from "framer-motion";
+import { toast } from "sonner";
+import { Button } from "@/components/ui/button";
 
 export const Route = createFileRoute("/admin/analytics")({
   component: AnalyticsPage,
@@ -11,54 +24,127 @@ export const Route = createFileRoute("/admin/analytics")({
   }),
 });
 
+function formatPathname(path: string) {
+  if (path === "/") return "الرئيسية";
+  if (path === "/about") return "عن البرنامج";
+  if (path === "/contact") return "تواصل معنا";
+  if (path === "/suggest") return "اقترح حكاية";
+  if (path === "/ask") return "اسأل الضيف";
+  if (path === "/episodes") return "كافة الحلقات";
+  if (path.startsWith("/episodes/"))
+    return `حلقة: ${decodeURIComponent(path.replace("/episodes/", "").replace(/-/g, " "))}`;
+  return path;
+}
+
 function AnalyticsPage() {
-  const { data: stats, isLoading, isError } = useQuery({
+  const queryClient = useQueryClient();
+
+  const {
+    data: stats,
+    isLoading,
+    isError,
+  } = useQuery({
     queryKey: ["site-analytics"],
     queryFn: async () => {
-      // Get all page views
-      const { data: views, error: viewsError } = await supabase
+      const { data: rawEvents, error } = await supabase
         .from("site_analytics")
         .select("*")
-        .eq("event_type", "page_view")
         .order("created_at", { ascending: false });
 
-      if (viewsError) throw viewsError;
+      if (error) throw error;
+
+      const views = rawEvents.filter((e) => e.event_type === "page_view");
+      const ctaClicks = rawEvents.filter((e) => e.event_type === "cta_click");
+      const formSubmits = rawEvents.filter((e) => e.event_type === "form_submitted");
 
       const totalViews = views.length;
-      
-      // Calculate unique visitors (by session_id)
-      const uniqueSessions = new Set(views.map(v => v.session_id)).size;
+      const uniqueSessions = new Set(views.map((v) => v.session_id)).size;
 
-      // Calculate top pages
+      // Sources
+      const sourceCounts: Record<string, number> = {};
+      views.forEach((v) => {
+        const source = (v.details as Record<string, string>)?.source || "Unknown";
+        sourceCounts[source] = (sourceCounts[source] || 0) + 1;
+      });
+      const topSources = Object.entries(sourceCounts)
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, 4);
+
+      // Top Pages
       const pageCounts: Record<string, number> = {};
-      views.forEach(v => {
+      views.forEach((v) => {
         pageCounts[v.path] = (pageCounts[v.path] || 0) + 1;
       });
       const topPages = Object.entries(pageCounts)
         .sort((a, b) => b[1] - a[1])
         .slice(0, 5);
 
-      // Recent activity (last 20)
-      const recentActivity = views.slice(0, 20);
+      // Recent Activity
+      const recentActivity = rawEvents.slice(0, 20);
 
       return {
         totalViews,
         uniqueSessions,
+        topSources,
         topPages,
-        recentActivity
+        recentActivity,
+        conversions: {
+          supportClicks: ctaClicks.length,
+          formSubmits: formSubmits.length,
+        },
       };
     },
-    refetchInterval: 30000, // Refresh every 30 seconds
+    refetchInterval: 30000,
+  });
+
+  const cleanMutation = useMutation({
+    mutationFn: async () => {
+      // Delete logs older than 90 days
+      const date90DaysAgo = new Date();
+      date90DaysAgo.setDate(date90DaysAgo.getDate() - 90);
+      const { error } = await supabase
+        .from("site_analytics")
+        .delete()
+        .lt("created_at", date90DaysAgo.toISOString());
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      toast.success("تم التنظيف", {
+        description: "تم مسح البيانات القديمة بنجاح للحفاظ على المساحة.",
+      });
+      queryClient.invalidateQueries({ queryKey: ["site-analytics"] });
+    },
+    onError: (err: Error) => {
+      toast.error("حدث خطأ", { description: err.message });
+    },
   });
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between mb-8">
-        <h1 className="text-2xl font-display text-foreground">إحصائيات الموقع</h1>
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-8 gap-4">
+        <h1 className="text-2xl font-display text-foreground">إحصائيات الموقع (أداة القرارات)</h1>
+        <Button
+          variant="outline"
+          onClick={() => {
+            if (
+              confirm(
+                "هل أنت متأكد من مسح الإحصائيات الأقدم من 3 أشهر لتوفر المساحة؟ (لا يمكن التراجع)",
+              )
+            ) {
+              cleanMutation.mutate();
+            }
+          }}
+          disabled={cleanMutation.isPending}
+          className="border-border text-muted-foreground hover:text-destructive"
+        >
+          <Trash2 size={16} className="mr-2" />
+          تنظيف البيانات القديمة
+        </Button>
       </div>
+
       {isLoading ? (
         <div className="flex items-center justify-center py-20 text-muted-foreground">
-          <Loader2 className="animate-spin ml-2" size={24} /> جاري جلب الإحصائيات...
+          <Loader2 className="animate-spin ml-2" size={24} /> جاري جلب وتحليل الإحصائيات...
         </div>
       ) : isError ? (
         <div className="p-8 text-center bg-destructive/10 text-destructive rounded-xl font-semibold border border-destructive/20">
@@ -66,55 +152,94 @@ function AnalyticsPage() {
         </div>
       ) : stats ? (
         <div className="space-y-6">
-          
           {/* Summary Cards */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            <StatCard 
-              title="إجمالي الزيارات (مرات فتح الصفحات)" 
-              value={stats.totalViews.toString()} 
-              icon={<MousePointerClick size={22} />} 
-              trend="+ مستمر"
+            <StatCard
+              title="إجمالي الزيارات"
+              value={stats.totalViews.toString()}
+              icon={<MousePointerClick size={22} />}
+              trend="مشاهدات صفحات"
             />
-            <StatCard 
-              title="الزوار الفريدين (أجهزة مختلفة)" 
-              value={stats.uniqueSessions.toString()} 
+            <StatCard
+              title="الزوار الفعليون"
+              value={stats.uniqueSessions.toString()}
               icon={<Users size={22} />}
-              trend="الفعلي"
+              trend="أشخاص مختلفين"
             />
-            <StatCard 
-              title="الصفحات النشطة" 
-              value={stats.topPages.length.toString()} 
-              icon={<Activity size={22} />}
+            <StatCard
+              title="ضغطات 'ادعم البرنامج'"
+              value={stats.conversions.supportClicks.toString()}
+              icon={<Heart size={22} />}
+              trend="تحويلات"
             />
-            <StatCard 
-              title="معدل الزيارات للزائر" 
-              value={stats.uniqueSessions ? (stats.totalViews / stats.uniqueSessions).toFixed(1) : "0"} 
-              icon={<BarChart3 size={22} />}
-              trend="صفحة / زائر"
+            <StatCard
+              title="النماذج المرسلة"
+              value={stats.conversions.formSubmits.toString()}
+              icon={<CheckCircle2 size={22} />}
+              trend="تفاعل الجمهور"
             />
           </div>
 
           <div className="grid lg:grid-cols-3 gap-6 pt-4">
             {/* Top Pages */}
-            <div className="lg:col-span-1 bg-card rounded-2xl border border-border/50 p-6 shadow-sm">
-              <h3 className="font-bold text-foreground mb-4 text-lg flex items-center gap-2">
-                <BarChart3 size={18} className="text-primary" />
-                الصفحات الأكثر زيارة
-              </h3>
-              <div className="space-y-4">
-                {stats.topPages.length === 0 ? (
-                  <p className="text-muted-foreground text-sm">لا توجد بيانات بعد.</p>
-                ) : (
-                  stats.topPages.map(([path, count], i) => (
-                    <div key={path} className="flex items-center justify-between">
-                      <div className="flex items-center gap-3">
-                        <span className="text-muted-foreground font-mono text-sm w-4">{i + 1}.</span>
-                        <span className="text-sm font-medium text-foreground truncate max-w-[150px] md:max-w-[200px]" dir="ltr">{path === '/' ? '/ (الرئيسية)' : path}</span>
+            <div className="lg:col-span-1 space-y-6">
+              {/* Traffic Sources */}
+              <div className="bg-card rounded-2xl border border-border/50 p-6 shadow-sm">
+                <h3 className="font-bold text-foreground mb-4 text-lg flex items-center gap-2">
+                  <Share2 size={18} className="text-primary" />
+                  مصادر الزيارات (من أين أتوا؟)
+                </h3>
+                <div className="space-y-4">
+                  {stats.topSources.length === 0 ? (
+                    <p className="text-muted-foreground text-sm">لا توجد بيانات بعد.</p>
+                  ) : (
+                    stats.topSources.map(([source, count]) => (
+                      <div key={source} className="flex flex-col gap-1.5">
+                        <div className="flex items-center justify-between text-sm">
+                          <span className="font-medium text-foreground">{source}</span>
+                          <span className="text-muted-foreground">{count}</span>
+                        </div>
+                        <div className="h-2 w-full bg-muted rounded-full overflow-hidden">
+                          <div
+                            className="h-full bg-primary"
+                            style={{ width: `${Math.max(5, (count / stats.totalViews) * 100)}%` }}
+                          />
+                        </div>
                       </div>
-                      <span className="font-bold text-primary bg-primary/10 px-2 py-0.5 rounded-full text-xs">{count} زيارة</span>
-                    </div>
-                  ))
-                )}
+                    ))
+                  )}
+                </div>
+              </div>
+
+              <div className="bg-card rounded-2xl border border-border/50 p-6 shadow-sm">
+                <h3 className="font-bold text-foreground mb-4 text-lg flex items-center gap-2">
+                  <BarChart3 size={18} className="text-primary" />
+                  الصفحات الأكثر زيارة
+                </h3>
+                <div className="space-y-4">
+                  {stats.topPages.length === 0 ? (
+                    <p className="text-muted-foreground text-sm">لا توجد بيانات بعد.</p>
+                  ) : (
+                    stats.topPages.map(([path, count], i) => (
+                      <div key={path} className="flex items-center justify-between">
+                        <div className="flex items-center gap-3">
+                          <span className="text-muted-foreground font-mono text-sm w-4">
+                            {i + 1}.
+                          </span>
+                          <span
+                            className="text-sm font-medium text-foreground truncate max-w-[150px] md:max-w-[200px]"
+                            dir="ltr"
+                          >
+                            {formatPathname(path)}
+                          </span>
+                        </div>
+                        <span className="font-bold text-primary bg-primary/10 px-2 py-0.5 rounded-full text-xs">
+                          {count} زيارة
+                        </span>
+                      </div>
+                    ))
+                  )}
+                </div>
               </div>
             </div>
 
@@ -122,33 +247,64 @@ function AnalyticsPage() {
             <div className="lg:col-span-2 bg-card rounded-2xl border border-border/50 p-6 shadow-sm">
               <h3 className="font-bold text-foreground mb-4 text-lg flex items-center gap-2">
                 <Activity size={18} className="text-primary" />
-                سجل النشاط الأخير
+                شريط النشاط الحي
               </h3>
-              
+
               <div className="space-y-3">
                 {stats.recentActivity.length === 0 ? (
-                  <p className="text-muted-foreground text-sm">لا توجد بيانات بعد.</p>
+                  <p className="text-muted-foreground text-sm">لا توجد نشاطات مسجلة.</p>
                 ) : (
-                  stats.recentActivity.map((activity) => (
-                    <div key={activity.id} className="flex flex-wrap md:flex-nowrap items-center justify-between p-3 hover:bg-muted/50 rounded-xl transition-colors border border-transparent hover:border-border/50 gap-3">
-                      <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
-                          <Users size={14} className="text-primary" />
+                  stats.recentActivity.map((activity) => {
+                    const isConversion = activity.event_type !== "page_view";
+                    return (
+                      <div
+                        key={activity.id}
+                        className={`flex flex-wrap md:flex-nowrap items-center justify-between p-3 rounded-xl transition-colors border gap-3 ${isConversion ? "bg-primary/5 border-primary/20" : "hover:bg-muted/50 border-transparent hover:border-border/50"}`}
+                      >
+                        <div className="flex items-center gap-3">
+                          <div
+                            className={`w-8 h-8 rounded-full flex items-center justify-center ${isConversion ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground"}`}
+                          >
+                            {activity.event_type === "cta_click" ? (
+                              <Heart size={14} />
+                            ) : activity.event_type === "form_submitted" ? (
+                              <CheckCircle2 size={14} />
+                            ) : (
+                              <Users size={14} />
+                            )}
+                          </div>
+                          <div>
+                            <p className="text-sm font-medium text-foreground">
+                              {activity.event_type === "cta_click" ? (
+                                'زائر ضغط على "ادعم البرنامج"'
+                              ) : activity.event_type === "form_submitted" ? (
+                                `زائر قام بتعبئة نموذج ${formatPathname(activity.path)}`
+                              ) : (
+                                <>
+                                  زائر تصفح{" "}
+                                  <span className="font-semibold text-primary">
+                                    {formatPathname(activity.path)}
+                                  </span>
+                                </>
+                              )}
+                            </p>
+                            <p className="text-xs text-muted-foreground mt-0.5 flex gap-2">
+                              <span>
+                                المصدر: {(activity.details as Record<string, string>)?.source || "غير معروف"}
+                              </span>
+                              <span className="opacity-50">|</span>
+                              <span className="font-mono text-[10px]">
+                                {(activity.session_id || "").substring(0, 8)}
+                              </span>
+                            </p>
+                          </div>
                         </div>
-                        <div>
-                          <p className="text-sm font-medium text-foreground">
-                            زائر تصفح <span className="font-mono text-xs text-primary" dir="ltr">{activity.path}</span>
-                          </p>
-                          <p className="text-xs text-muted-foreground mt-0.5">
-                            الجلسة: <span className="font-mono text-[10px]">{activity.session_id.substring(0, 8)}...</span>
-                          </p>
+                        <div className="text-xs text-muted-foreground whitespace-nowrap">
+                          {new Date(activity.created_at).toLocaleString("ar-JO")}
                         </div>
                       </div>
-                      <div className="text-xs text-muted-foreground whitespace-nowrap">
-                        {new Date(activity.created_at).toLocaleString('ar-JO')}
-                      </div>
-                    </div>
-                  ))
+                    );
+                  })
                 )}
               </div>
             </div>
@@ -159,9 +315,19 @@ function AnalyticsPage() {
   );
 }
 
-function StatCard({ title, value, icon, trend }: { title: string, value: string, icon: React.ReactNode, trend?: string }) {
+function StatCard({
+  title,
+  value,
+  icon,
+  trend,
+}: {
+  title: string;
+  value: string;
+  icon: React.ReactNode;
+  trend?: string;
+}) {
   return (
-    <motion.div 
+    <motion.div
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       className="bg-card rounded-2xl p-5 border border-border/50 shadow-sm relative overflow-hidden group hover:border-primary/30 transition-colors"

@@ -4,6 +4,7 @@ import { Menu, X, LayoutDashboard } from "lucide-react";
 import { motion, useScroll, useMotionValueEvent } from "framer-motion";
 import { useAuth } from "@/lib/auth";
 import { Button } from "@/components/ui/button";
+import { trackSiteEvent } from "@/components/site/AnalyticsTracker";
 
 const navItems = [
   { to: "/", label: "الرئيسية" },
@@ -40,7 +41,7 @@ export function Header() {
   }, [open]);
 
   return (
-    <motion.header 
+    <motion.header
       variants={{ visible: { y: 0 }, hidden: { y: "-100%" } }}
       animate={hidden ? "hidden" : "visible"}
       transition={{ duration: 0.35, ease: "easeInOut" }}
@@ -63,7 +64,9 @@ export function Header() {
               key={item.to}
               to={item.to}
               className="px-4 py-2 text-sm font-semibold text-muted-foreground hover:text-primary transition-colors rounded-md"
-              activeProps={{ className: "px-4 py-2 text-sm font-semibold text-primary rounded-md bg-primary/5" }}
+              activeProps={{
+                className: "px-4 py-2 text-sm font-semibold text-primary rounded-md bg-primary/5",
+              }}
               activeOptions={{ exact: item.to === "/" }}
             >
               {item.label}
@@ -73,20 +76,33 @@ export function Header() {
 
         <div className="hidden md:flex items-center gap-2">
           {isEditor && (
-            <Link to="/admin" className="inline-flex items-center gap-1.5 px-3 py-2 rounded-full border border-border text-xs font-bold text-foreground hover:border-primary/60 transition">
+            <Link
+              to="/admin"
+              className="inline-flex items-center gap-1.5 px-3 py-2 rounded-full border border-border text-xs font-bold text-foreground hover:border-primary/60 transition"
+            >
               <LayoutDashboard size={13} /> الإدارة
             </Link>
           )}
           <Link
             to="/about"
             hash="support"
-            className="inline-flex items-center px-5 py-2.5 rounded-full bg-gradient-warm text-primary-foreground text-sm font-bold shadow-glow hover:opacity-90 transition"
+            onClick={() =>
+              trackSiteEvent("cta_click", "/about#support", { button: "header_support" })
+            }
+            className="rounded-full bg-primary px-6 py-2.5 text-sm font-bold text-primary-foreground hover:bg-primary/90 transition shadow-glow hidden lg:inline-flex"
           >
             ادعم البرنامج
           </Link>
         </div>
 
-        <Button variant="ghost" size="icon" className="md:hidden" onClick={() => setOpen(!open)} aria-label={open ? "إغلاق القائمة" : "فتح القائمة"} aria-expanded={open}>
+        <Button
+          variant="ghost"
+          size="icon"
+          className="md:hidden"
+          onClick={() => setOpen(!open)}
+          aria-label={open ? "إغلاق القائمة" : "فتح القائمة"}
+          aria-expanded={open}
+        >
           {open ? <X size={24} /> : <Menu size={24} />}
         </Button>
       </div>
@@ -108,7 +124,10 @@ export function Header() {
             <Link
               to="/about"
               hash="support"
-              onClick={() => setOpen(false)}
+              onClick={() => {
+                setOpen(false);
+                trackSiteEvent("cta_click", "/about#support", { button: "mobile_menu_support" });
+              }}
               className="mt-3 rounded-full bg-primary px-5 py-3 text-center text-sm font-bold text-primary-foreground"
             >
               ادعم البرنامج
