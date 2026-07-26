@@ -11,7 +11,7 @@ import { useSpamGuard, HONEYPOT_INPUT_PROPS } from "@/lib/spam-guard";
 const askSchema = z.object({
   question: z.string().trim().min(3, "السؤال قصير جداً").max(1000, "السؤال طويل جداً (الحد 1000 حرف)"),
   name: z.string().trim().max(100, "الاسم طويل جداً").optional().or(z.literal("")),
-  phone: z.string().trim().max(30).optional().or(z.literal("")),
+  phone: z.string().trim().max(30).regex(/^[0-9\+\-\s\(\)]*$/, "الرجاء إدخال أرقام فقط").optional().or(z.literal("")),
 });
 
 export const Route = createFileRoute("/ask")({
@@ -31,6 +31,7 @@ export const Route = createFileRoute("/ask")({
 function AskPage() {
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
+  const [errors, setErrors] = useState<Record<string, string>>({});
   const [episodeId, setEpisodeId] = useState<string>("");
   const spam = useSpamGuard();
 
@@ -59,8 +60,14 @@ function AskPage() {
       name: String(fd.get("name") ?? ""),
       phone: String(fd.get("phone") ?? ""),
     });
+    
+    setErrors({});
     if (!parsed.success) {
-      toast.error("تعذّر الإرسال", { description: parsed.error.issues[0]?.message });
+      const fieldErrors: Record<string, string> = {};
+      parsed.error.issues.forEach((issue) => {
+        if (issue.path[0]) fieldErrors[issue.path[0].toString()] = issue.message;
+      });
+      setErrors(fieldErrors);
       return;
     }
     const lastSubmit = localStorage.getItem("lastAskSubmit");
@@ -140,6 +147,7 @@ function AskPage() {
               animate={{ opacity: 1 }}
               className="space-y-8"
             >
+              <fieldset disabled={submitting} className="space-y-8 disabled:opacity-70 transition-opacity">
               {/* Guest Selection — Cards instead of <select> */}
               <div>
                 <span className="block text-sm font-semibold text-foreground mb-4">
@@ -227,8 +235,9 @@ function AskPage() {
                     minLength={3}
                     rows={5}
                     placeholder={selected ? `اكتب سؤالك لـ ${selected.character_name ?? selected.title}…` : "اكتب سؤالك للضيف باللهجة الإربداوية أو الفصحى — كيفما تحب."}
-                    className="w-full px-4 py-3 rounded-lg bg-input border border-border text-foreground placeholder:text-muted-foreground/60 focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition resize-none text-base"
+                    className={`w-full px-4 py-3 rounded-lg bg-input border ${errors.question ? "border-destructive focus:border-destructive focus:ring-destructive/20" : "border-border focus:border-primary focus:ring-primary/20"} text-foreground placeholder:text-muted-foreground/60 focus:outline-none focus:ring-2 transition resize-none text-base`}
                   />
+                  {errors.question && <p className="mt-1.5 text-xs font-bold text-destructive">{errors.question}</p>}
                 </label>
 
                 <label className="block">
@@ -236,8 +245,9 @@ function AskPage() {
                   <input
                     name="name"
                     placeholder="حتى نذكرك إذا انطرح السؤال"
-                    className="w-full px-4 py-3 rounded-lg bg-input border border-border text-foreground placeholder:text-muted-foreground/60 focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition text-base"
+                    className={`w-full px-4 py-3 rounded-lg bg-input border ${errors.name ? "border-destructive focus:border-destructive focus:ring-destructive/20" : "border-border focus:border-primary focus:ring-primary/20"} text-foreground placeholder:text-muted-foreground/60 focus:outline-none focus:ring-2 transition text-base`}
                   />
+                  {errors.name && <p className="mt-1.5 text-xs font-bold text-destructive">{errors.name}</p>}
                 </label>
 
                 <div aria-hidden="true" style={{ position: "absolute", left: "-9999px", width: 1, height: 1, overflow: "hidden" }}>
@@ -260,6 +270,7 @@ function AskPage() {
                   )}
                 </div>
               </div>
+              </fieldset>
             </motion.form>
           )}
         </AnimatePresence>

@@ -11,7 +11,7 @@ import { useSpamGuard, HONEYPOT_INPUT_PROPS } from "@/lib/spam-guard";
 
 const contactSchema = z.object({
   name: z.string().trim().min(2, "اسمك قصير جداً").max(100),
-  phone: z.string().trim().max(30).optional().or(z.literal("")),
+  phone: z.string().trim().max(30).regex(/^[0-9\+\-\s\(\)]*$/, "الرجاء إدخال أرقام فقط").optional().or(z.literal("")),
   subject: z.string().trim().min(3, "الموضوع قصير جداً").max(200),
   message: z.string().trim().min(10, "الرسالة قصيرة جداً").max(2000),
   message_type: z.enum(["general", "support", "partnership", "media"]),
@@ -40,6 +40,7 @@ export const Route = createFileRoute("/contact")({
 function ContactPage() {
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
+  const [errors, setErrors] = useState<Record<string, string>>({});
   const [messageType, setMessageType] = useState<string>("general");
   const { data: settings } = useSiteSettings();
   const email = settings?.contact_email ?? "ahmad000haddad@gmail.com";
@@ -57,10 +58,17 @@ function ContactPage() {
       message: String(fd.get("message") ?? ""),
       message_type: messageType,
     });
+    
+    setErrors({});
     if (!parsed.success) {
-      toast.error("تعذّر الإرسال", { description: parsed.error.issues[0]?.message });
+      const fieldErrors: Record<string, string> = {};
+      parsed.error.issues.forEach((issue) => {
+        if (issue.path[0]) fieldErrors[issue.path[0].toString()] = issue.message;
+      });
+      setErrors(fieldErrors);
       return;
     }
+
     const lastSubmit = localStorage.getItem("lastContactSubmit");
     if (lastSubmit && Date.now() - parseInt(lastSubmit) < 60000) {
       toast.error("يرجى الانتظار", { description: "عفواً، انتظر دقيقة قبل إرسال رسالة أخرى." });
@@ -142,6 +150,7 @@ function ContactPage() {
               animate={{ opacity: 1 }}
               className="bg-card border border-border/60 rounded-2xl p-8 md:p-10 shadow-deep space-y-6"
             >
+              <fieldset disabled={submitting} className="space-y-6 disabled:opacity-70 transition-opacity">
               {/* Message type */}
               <div>
                 <span className="block text-sm font-semibold text-foreground mb-3">نوع رسالتك</span>
@@ -164,11 +173,11 @@ function ContactPage() {
               </div>
 
               <div className="grid md:grid-cols-2 gap-5">
-                <Field label="اسمك *" name="name" placeholder="أبو علي" required />
-                <Field label="رقم الواتساب (اختياري)" name="phone" placeholder="07XXXXXXXX" type="tel" />
+                <Field label="اسمك *" name="name" placeholder="أبو علي" error={errors.name} required />
+                <Field label="رقم الواتساب (اختياري)" name="phone" placeholder="07XXXXXXXX" error={errors.phone} type="tel" />
               </div>
 
-              <Field label="موضوع الرسالة *" name="subject" placeholder="شو موضوع تواصلك؟" required />
+              <Field label="موضوع الرسالة *" name="subject" placeholder="شو موضوع تواصلك؟" error={errors.subject} required />
 
               <label className="block">
                 <span className="block text-sm font-semibold text-foreground mb-2">رسالتك *</span>
@@ -178,8 +187,9 @@ function ContactPage() {
                   minLength={10}
                   rows={5}
                   placeholder="اكتب رسالتك هنا…"
-                  className="w-full px-4 py-3 rounded-lg bg-input border border-border text-foreground placeholder:text-muted-foreground/60 focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition resize-none text-base"
+                  className={`w-full px-4 py-3 rounded-lg bg-input border ${errors.message ? "border-destructive focus:border-destructive focus:ring-destructive/20" : "border-border focus:border-primary focus:ring-primary/20"} text-foreground placeholder:text-muted-foreground/60 focus:outline-none focus:ring-2 transition resize-none text-base`}
                 />
+                {errors.message && <p className="mt-1.5 text-xs font-bold text-destructive">{errors.message}</p>}
               </label>
 
               <div aria-hidden="true" style={{ position: "absolute", left: "-9999px", width: 1, height: 1, overflow: "hidden" }}>
@@ -197,6 +207,7 @@ function ContactPage() {
                   <><Send size={18} /> أرسل رسالتك</>
                 )}
               </button>
+              </fieldset>
             </motion.form>
           )}
         </AnimatePresence>
@@ -205,14 +216,15 @@ function ContactPage() {
   );
 }
 
-function Field({ label, ...props }: { label: string } & React.InputHTMLAttributes<HTMLInputElement>) {
+function Field({ label, error, ...props }: { label: string; error?: string } & React.InputHTMLAttributes<HTMLInputElement>) {
   return (
     <label className="block">
       <span className="block text-sm font-semibold text-foreground mb-2">{label}</span>
       <input
         {...props}
-        className="w-full px-4 py-3 rounded-lg bg-input border border-border text-foreground placeholder:text-muted-foreground/60 focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition text-base"
+        className={`w-full px-4 py-3 rounded-lg bg-input border ${error ? "border-destructive focus:border-destructive focus:ring-destructive/20" : "border-border focus:border-primary focus:ring-primary/20"} text-foreground placeholder:text-muted-foreground/60 focus:outline-none focus:ring-2 transition text-base`}
       />
+      {error && <p className="mt-1.5 text-xs font-bold text-destructive">{error}</p>}
     </label>
   );
 }

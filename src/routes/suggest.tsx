@@ -14,7 +14,7 @@ const suggestSchema = z.object({
   age: z.string().trim().max(40).optional().or(z.literal("")),
   story: z.string().trim().min(5, "الحكاية قصيرة جداً").max(2000, "الحكاية طويلة (الحد 2000 حرف)"),
   name: z.string().trim().min(2, "اسمك مطلوب").max(100),
-  phone: z.string().trim().min(6, "رقم غير صالح").max(30, "رقم طويل جداً"),
+  phone: z.string().trim().min(6, "رقم غير صالح").max(30, "رقم طويل جداً").regex(/^[0-9\+\-\s\(\)]*$/, "الرجاء إدخال أرقام فقط"),
 });
 
 export const Route = createFileRoute("/suggest")({
@@ -34,6 +34,7 @@ export const Route = createFileRoute("/suggest")({
 function SuggestPage() {
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
+  const [errors, setErrors] = useState<Record<string, string>>({});
   const spam = useSpamGuard();
 
   const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -51,8 +52,14 @@ function SuggestPage() {
       name: String(fd.get("name") ?? ""),
       phone: String(fd.get("phone") ?? ""),
     });
+    
+    setErrors({});
     if (!parsed.success) {
-      toast.error("تعذّر الإرسال", { description: parsed.error.issues[0]?.message });
+      const fieldErrors: Record<string, string> = {};
+      parsed.error.issues.forEach((issue) => {
+        if (issue.path[0]) fieldErrors[issue.path[0].toString()] = issue.message;
+      });
+      setErrors(fieldErrors);
       return;
     }
     const d = parsed.data;
@@ -135,27 +142,29 @@ function SuggestPage() {
               animate={{ opacity: 1 }}
               className="bg-card border border-border/60 rounded-2xl p-8 md:p-10 shadow-deep space-y-6"
             >
+              <fieldset disabled={submitting} className="space-y-6 disabled:opacity-70 transition-opacity">
           <div className="grid md:grid-cols-2 gap-5">
-            <Field label="اسم الشخصية المقترحة *" name="character" placeholder="مثال: أبو سامي العطار" required />
-            <Field label="المهنة / الدور" name="role" placeholder="عطار، إسكافي، خبّاز…" />
+            <Field label="اسم الشخصية المقترحة *" name="character" placeholder="مثال: أبو سامي العطار" error={errors.character} required />
+            <Field label="المهنة / الدور" name="role" placeholder="عطار، إسكافي، خبّاز…" error={errors.role} />
           </div>
 
           <div className="grid md:grid-cols-2 gap-5">
-            <Field label="الحي أو المكان *" name="place" placeholder="حارة البارحة، وسط البلد…" required />
-            <Field label="العمر التقريبي" name="age" placeholder="٧٠ سنة تقريباً" />
+            <Field label="الحي أو المكان *" name="place" placeholder="حارة البارحة، وسط البلد…" error={errors.place} required />
+            <Field label="العمر التقريبي" name="age" placeholder="٧٠ سنة تقريباً" error={errors.age} />
           </div>
 
           <TextArea
             label="ليش بتشوفه يستاهل حلقة؟ *"
             name="story"
             placeholder="احكيلنا قصته باختصار: شو الإشي المميز فيه؟ شو الحكاية اللي بتستحق تنحكى؟"
+            error={errors.story}
             required minLength={5}
             rows={5}
           />
 
           <div className="grid md:grid-cols-2 gap-5">
-            <Field label="اسمك *" name="name" placeholder="عشان نتواصل معك" required />
-            <Field label="رقم تواصلك (واتساب) *" name="phone" placeholder="07XXXXXXXX" required type="tel" />
+            <Field label="اسمك *" name="name" placeholder="عشان نتواصل معك" error={errors.name} required />
+            <Field label="رقم تواصلك (واتساب) *" name="phone" placeholder="07XXXXXXXX" error={errors.phone} required type="tel" />
           </div>
 
           <div className="flex items-start gap-3 pt-2">
@@ -180,6 +189,7 @@ function SuggestPage() {
               <><Send size={18} /> ابعت الترشيح</>
             )}
           </button>
+              </fieldset>
             </motion.form>
           )}
         </AnimatePresence>
@@ -192,26 +202,28 @@ function SuggestPage() {
   );
 }
 
-function Field({ label, ...props }: { label: string } & React.InputHTMLAttributes<HTMLInputElement>) {
+function Field({ label, error, ...props }: { label: string; error?: string } & React.InputHTMLAttributes<HTMLInputElement>) {
   return (
     <label className="block">
       <span className="block text-sm font-semibold text-foreground mb-2">{label}</span>
       <input
         {...props}
-        className="w-full px-4 py-3 rounded-lg bg-input border border-border text-foreground placeholder:text-muted-foreground/60 focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition text-base"
+        className={`w-full px-4 py-3 rounded-lg bg-input border ${error ? "border-destructive focus:border-destructive focus:ring-destructive/20" : "border-border focus:border-primary focus:ring-primary/20"} text-foreground placeholder:text-muted-foreground/60 focus:outline-none focus:ring-2 transition text-base`}
       />
+      {error && <p className="mt-1.5 text-xs font-bold text-destructive">{error}</p>}
     </label>
   );
 }
 
-function TextArea({ label, ...props }: { label: string } & React.TextareaHTMLAttributes<HTMLTextAreaElement>) {
+function TextArea({ label, error, ...props }: { label: string; error?: string } & React.TextareaHTMLAttributes<HTMLTextAreaElement>) {
   return (
     <label className="block">
       <span className="block text-sm font-semibold text-foreground mb-2">{label}</span>
       <textarea
         {...props}
-        className="w-full px-4 py-3 rounded-lg bg-input border border-border text-foreground placeholder:text-muted-foreground/60 focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition resize-none text-base"
+        className={`w-full px-4 py-3 rounded-lg bg-input border ${error ? "border-destructive focus:border-destructive focus:ring-destructive/20" : "border-border focus:border-primary focus:ring-primary/20"} text-foreground placeholder:text-muted-foreground/60 focus:outline-none focus:ring-2 transition resize-none text-base`}
       />
+      {error && <p className="mt-1.5 text-xs font-bold text-destructive">{error}</p>}
     </label>
   );
 }
