@@ -50,6 +50,33 @@ export type Database = {
         }
         Relationships: []
       }
+      site_analytics: {
+        Row: {
+          id: string
+          session_id: string
+          path: string
+          event_type: string
+          created_at: string
+          details: Json | null
+        }
+        Insert: {
+          id?: string
+          session_id: string
+          path: string
+          event_type: string
+          created_at?: string
+          details?: Json | null
+        }
+        Update: {
+          id?: string
+          session_id?: string
+          path?: string
+          event_type?: string
+          created_at?: string
+          details?: Json | null
+        }
+        Relationships: []
+      }
       episodes: {
         Row: {
           behind_the_scenes: string | null

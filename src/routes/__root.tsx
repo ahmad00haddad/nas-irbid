@@ -17,6 +17,7 @@ import { Toaster } from "@/components/ui/sonner";
 import { AuthProvider } from "@/lib/auth";
 import { Cursor } from "@/components/ui/cursor";
 import { RippleEffect } from "@/components/ui/ripple-effect";
+import { AnalyticsTracker } from "@/components/site/AnalyticsTracker";
 
 function NotFoundComponent() {
   return (
@@ -143,6 +144,7 @@ function RootComponent() {
         </div>
         <Cursor />
         <RippleEffect />
+        <AnalyticsTracker />
         <Toaster position="top-center" richColors />
       </AuthProvider>
     </QueryClientProvider>

@@ -1,7 +1,7 @@
 import { createFileRoute, Outlet, Link, redirect } from "@tanstack/react-router";
 import { useAuth } from "@/lib/auth";
 import { supabase } from "@/integrations/supabase/client";
-import { LayoutDashboard, Film, Users, MessageSquare, HelpCircle, LogOut, Settings, ShieldAlert } from "lucide-react";
+import { LayoutDashboard, Film, Users, MessageSquare, HelpCircle, LogOut, Settings, ShieldAlert, BarChart3 } from "lucide-react";
 
 export const Route = createFileRoute("/admin")({
   // Client-only render so the admin shell never appears in server HTML — no SSR flash.
@@ -26,7 +26,8 @@ const editorNav: { to: string; label: string; icon: typeof LayoutDashboard; exac
 ];
 
 // Nav items visible only to admins
-const adminOnlyNav: { to: string; label: string; icon: typeof LayoutDashboard }[] = [
+const adminOnlyNav: { to: string; label: string; icon: any }[] = [
+  { to: "/admin/analytics", label: "إحصائيات الموقع", icon: BarChart3 },
   { to: "/admin/settings", label: "إعدادات الموقع", icon: Settings },
 ];
 
