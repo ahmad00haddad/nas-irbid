@@ -10,6 +10,7 @@ import { ReadingProgressBar } from "@/components/ui/reading-progress";
 import { TextReveal } from "@/components/ui/text-reveal";
 import { FadeIn } from "@/components/ui/fade-in";
 import { ErrorState } from "@/components/ui/error-state";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 export const Route = createFileRoute("/episodes_/$slug")({
   component: EpisodeDetail,
@@ -134,26 +135,35 @@ function EpisodeDetail() {
         </div>
       )}
 
-      {/* Story */}
+      {/* Story & Behind the Scenes via Tabs */}
       <div className="container mx-auto px-6 py-12">
-        <div className="max-w-3xl mx-auto space-y-12">
+        <div className="max-w-3xl mx-auto">
           {ep.story && (
-            <section>
-              <h2 className="font-display text-2xl text-gradient-gold mb-4">القصة</h2>
-              <div className="prose text-foreground leading-loose whitespace-pre-wrap text-base md:text-lg">
-                {ep.story}
-              </div>
-            </section>
-          )}
-
-          {ep.behind_the_scenes && (
-            <section className="p-8 rounded-2xl bg-card border border-border/60">
-              <span className="text-xs font-bold text-primary tracking-widest">خلف الكواليس</span>
-              <h2 className="font-display text-2xl text-foreground mt-2 mb-4">ما لم يظهر في الحلقة</h2>
-              <div className="text-foreground/90 leading-relaxed whitespace-pre-wrap">
-                {ep.behind_the_scenes}
-              </div>
-            </section>
+            <Tabs defaultValue="story" className="w-full">
+              <TabsList className="w-full grid grid-cols-2 mb-8 bg-secondary/50 rounded-xl p-1 border border-border/50">
+                <TabsTrigger value="story" className="rounded-lg font-bold text-sm">القصة الكاملة</TabsTrigger>
+                <TabsTrigger value="behind" disabled={!ep.behind_the_scenes} className="rounded-lg font-bold text-sm">خلف الكواليس</TabsTrigger>
+              </TabsList>
+              
+              <TabsContent value="story" className="animate-in fade-in slide-in-from-bottom-2 duration-500">
+                <div className="prose text-foreground leading-loose whitespace-pre-wrap text-base md:text-lg">
+                  {ep.story}
+                </div>
+              </TabsContent>
+              
+              {ep.behind_the_scenes && (
+                <TabsContent value="behind" className="animate-in fade-in slide-in-from-bottom-2 duration-500">
+                  <section className="p-8 rounded-2xl bg-card border border-border/60 shadow-deep relative overflow-hidden">
+                    <div className="absolute top-0 right-0 w-32 h-32 bg-primary/10 rounded-full blur-3xl -mr-10 -mt-10 pointer-events-none" />
+                    <span className="text-xs font-bold text-primary tracking-widest">محتوى حصري</span>
+                    <h2 className="font-display text-2xl text-foreground mt-2 mb-4">ما لم يظهر في الحلقة</h2>
+                    <div className="text-foreground/90 leading-relaxed whitespace-pre-wrap relative z-10 text-base md:text-lg">
+                      {ep.behind_the_scenes}
+                    </div>
+                  </section>
+                </TabsContent>
+              )}
+            </Tabs>
           )}
         </div>
       </div>
