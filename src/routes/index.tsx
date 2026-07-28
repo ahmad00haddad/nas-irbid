@@ -104,45 +104,6 @@ function Index() {
         </div>
       </section>
 
-      {/* PARTICIPATION GRID */}
-      <section className="container mx-auto px-6 py-24">
-        <FadeIn className="text-center max-w-2xl mx-auto mb-16">
-          <span className="text-xs font-bold text-primary tracking-widest">شاركنا الحكاية</span>
-          <h2 className="font-display text-4xl md:text-5xl mt-3 mb-4 text-foreground">
-            البرنامج <span className="text-primary">يصنعه أهله</span>
-          </h2>
-          <p className="text-muted-foreground leading-relaxed">
-            رأيك واقتراحاتك جزء من كل حلقة. اختر كيف تريد أن تشارك:
-          </p>
-        </FadeIn>
-
-        <StaggerContainer className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {[
-            { icon: Users, title: "رشّح شخصية", text: "تعرف حدا يستاهل حلقة؟ صاحب مهنة قديمة، حكواتي، أو ست بيتٍ بحكاية؟", link: "/suggest", cta: "ابعت ترشيحك" },
-            { icon: HelpCircle, title: "اسأل الضيف", text: "اختر شخصية من حلقاتنا واسألها سؤالك — ممكن نطرحه عليها في حلقة قادمة.", link: "/ask", cta: "أرسل سؤالك" },
-            { icon: Share2, title: "انشر الحلقة", text: "كل مشاركة بتوصل البرنامج لعائلة جديدة، وحكاية إربد لجمهور أوسع.", link: "/episodes", cta: "شاهد الحلقات" },
-          ].map(({ icon: Icon, title, text, link, cta }) => (
-            <StaggerItem key={title}>
-              <MotionLink
-                to={link}
-                whileHover={{ y: -5 }}
-                whileTap={{ scale: 0.98 }}
-                className="group block p-7 rounded-2xl bg-card border border-border/60 hover:border-primary/60 transition-colors shadow-deep"
-              >
-                <div className="w-12 h-12 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center mb-5 group-hover:bg-primary group-hover:border-primary transition">
-                  <Icon size={22} className="text-primary group-hover:text-primary-foreground transition" />
-                </div>
-                <h3 className="font-display text-xl text-foreground mb-2">{title}</h3>
-                <p className="text-sm text-muted-foreground leading-relaxed mb-4">{text}</p>
-                <span className="text-sm font-bold text-primary inline-flex items-center gap-1">
-                  {cta} <ArrowLeft size={14} className="group-hover:-translate-x-1 transition-transform" />
-                </span>
-              </MotionLink>
-            </StaggerItem>
-          ))}
-        </StaggerContainer>
-      </section>
-
       {/* LATEST EPISODES */}
       {isLoading ? (
         <section className="container mx-auto px-6 py-16" aria-label="جاري تحميل الحلقات">
@@ -217,6 +178,45 @@ function Index() {
           </div>
         </section>
       )}
+
+      {/* PARTICIPATION GRID */}
+      <section className="container mx-auto px-6 py-24">
+        <FadeIn className="text-center max-w-2xl mx-auto mb-16">
+          <span className="text-xs font-bold text-primary tracking-widest">شاركنا الحكاية</span>
+          <h2 className="font-display text-4xl md:text-5xl mt-3 mb-4 text-foreground">
+            البرنامج <span className="text-primary">يصنعه أهله</span>
+          </h2>
+          <p className="text-muted-foreground leading-relaxed">
+            رأيك واقتراحاتك جزء من كل حلقة. اختر كيف تريد أن تشارك:
+          </p>
+        </FadeIn>
+
+        <StaggerContainer className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {[
+            { icon: Users, title: "رشّح شخصية", text: "تعرف حدا يستاهل حلقة؟ صاحب مهنة قديمة، حكواتي، أو ست بيتٍ بحكاية؟", link: "/suggest", cta: "ابعت ترشيحك" },
+            { icon: HelpCircle, title: "اسأل الضيف", text: "اختر شخصية من حلقاتنا واسألها سؤالك — ممكن نطرحه عليها في حلقة قادمة.", link: "/ask", cta: "أرسل سؤالك" },
+            { icon: Share2, title: "انشر الحلقة", text: "كل مشاركة بتوصل البرنامج لعائلة جديدة، وحكاية إربد لجمهور أوسع.", link: "/episodes", cta: "شاهد الحلقات" },
+          ].map(({ icon: Icon, title, text, link, cta }) => (
+            <StaggerItem key={title}>
+              <MotionLink
+                to={link}
+                whileHover={{ y: -5 }}
+                whileTap={{ scale: 0.98 }}
+                className="group block p-7 rounded-2xl bg-card border border-border/60 hover:border-primary/60 transition-colors shadow-deep"
+              >
+                <div className="w-12 h-12 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center mb-5 group-hover:bg-primary group-hover:border-primary transition">
+                  <Icon size={22} className="text-primary group-hover:text-primary-foreground transition" />
+                </div>
+                <h3 className="font-display text-xl text-foreground mb-2">{title}</h3>
+                <p className="text-sm text-muted-foreground leading-relaxed mb-4">{text}</p>
+                <span className="text-sm font-bold text-primary inline-flex items-center gap-1">
+                  {cta} <ArrowLeft size={14} className="group-hover:-translate-x-1 transition-transform" />
+                </span>
+              </MotionLink>
+            </StaggerItem>
+          ))}
+        </StaggerContainer>
+      </section>
 
       {/* QUOTE */}
       <section className="container mx-auto px-6 py-24">
