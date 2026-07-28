@@ -181,18 +181,16 @@ function ContactPage() {
 
               <Field label="موضوع الرسالة *" name="subject" placeholder="شو موضوع تواصلك؟" error={errors.subject} required />
 
-              <label className="block">
-                <span className="block text-sm font-semibold text-foreground mb-2">رسالتك *</span>
-                <textarea
-                  name="message"
-                  required
-                  minLength={10}
-                  rows={5}
-                  placeholder="اكتب رسالتك هنا…"
-                  className={`w-full px-4 py-3 rounded-lg bg-input border ${errors.message ? "border-destructive focus:border-destructive focus:ring-destructive/20" : "border-border focus:border-primary focus:ring-primary/20"} text-foreground placeholder:text-muted-foreground/60 focus:outline-none focus:ring-2 transition resize-none text-base`}
-                />
-                {errors.message && <p className="mt-1.5 text-xs font-bold text-destructive">{errors.message}</p>}
-              </label>
+              <TextArea
+                label="رسالتك *"
+                name="message"
+                required
+                minLength={10}
+                maxLength={2000}
+                rows={5}
+                placeholder="اكتب رسالتك هنا…"
+                error={errors.message}
+              />
 
               <div aria-hidden="true" style={{ position: "absolute", left: "-9999px", width: 1, height: 1, overflow: "hidden" }}>
                 <label>Website<input {...HONEYPOT_INPUT_PROPS} /></label>
@@ -225,6 +223,31 @@ function Field({ label, error, ...props }: { label: string; error?: string } & R
       <input
         {...props}
         className={`w-full px-4 py-3 rounded-lg bg-input border ${error ? "border-destructive focus:border-destructive focus:ring-destructive/20" : "border-border focus:border-primary focus:ring-primary/20"} text-foreground placeholder:text-muted-foreground/60 focus:outline-none focus:ring-2 transition text-base`}
+      />
+      {error && <p className="mt-1.5 text-xs font-bold text-destructive">{error}</p>}
+    </label>
+  );
+}
+
+function TextArea({ label, error, ...props }: { label: string; error?: string } & React.TextareaHTMLAttributes<HTMLTextAreaElement>) {
+  const [len, setLen] = useState(0);
+  return (
+    <label className="block">
+      <div className="flex items-center justify-between mb-2">
+        <span className="block text-sm font-semibold text-foreground">{label}</span>
+        {props.maxLength && (
+          <span className={`text-xs font-medium ${len > props.maxLength * 0.9 ? "text-destructive" : "text-muted-foreground"}`}>
+            {len} / {props.maxLength}
+          </span>
+        )}
+      </div>
+      <textarea
+        {...props}
+        onChange={(e) => {
+          setLen(e.target.value.length);
+          props.onChange?.(e);
+        }}
+        className={`w-full px-4 py-3 rounded-lg bg-input border ${error ? "border-destructive focus:border-destructive focus:ring-destructive/20" : "border-border focus:border-primary focus:ring-primary/20"} text-foreground placeholder:text-muted-foreground/60 focus:outline-none focus:ring-2 transition resize-none text-base`}
       />
       {error && <p className="mt-1.5 text-xs font-bold text-destructive">{error}</p>}
     </label>

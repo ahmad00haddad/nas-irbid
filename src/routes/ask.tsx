@@ -229,18 +229,16 @@ function AskPage() {
 
               {/* Question */}
               <div className="bg-card border border-border/60 rounded-2xl p-6 md:p-8 shadow-deep space-y-5">
-                <label className="block">
-                  <span className="block text-sm font-semibold text-foreground mb-2">سؤالك *</span>
-                  <textarea
-                    name="question"
-                    required
-                    minLength={3}
-                    rows={5}
-                    placeholder={selected ? `اكتب سؤالك لـ ${selected.character_name ?? selected.title}…` : "اكتب سؤالك للضيف باللهجة الإربداوية أو الفصحى — كيفما تحب."}
-                    className={`w-full px-4 py-3 rounded-lg bg-input border ${errors.question ? "border-destructive focus:border-destructive focus:ring-destructive/20" : "border-border focus:border-primary focus:ring-primary/20"} text-foreground placeholder:text-muted-foreground/60 focus:outline-none focus:ring-2 transition resize-none text-base`}
-                  />
-                  {errors.question && <p className="mt-1.5 text-xs font-bold text-destructive">{errors.question}</p>}
-                </label>
+                <TextArea
+                  label="سؤالك *"
+                  name="question"
+                  required
+                  minLength={3}
+                  maxLength={1000}
+                  rows={5}
+                  placeholder={selected ? `اكتب سؤالك لـ ${selected.character_name ?? selected.title}…` : "اكتب سؤالك للضيف باللهجة الإربداوية أو الفصحى — كيفما تحب."}
+                  error={errors.question}
+                />
 
                 <label className="block">
                   <span className="block text-sm font-semibold text-foreground mb-2">اسمك (اختياري)</span>
