@@ -74,12 +74,9 @@ function Index() {
             >
               {settings?.hero_title ?? "نوثّقُ إربد بصوت أهلها"}
             </TextReveal>
-            <p className="text-lg md:text-xl text-muted-foreground leading-relaxed max-w-2xl mx-auto mb-6">
+            <p className="text-lg md:text-xl text-muted-foreground leading-relaxed max-w-2xl mx-auto mb-10">
               {settings?.hero_subtitle ?? "برنامج وثائقي مستقل يحفظ ذاكرة المدينة وحكايات ناسها"}
             </p>
-            <div className="font-display text-2xl text-primary/80 mb-10 -rotate-2 opacity-90" style={{ fontFamily: "cursive" }}>
-              فيلم لـ أحمد حداد | تقديم بسمة الذينات
-            </div>
             <div className="flex flex-wrap gap-4 justify-center">
               <Magnetic>
                 <MotionLink

@@ -50,7 +50,7 @@ export function Footer() {
             </a>
           </div>
           <div className="mt-8 pt-6 border-t border-border/50">
-            <div className="font-display text-xl text-primary/80 mb-2 -rotate-2 opacity-90" style={{ fontFamily: "cursive" }}>
+            <div className="text-sm font-semibold text-primary/80 mb-1 opacity-90">
               فيلم لـ أحمد حداد
             </div>
             <p className="text-xs text-muted-foreground leading-relaxed">

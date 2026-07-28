@@ -278,3 +278,28 @@ function AskPage() {
     </div>
   );
 }
+
+function TextArea({ label, error, ...props }: { label: string; error?: string } & React.TextareaHTMLAttributes<HTMLTextAreaElement>) {
+  const [len, setLen] = useState(0);
+  return (
+    <label className="block">
+      <div className="flex items-center justify-between mb-2">
+        <span className="block text-sm font-semibold text-foreground">{label}</span>
+        {props.maxLength && (
+          <span className={`text-xs font-medium ${len > props.maxLength * 0.9 ? "text-destructive" : "text-muted-foreground"}`}>
+            {len} / {props.maxLength}
+          </span>
+        )}
+      </div>
+      <textarea
+        {...props}
+        onChange={(e) => {
+          setLen(e.target.value.length);
+          props.onChange?.(e);
+        }}
+        className={`w-full px-4 py-3 rounded-lg bg-input border ${error ? "border-destructive focus:border-destructive focus:ring-destructive/20" : "border-border focus:border-primary focus:ring-primary/20"} text-foreground placeholder:text-muted-foreground/60 focus:outline-none focus:ring-2 transition resize-none text-base`}
+      />
+      {error && <p className="mt-1.5 text-xs font-bold text-destructive">{error}</p>}
+    </label>
+  );
+}
