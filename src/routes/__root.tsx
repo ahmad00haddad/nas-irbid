@@ -142,6 +142,7 @@ function RootComponent() {
           </AnimatePresence>
           <Footer />
         </div>
+        <div className="film-grain" />
         <Cursor />
         <RippleEffect />
         <AnalyticsTracker />

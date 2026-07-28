@@ -11,6 +11,7 @@ import { FadeIn, StaggerContainer, StaggerItem } from "@/components/ui/fade-in";
 import { Magnetic } from "@/components/ui/magnetic";
 import { TextReveal } from "@/components/ui/text-reveal";
 import { HorizontalScroll } from "@/components/ui/horizontal-scroll";
+import { Marquee } from "@/components/ui/marquee";
 import { motion } from "framer-motion";
 
 const MotionLink = motion.create(Link);
@@ -73,9 +74,12 @@ function Index() {
             >
               {settings?.hero_title ?? "نوثّقُ إربد بصوت أهلها"}
             </TextReveal>
-            <p className="text-lg md:text-xl text-muted-foreground leading-relaxed max-w-2xl mx-auto mb-10">
+            <p className="text-lg md:text-xl text-muted-foreground leading-relaxed max-w-2xl mx-auto mb-6">
               {settings?.hero_subtitle ?? "برنامج وثائقي مستقل يحفظ ذاكرة المدينة وحكايات ناسها"}
             </p>
+            <div className="font-display text-2xl text-primary/80 mb-10 -rotate-2 opacity-90" style={{ fontFamily: "cursive" }}>
+              فيلم لـ أحمد حداد | تقديم بسمة الذينات
+            </div>
             <div className="flex flex-wrap gap-4 justify-center">
               <Magnetic>
                 <MotionLink
@@ -102,6 +106,18 @@ function Index() {
             </div>
           </FadeIn>
         </div>
+      </section>
+
+      {/* TICKER MARQUEE */}
+      <section className="border-b border-border/60 bg-card py-3">
+        <Marquee className="opacity-70 text-sm font-bold tracking-widest text-primary" pauseOnHover>
+          <span className="mx-8">المدينةُ ليست حجرًا ولا أسفلتًا، المدينةُ ناسُها</span>
+          <span className="mx-8">•</span>
+          <span className="mx-8">حكايات إربد قبل أن يطويها الزمن</span>
+          <span className="mx-8">•</span>
+          <span className="mx-8">ذاكرة شفوية توثق المهن والحارات</span>
+          <span className="mx-8">•</span>
+        </Marquee>
       </section>
 
       {/* LATEST EPISODES */}
@@ -158,8 +174,12 @@ function Index() {
                 </div>
               </MotionLink>
             </FadeIn>
-            <StaggerContainer className="hidden md:flex gap-5 pb-2">
-              {episodes.slice(1).map((ep) => <StaggerItem key={ep.id}><PublicEpisodeCard episode={ep as PublicEpisode} /></StaggerItem>)}
+            <StaggerContainer className="hidden md:grid grid-cols-2 lg:grid-cols-12 gap-5 pb-2">
+              {episodes.slice(1).map((ep, i) => (
+                <StaggerItem key={ep.id} className={i === 2 ? "lg:col-span-12" : "lg:col-span-6"}>
+                  <PublicEpisodeCard episode={ep as PublicEpisode} />
+                </StaggerItem>
+              ))}
             </StaggerContainer>
             <div className="md:hidden">
               <HorizontalScroll>

@@ -1,6 +1,7 @@
 import { Link } from "@tanstack/react-router";
 import { BriefcaseBusiness, CalendarDays, MapPin, Play } from "lucide-react";
 import { motion } from "framer-motion";
+import { toArabicNumerals } from "@/lib/utils";
 
 const MotionLink = motion.create(Link);
 
@@ -32,8 +33,14 @@ export function PublicEpisodeCard({ episode }: { episode: PublicEpisode }) {
       className="group block overflow-hidden rounded-2xl border border-border/70 bg-card shadow-deep transition-colors duration-300 hover:border-primary/60"
     >
       <div className="relative aspect-[4/3] overflow-hidden bg-secondary">
+        {/* Photo Corners */}
+        <div className="absolute top-2 left-2 w-4 h-4 border-t-2 border-l-2 border-primary/40 z-10 mix-blend-overlay" />
+        <div className="absolute top-2 right-2 w-4 h-4 border-t-2 border-r-2 border-primary/40 z-10 mix-blend-overlay" />
+        <div className="absolute bottom-2 left-2 w-4 h-4 border-b-2 border-l-2 border-primary/40 z-10 mix-blend-overlay" />
+        <div className="absolute bottom-2 right-2 w-4 h-4 border-b-2 border-r-2 border-primary/40 z-10 mix-blend-overlay" />
+
         {image ? (
-          <img src={image} alt={`صورة حلقة ${episode.title}`} loading="lazy" width={480} height={360} className="h-full w-full object-cover transition duration-700 group-hover:scale-105" />
+          <img src={image} alt={`صورة حلقة ${episode.title}`} loading="lazy" width={480} height={360} className="h-full w-full object-cover transition duration-700 group-hover:scale-105 sepia-[0.15]" />
         ) : (
           <div className="flex h-full items-center justify-center pattern-geo" aria-hidden="true">
             <Play className="text-primary/50" size={36} />
@@ -43,9 +50,15 @@ export function PublicEpisodeCard({ episode }: { episode: PublicEpisode }) {
         <div className="absolute bottom-4 right-4 flex h-11 w-11 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-glow transition group-hover:scale-110">
           <Play size={16} fill="currentColor" />
         </div>
+        
+        {/* Archive Stamp */}
+        <div className="absolute top-4 right-4 -rotate-[15deg] opacity-80 mix-blend-multiply border-2 border-destructive/80 text-destructive/80 font-display font-bold text-sm px-2 py-0.5 rounded-sm">
+          وُثّق
+        </div>
+
         {episode.episode_number && (
-          <span className="absolute left-4 top-4 rounded-full border border-card/40 bg-card/90 px-3 py-1 text-[11px] font-bold text-foreground backdrop-blur">
-            الحلقة {episode.episode_number}
+          <span className="absolute left-4 top-4 rounded-full border border-card/40 bg-card/90 px-3 py-1 text-[11px] font-bold text-foreground backdrop-blur font-display">
+            الحلقة {toArabicNumerals(episode.episode_number)}
           </span>
         )}
       </div>

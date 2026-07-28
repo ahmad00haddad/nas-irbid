@@ -49,9 +49,14 @@ export function Footer() {
               <Mail size={18} />
             </a>
           </div>
-          <p className="text-xs text-muted-foreground mt-6 leading-relaxed">
-            صُنع بحُب في إربد · جميع الحقوق محفوظة © {new Date().getFullYear()}
-          </p>
+          <div className="mt-8 pt-6 border-t border-border/50">
+            <div className="font-display text-xl text-primary/80 mb-2 -rotate-2 opacity-90" style={{ fontFamily: "cursive" }}>
+              فيلم لـ أحمد حداد
+            </div>
+            <p className="text-xs text-muted-foreground leading-relaxed">
+              تقديم بسمة الذينات · جميع الحقوق محفوظة © {new Date().getFullYear()}
+            </p>
+          </div>
         </div>
       </div>
     </footer>
