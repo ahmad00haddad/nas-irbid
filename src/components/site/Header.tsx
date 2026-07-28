@@ -1,7 +1,7 @@
 import { Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { Menu, X, LayoutDashboard } from "lucide-react";
-import { motion, useScroll, useMotionValueEvent } from "framer-motion";
+import { motion, useScroll, useMotionValueEvent, AnimatePresence } from "framer-motion";
 import { useAuth } from "@/lib/auth";
 import { Button } from "@/components/ui/button";
 import { trackSiteEvent } from "@/components/site/AnalyticsTracker";
@@ -107,43 +107,51 @@ export function Header() {
         </Button>
       </div>
 
-      {open && (
-        <div className="md:hidden animate-in slide-in-from-top-2 border-t border-border bg-background duration-200">
-          <nav className="container mx-auto px-6 py-4 flex flex-col gap-1">
-            {navItems.map((item) => (
+      <AnimatePresence>
+        {open && (
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: "auto", opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.2, ease: "easeInOut" }}
+            className="md:hidden border-t border-border bg-background overflow-hidden"
+          >
+            <nav className="container mx-auto px-6 py-4 flex flex-col gap-1">
+              {navItems.map((item) => (
+                <Link
+                  key={item.to}
+                  to={item.to}
+                  onClick={() => setOpen(false)}
+                  className="px-3 py-3 text-sm font-semibold text-muted-foreground hover:text-primary transition-colors"
+                  activeProps={{ className: "px-3 py-3 text-sm font-bold text-primary bg-primary/5 rounded-md" }}
+                >
+                  {item.label}
+                </Link>
+              ))}
               <Link
-                key={item.to}
-                to={item.to}
-                onClick={() => setOpen(false)}
-                className="px-3 py-3 text-sm font-semibold text-muted-foreground hover:text-primary"
-                activeProps={{ className: "px-3 py-3 text-sm font-bold text-primary" }}
+                to="/about"
+                hash="support"
+                onClick={() => {
+                  setOpen(false);
+                  trackSiteEvent("cta_click", "/about#support", { button: "mobile_menu_support" });
+                }}
+                className="mt-3 rounded-full bg-primary px-5 py-3 text-center text-sm font-bold text-primary-foreground shadow-glow active:scale-95 transition-transform"
               >
-                {item.label}
+                ادعم البرنامج
               </Link>
-            ))}
-            <Link
-              to="/about"
-              hash="support"
-              onClick={() => {
-                setOpen(false);
-                trackSiteEvent("cta_click", "/about#support", { button: "mobile_menu_support" });
-              }}
-              className="mt-3 rounded-full bg-primary px-5 py-3 text-center text-sm font-bold text-primary-foreground"
-            >
-              ادعم البرنامج
-            </Link>
-            {isEditor && (
-              <Link
-                to="/admin"
-                onClick={() => setOpen(false)}
-                className="mt-2 inline-flex items-center justify-center gap-2 rounded-full border border-border px-5 py-3 text-sm font-bold text-foreground"
-              >
-                <LayoutDashboard size={15} /> لوحة الإدارة
-              </Link>
-            )}
-          </nav>
-        </div>
-      )}
+              {isEditor && (
+                <Link
+                  to="/admin"
+                  onClick={() => setOpen(false)}
+                  className="mt-2 inline-flex items-center justify-center gap-2 rounded-full border border-border px-5 py-3 text-sm font-bold text-foreground hover:bg-muted active:scale-95 transition-all"
+                >
+                  <LayoutDashboard size={15} /> لوحة الإدارة
+                </Link>
+              )}
+            </nav>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </motion.header>
   );
 }
