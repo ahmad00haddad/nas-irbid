@@ -5,7 +5,7 @@ import { useDeferredValue, useMemo, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Search, RotateCcw, X } from "lucide-react";
 import { PublicEpisodeCard, type PublicEpisode } from "@/components/site/PublicEpisodeCard";
-import { Skeleton } from "@/components/ui/skeleton";
+import { Skeleton, EpisodeGridSkeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 import { FadeIn } from "@/components/ui/fade-in";
 import { ErrorState } from "@/components/ui/error-state";
@@ -108,8 +108,8 @@ function EpisodesPage() {
       </FadeIn>
 
       {isLoading ? (
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3" aria-label="جاري تحميل الحلقات">
-          {Array.from({ length: 6 }).map((_, index) => <Skeleton key={index} className="aspect-[4/5] rounded-2xl" />)}
+        <div aria-label="جاري تحميل الحلقات">
+          <EpisodeGridSkeleton count={6} />
         </div>
       ) : isError ? (
         <div className="py-8">

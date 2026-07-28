@@ -4,7 +4,8 @@ import { supabase } from "@/integrations/supabase/client";
 import introLogo from "@/assets/intro-logo.gif.asset.json";
 import { ArrowLeft, Users, HelpCircle, Share2, Play, MapPin } from "lucide-react";
 import { PublicEpisodeCard, type PublicEpisode } from "@/components/site/PublicEpisodeCard";
-import { Skeleton } from "@/components/ui/skeleton";
+import { Skeleton, EpisodeCardSkeleton } from "@/components/ui/skeleton";
+import { ErrorState } from "@/components/ui/error-state";
 import { useSiteSettings } from "@/lib/site-settings";
 import { FadeIn, StaggerContainer, StaggerItem } from "@/components/ui/fade-in";
 import { Magnetic } from "@/components/ui/magnetic";
@@ -144,17 +145,22 @@ function Index() {
 
       {/* LATEST EPISODES */}
       {isLoading ? (
-        <section className="container mx-auto px-6 py-16">
+        <section className="container mx-auto px-6 py-16" aria-label="جاري تحميل الحلقات">
           <Skeleton className="mb-10 h-14 w-72" />
-          <div className="grid gap-6 md:grid-cols-2"><Skeleton className="aspect-video rounded-3xl" /><Skeleton className="aspect-video rounded-3xl" /></div>
+          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+            <EpisodeCardSkeleton />
+            <EpisodeCardSkeleton />
+            <EpisodeCardSkeleton />
+          </div>
         </section>
       ) : isError ? (
-        <section className="container mx-auto px-6 py-16 text-center">
-          <div className="mx-auto max-w-xl rounded-2xl border border-destructive/30 bg-card p-10">
-            <h2 className="font-display text-2xl text-foreground">تعذّر تحميل أحدث الحلقات</h2>
-            <p className="mt-2 text-sm text-muted-foreground">يمكنك متابعة الصفحة أو المحاولة مرة أخرى.</p>
-            <button onClick={() => refetch()} className="mt-5 rounded-full bg-primary px-5 py-2.5 text-sm font-bold text-primary-foreground">إعادة المحاولة</button>
-          </div>
+        <section className="container mx-auto px-6 py-16">
+          <ErrorState
+            title="تعذّر تحميل أحدث الحلقات"
+            description="يرجى التحقق من اتصالك بالإنترنت، ثم حاول مرة أخرى."
+            variant="network"
+            action={{ label: "إعادة المحاولة", onClick: () => refetch() }}
+          />
         </section>
       ) : episodes.length > 0 && (
         <section className="container mx-auto px-6 py-16">
