@@ -4,7 +4,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth";
 import { useState } from "react";
 import { toast } from "sonner";
-import { Plus, Trash2, Pencil, X, Eye, EyeOff, AlertTriangle } from "lucide-react";
+import { Plus, Trash2, Pencil, X, Eye, EyeOff, AlertTriangle, Link, MapPin } from "lucide-react";
+
 
 export const Route = createFileRoute("/admin/episodes")({
   component: AdminEpisodes,
@@ -45,6 +46,39 @@ function sanitizeSlug(raw: string): string {
     .replace(/-{2,}/g, "-")
     .replace(/^-|-$/g, "");
 }
+
+/**
+ * Extracts lat/lng from a Google Maps URL.
+ * Supports formats:
+ *   https://maps.google.com/?q=32.55,35.85
+ *   https://www.google.com/maps/place/.../@32.55,35.85,15z
+ *   https://www.google.com/maps?ll=32.55,35.85
+ *   Decimal coords pasted directly: "32.55, 35.85"
+ */
+function parseGoogleMapsCoords(input: string): { lat: number; lng: number } | null {
+  // Direct decimal pair: "32.123456, 35.654321"
+  const directMatch = input.match(/^\s*(-?\d{1,3}\.\d+)\s*,\s*(-?\d{1,3}\.\d+)\s*$/);
+  if (directMatch) {
+    const lat = parseFloat(directMatch[1]);
+    const lng = parseFloat(directMatch[2]);
+    if (lat >= -90 && lat <= 90 && lng >= -180 && lng <= 180) return { lat, lng };
+  }
+
+  // /@lat,lng,zoom or /@lat,lng pattern
+  const atMatch = input.match(/\/@(-?\d+\.\d+),(-?\d+\.\d+)/);
+  if (atMatch) return { lat: parseFloat(atMatch[1]), lng: parseFloat(atMatch[2]) };
+
+  // ?q=lat,lng
+  const qMatch = input.match(/[?&]q=(-?\d+\.\d+),(-?\d+\.\d+)/);
+  if (qMatch) return { lat: parseFloat(qMatch[1]), lng: parseFloat(qMatch[2]) };
+
+  // ?ll=lat,lng
+  const llMatch = input.match(/[?&]ll=(-?\d+\.\d+),(-?\d+\.\d+)/);
+  if (llMatch) return { lat: parseFloat(llMatch[1]), lng: parseFloat(llMatch[2]) };
+
+  return null;
+}
+
 
 /** Confirm dialog component for destructive actions */
 function ConfirmDialog({
@@ -273,9 +307,72 @@ function EpisodeEditor({
             <Input label="العقد الزمني" placeholder="٧٠s, ٨٠s..." value={v.decade ?? ""} onChange={(e) => set("decade", e.target.value)} />
             <Input label="الحي / المنطقة" value={v.neighborhood ?? ""} onChange={(e) => set("neighborhood", e.target.value)} />
           </div>
-          <div className="grid sm:grid-cols-2 gap-4">
-            <Input label="خط العرض (Latitude)" type="number" step="any" placeholder="32.551445" value={v.latitude ?? ""} onChange={(e) => set("latitude", e.target.value ? Number(e.target.value) : null)} />
-            <Input label="خط الطول (Longitude)" type="number" step="any" placeholder="35.851479" value={v.longitude ?? ""} onChange={(e) => set("longitude", e.target.value ? Number(e.target.value) : null)} />
+          <div className="space-y-2">
+            <div className="flex items-center gap-2">
+              <MapPin size={14} className="text-primary shrink-0" />
+              <span className="text-xs font-semibold text-foreground">الموقع الجغرافي على الخريطة</span>
+            </div>
+            {/* Google Maps link paste helper */}
+            <div className="flex gap-2">
+              <input
+                type="text"
+                placeholder="الصق رابط Google Maps هنا لاستخراج الإحداثيات تلقائياً..."
+                className="flex-1 px-3 py-2.5 rounded-lg bg-input border border-border text-foreground text-sm focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none"
+                onPaste={(e) => {
+                  const text = e.clipboardData.getData("text");
+                  const coords = parseGoogleMapsCoords(text);
+                  if (coords) {
+                    e.preventDefault();
+                    set("latitude", coords.lat);
+                    set("longitude", coords.lng);
+                    toast.success(`✓ تم استخراج الإحداثيات: ${coords.lat.toFixed(6)}, ${coords.lng.toFixed(6)}`);
+                  }
+                }}
+                onKeyDown={(e) => e.key === "Enter" && e.preventDefault()}
+              />
+              <button
+                type="button"
+                onClick={() => {
+                  const url = (document.activeElement as HTMLInputElement)?.value;
+                  if (!url) { toast.info("الصق الرابط في الحقل أولاً"); return; }
+                  const coords = parseGoogleMapsCoords(url);
+                  if (coords) {
+                    set("latitude", coords.lat);
+                    set("longitude", coords.lng);
+                    toast.success(`✓ ${coords.lat.toFixed(6)}, ${coords.lng.toFixed(6)}`);
+                  } else {
+                    toast.error("لم يتم التعرف على الإحداثيات في هذا الرابط");
+                  }
+                }}
+                className="px-3 py-2 rounded-lg bg-primary/10 text-primary border border-primary/20 text-xs font-bold flex items-center gap-1 hover:bg-primary/20 transition shrink-0"
+              >
+                <Link size={13} /> استخراج
+              </button>
+            </div>
+            <div className="grid sm:grid-cols-2 gap-3">
+              <Input
+                label="خط العرض (Latitude)"
+                type="number" step="any" placeholder="32.551445"
+                value={v.latitude ?? ""}
+                onChange={(e) => set("latitude", e.target.value ? Number(e.target.value) : null)}
+              />
+              <Input
+                label="خط الطول (Longitude)"
+                type="number" step="any" placeholder="35.851479"
+                value={v.longitude ?? ""}
+                onChange={(e) => set("longitude", e.target.value ? Number(e.target.value) : null)}
+              />
+            </div>
+            {v.latitude && v.longitude && (
+              <a
+                href={`https://www.google.com/maps?q=${v.latitude},${v.longitude}`}
+                target="_blank"
+                rel="noreferrer"
+                className="inline-flex items-center gap-1 text-[11px] text-primary hover:underline"
+              >
+                <MapPin size={10} /> تحقق من الموقع على خرائط جوجل
+              </a>
+            )}
           </div>
 
           <Input label="معرّف فيديو يوتيوب (YouTube ID)" placeholder="dQw4w9WgXcQ" value={v.youtube_id ?? ""} onChange={(e) => set("youtube_id", e.target.value)} />
