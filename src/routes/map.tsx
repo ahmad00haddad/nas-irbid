@@ -1,14 +1,14 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { Loader2, Map as MapIcon } from "lucide-react";
+import { Loader2, Map as MapIcon, AlertCircle } from "lucide-react";
 import { lazy, Suspense, useEffect, useState } from "react";
 
-// Dynamically import the map component so it's not executed during SSR
+// Dynamically import — avoids SSR issues with mapbox-gl (uses window/document)
 const ClientMap = lazy(() => import("@/components/site/Map"));
 
-// Your Google Maps API Key — store in env variable in production
-const GOOGLE_MAPS_API_KEY = import.meta.env.VITE_GOOGLE_MAPS_API_KEY ?? "";
+// Mapbox public access token — add VITE_MAPBOX_TOKEN to your .env file
+const MAPBOX_TOKEN = import.meta.env.VITE_MAPBOX_TOKEN ?? "";
 
 export const Route = createFileRoute("/map")({
   component: MapPage,
@@ -42,7 +42,6 @@ function MapPage() {
         .eq("published", true)
         .not("latitude", "is", null)
         .not("longitude", "is", null);
-
       if (error) throw error;
       return data;
     },
@@ -50,59 +49,68 @@ function MapPage() {
 
   return (
     <div className="relative min-h-[calc(100vh-80px)] w-full flex flex-col bg-background">
+
       {/* Overlay Header */}
-      <div className="absolute inset-x-0 top-0 z-10 pointer-events-none px-6 py-5 md:px-10 md:py-8 bg-gradient-to-b from-background/95 via-background/70 to-transparent">
-        <div className="flex items-start gap-3">
+      <div className="absolute inset-x-0 top-0 z-10 pointer-events-none px-6 py-5 md:px-10 md:py-7 bg-gradient-to-b from-background/95 via-background/60 to-transparent">
+        <div className="flex items-center gap-3">
           <div
-            className="mt-1 w-9 h-9 rounded-lg flex items-center justify-center shrink-0"
-            style={{ background: "oklch(0.42 0.16 25)", boxShadow: "0 4px 16px oklch(0.42 0.16 25 / 0.35)" }}
+            className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0"
+            style={{ background: "oklch(0.42 0.16 25)", boxShadow: "0 4px 16px oklch(0.42 0.16 25 / 0.4)" }}
           >
             <MapIcon size={18} color="white" />
           </div>
           <div>
-            <h1 className="font-display text-3xl md:text-4xl text-foreground m-0 leading-tight">
+            <h1 className="font-display text-2xl md:text-4xl text-foreground m-0 leading-tight">
               خريطة الحكايات
             </h1>
-            <p className="text-muted-foreground mt-1 text-sm md:text-base max-w-md m-0">
-              {isLoading
-                ? "جاري تحميل مواقع الحلقات..."
-                : episodes.length === 0
-                  ? "لا توجد حلقات مضافة بإحداثيات بعد."
-                  : `${episodes.length} حلقة على خارطة إربد — اضغط على الدبوس لاستعراضها`}
-            </p>
+            {!isLoading && episodes.length > 0 && (
+              <p className="text-muted-foreground mt-0.5 text-xs md:text-sm m-0">
+                {episodes.length} حلقة موثّقة على أرض إربد — اضغط على الدبوس لاستعراضها
+              </p>
+            )}
           </div>
         </div>
       </div>
 
-      {/* Loading Spinner */}
+      {/* Loading */}
       {isLoading && (
-        <div className="absolute inset-0 z-20 flex items-center justify-center bg-background/60 backdrop-blur-sm">
+        <div className="absolute inset-0 z-20 flex items-center justify-center bg-background/70 backdrop-blur-sm">
           <div className="flex flex-col items-center gap-3">
             <Loader2 className="animate-spin text-primary w-10 h-10" />
-            <span className="text-sm text-muted-foreground">جاري تحميل الخريطة…</span>
+            <span className="text-sm text-muted-foreground font-medium">جاري تحميل الخريطة…</span>
           </div>
         </div>
       )}
 
       {/* No API Key Warning */}
-      {!GOOGLE_MAPS_API_KEY && isClient && !isLoading && (
-        <div className="absolute inset-0 z-20 flex items-center justify-center bg-background/90 backdrop-blur-sm">
-          <div className="text-center max-w-sm px-6 py-8 bg-card rounded-2xl border border-border shadow-xl">
+      {!MAPBOX_TOKEN && isClient && !isLoading && (
+        <div className="absolute inset-0 z-30 flex items-center justify-center bg-background/90 backdrop-blur-sm p-6">
+          <div className="text-center max-w-sm w-full px-8 py-8 bg-card rounded-2xl border border-border shadow-2xl">
             <div className="w-14 h-14 mx-auto rounded-full bg-primary/10 flex items-center justify-center mb-4">
-              <MapIcon size={24} className="text-primary" />
+              <AlertCircle size={26} className="text-primary" />
             </div>
-            <h2 className="font-display text-xl text-foreground mb-2">إعداد الخريطة</h2>
-            <p className="text-sm text-muted-foreground leading-relaxed">
-              يلزمك مفتاح Google Maps API. أضف
-              <code className="mx-1 px-1.5 py-0.5 rounded bg-secondary text-xs">VITE_GOOGLE_MAPS_API_KEY</code>
-              إلى ملف <code className="mx-1 px-1.5 py-0.5 rounded bg-secondary text-xs">.env</code>
+            <h2 className="font-display text-xl text-foreground mb-2">يلزمك مفتاح Mapbox</h2>
+            <p className="text-sm text-muted-foreground leading-relaxed mb-4">
+              أضف متغير البيئة التالي إلى إعدادات مشروعك في Lovable:
             </p>
+            <code className="block bg-secondary text-foreground/90 rounded-xl px-4 py-3 text-xs text-left ltr break-all shadow-inner">
+              VITE_MAPBOX_TOKEN=pk.eyJ1...
+            </code>
+            <a
+              href="https://account.mapbox.com/auth/signup/"
+              target="_blank"
+              rel="noreferrer"
+              className="mt-4 inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-primary text-primary-foreground text-sm font-bold no-underline hover:opacity-90 transition"
+              style={{ color: "white" }}
+            >
+              احصل على مفتاح مجاني
+            </a>
           </div>
         </div>
       )}
 
-      {/* Map — Client-only */}
-      {isClient && (
+      {/* Map */}
+      {isClient && MAPBOX_TOKEN && (
         <Suspense
           fallback={
             <div className="flex-1 w-full h-full flex items-center justify-center bg-secondary/20">
@@ -110,7 +118,7 @@ function MapPage() {
             </div>
           }
         >
-          <ClientMap episodes={episodes as any} apiKey={GOOGLE_MAPS_API_KEY} />
+          <ClientMap episodes={episodes as any} accessToken={MAPBOX_TOKEN} />
         </Suspense>
       )}
     </div>
