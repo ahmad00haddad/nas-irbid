@@ -50,33 +50,6 @@ export type Database = {
         }
         Relationships: []
       }
-      site_analytics: {
-        Row: {
-          id: string
-          session_id: string
-          path: string
-          event_type: string
-          created_at: string
-          details: Json | null
-        }
-        Insert: {
-          id?: string
-          session_id: string
-          path: string
-          event_type: string
-          created_at?: string
-          details?: Json | null
-        }
-        Update: {
-          id?: string
-          session_id?: string
-          path?: string
-          event_type?: string
-          created_at?: string
-          details?: Json | null
-        }
-        Relationships: []
-      }
       episodes: {
         Row: {
           behind_the_scenes: string | null
@@ -228,6 +201,33 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      site_analytics: {
+        Row: {
+          created_at: string
+          details: Json | null
+          event_type: string
+          id: string
+          path: string
+          session_id: string
+        }
+        Insert: {
+          created_at?: string
+          details?: Json | null
+          event_type: string
+          id?: string
+          path: string
+          session_id: string
+        }
+        Update: {
+          created_at?: string
+          details?: Json | null
+          event_type?: string
+          id?: string
+          path?: string
+          session_id?: string
+        }
+        Relationships: []
       }
       site_settings: {
         Row: {
