@@ -77,7 +77,7 @@ export const Route = createFileRoute("/episodes_/$slug")({
 });
 
 function EpisodeDetail() {
-  const ep = Route.useLoaderData();
+  const ep = Route.useLoaderData()!;
   const { data: related = [] } = useQuery({
     queryKey: ["related-episodes", ep.id, ep.neighborhood],
     queryFn: async () => {
