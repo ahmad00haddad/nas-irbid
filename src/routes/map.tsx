@@ -41,7 +41,14 @@ function MapPage() {
         .not("longitude", "is", null);
 
       if (error) throw error;
-      return data;
+      // Guard against invalid/swapped coordinates so no pin lands off the map
+      return (data ?? []).filter(
+        (ep) =>
+          typeof ep.latitude === "number" &&
+          typeof ep.longitude === "number" &&
+          Math.abs(ep.latitude) <= 90 &&
+          Math.abs(ep.longitude) <= 180,
+      );
     },
   });
 
