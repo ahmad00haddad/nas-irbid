@@ -25,13 +25,15 @@ type Episode = {
   behind_the_scenes: string | null;
   episode_number: number | null;
   season: number | null;
+  latitude: number | null;
+  longitude: number | null;
   published: boolean;
 };
 
 const empty: Partial<Episode> = {
   slug: "", title: "", character_name: "", profession: "", neighborhood: "",
   decade: "", youtube_id: "", cover_image_url: "", short_description: "", story: "",
-  behind_the_scenes: "", episode_number: null, season: 1, published: false,
+  behind_the_scenes: "", episode_number: null, season: 1, latitude: null, longitude: null, published: false,
 };
 
 /** Sanitize a slug: lowercase, strip non-alphanumeric (except hyphens), collapse hyphens */
@@ -269,6 +271,11 @@ function EpisodeEditor({
           </div>
           <div className="grid sm:grid-cols-2 gap-4">
             <Input label="العقد الزمني" placeholder="٧٠s, ٨٠s..." value={v.decade ?? ""} onChange={(e) => set("decade", e.target.value)} />
+            <Input label="الحي / المنطقة" value={v.neighborhood ?? ""} onChange={(e) => set("neighborhood", e.target.value)} />
+          </div>
+          <div className="grid sm:grid-cols-2 gap-4">
+            <Input label="خط العرض (Latitude)" type="number" step="any" placeholder="32.551445" value={v.latitude ?? ""} onChange={(e) => set("latitude", e.target.value ? Number(e.target.value) : null)} />
+            <Input label="خط الطول (Longitude)" type="number" step="any" placeholder="35.851479" value={v.longitude ?? ""} onChange={(e) => set("longitude", e.target.value ? Number(e.target.value) : null)} />
           </div>
 
           <Input label="معرّف فيديو يوتيوب (YouTube ID)" placeholder="dQw4w9WgXcQ" value={v.youtube_id ?? ""} onChange={(e) => set("youtube_id", e.target.value)} />

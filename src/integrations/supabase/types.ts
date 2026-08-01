@@ -60,6 +60,8 @@ export type Database = {
           episode_number: number | null
           gallery_urls: string[] | null
           id: string
+          latitude: number | null
+          longitude: number | null
           neighborhood: string | null
           profession: string | null
           published: boolean
@@ -71,6 +73,52 @@ export type Database = {
           title: string
           updated_at: string
           youtube_id: string | null
+        }
+        Insert: {
+          behind_the_scenes?: string | null
+          character_name?: string | null
+          cover_image_url?: string | null
+          created_at?: string
+          decade?: string | null
+          episode_number?: number | null
+          gallery_urls?: string[] | null
+          id?: string
+          latitude?: number | null
+          longitude?: number | null
+          neighborhood?: string | null
+          profession?: string | null
+          published?: boolean
+          published_at?: string | null
+          season?: number | null
+          short_description?: string | null
+          slug: string
+          story?: string | null
+          title: string
+          updated_at?: string
+          youtube_id?: string | null
+        }
+        Update: {
+          behind_the_scenes?: string | null
+          character_name?: string | null
+          cover_image_url?: string | null
+          created_at?: string
+          decade?: string | null
+          episode_number?: number | null
+          gallery_urls?: string[] | null
+          id?: string
+          latitude?: number | null
+          longitude?: number | null
+          neighborhood?: string | null
+          profession?: string | null
+          published?: boolean
+          published_at?: string | null
+          season?: number | null
+          short_description?: string | null
+          slug?: string
+          story?: string | null
+          title?: string
+          updated_at?: string
+          youtube_id?: string | null
         }
         Insert: {
           behind_the_scenes?: string | null

@@ -9,6 +9,7 @@ import { trackSiteEvent } from "@/components/site/AnalyticsTracker";
 const navItems = [
   { to: "/", label: "الرئيسية" },
   { to: "/episodes", label: "الحلقات" },
+  { to: "/map", label: "خريطة الحكايات" },
   { to: "/suggest", label: "اقترح حكاية" },
   { to: "/ask", label: "اسأل الضيف" },
   { to: "/contact", label: "تواصل معنا" },
