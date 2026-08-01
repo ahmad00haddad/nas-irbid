@@ -1,4 +1,4 @@
-import { MapContainer, TileLayer, Marker, Popup, ZoomControl } from "react-leaflet";
+import { MapContainer, TileLayer, Marker, Tooltip, ZoomControl } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
 import { Play, Navigation, MapPin } from "lucide-react";
@@ -45,7 +45,12 @@ export default function Map({ episodes }: { episodes: any[] }) {
   }, [episodes]);
 
   return (
-    <div className="flex-1 w-full h-full relative" style={{ filter: "sepia(0.6) contrast(1.1) brightness(0.95)" }}>
+    <div className="flex-1 w-full h-full relative">
+      <style>{`
+        .leaflet-tile-pane {
+          filter: sepia(0.6) contrast(1.1) brightness(0.95);
+        }
+      `}</style>
       <MapContainer 
         center={IRBID_CENTER} 
         zoom={14} 
@@ -67,14 +72,10 @@ export default function Map({ episodes }: { episodes: any[] }) {
               key={`group-${index}`} 
               position={[lat, lng]} 
               icon={getCustomIcon()!}
-              eventHandlers={{
-                mouseover: (e) => {
-                  e.target.openPopup();
-                }
-              }}
+              // No eventHandlers needed, Tooltip automatically shows on hover and hides on mouseout
             >
-              <Popup className="vintage-popup" closeButton={false}>
-                <div className="flex flex-col gap-5 p-1 max-h-[350px] overflow-y-auto px-2 -mx-2 custom-scrollbar">
+              <Tooltip interactive={true} direction="top" offset={[0, -20]} opacity={1} className="vintage-popup bg-transparent border-0 shadow-none">
+                <div className="flex flex-col gap-5 p-3 bg-background rounded-xl shadow-xl border border-border/50 max-h-[350px] overflow-y-auto custom-scrollbar w-64">
                   {group.map((ep, i) => {
                     const img = ep.cover_image_url ?? (ep.youtube_id ? `https://img.youtube.com/vi/${ep.youtube_id}/mqdefault.jpg` : null);
                     return (
@@ -121,7 +122,7 @@ export default function Map({ episodes }: { episodes: any[] }) {
                     );
                   })}
                 </div>
-              </Popup>
+              </Tooltip>
             </Marker>
           );
         })}
