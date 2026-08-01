@@ -1,0 +1,1 @@
+UPDATE public.episodes SET latitude = 32.556624, longitude = 35.848629 WHERE slug = 'qadri';
