@@ -1,11 +1,14 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { Loader2 } from "lucide-react";
+import { Loader2, Map as MapIcon } from "lucide-react";
 import { lazy, Suspense, useEffect, useState } from "react";
 
 // Dynamically import the map component so it's not executed during SSR
 const ClientMap = lazy(() => import("@/components/site/Map"));
+
+// Your Google Maps API Key — store in env variable in production
+const GOOGLE_MAPS_API_KEY = import.meta.env.VITE_GOOGLE_MAPS_API_KEY ?? "";
 
 export const Route = createFileRoute("/map")({
   component: MapPage,
@@ -23,7 +26,7 @@ export const Route = createFileRoute("/map")({
 
 function MapPage() {
   const [isClient, setIsClient] = useState(false);
-  
+
   useEffect(() => {
     setIsClient(true);
   }, []);
@@ -33,11 +36,13 @@ function MapPage() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("episodes")
-        .select("id, slug, title, character_name, profession, neighborhood, decade, cover_image_url, youtube_id, latitude, longitude")
+        .select(
+          "id, slug, title, character_name, profession, neighborhood, decade, cover_image_url, youtube_id, latitude, longitude"
+        )
         .eq("published", true)
         .not("latitude", "is", null)
         .not("longitude", "is", null);
-      
+
       if (error) throw error;
       return data;
     },
@@ -45,29 +50,67 @@ function MapPage() {
 
   return (
     <div className="relative min-h-[calc(100vh-80px)] w-full flex flex-col bg-background">
-      <div className="absolute inset-x-0 top-0 z-10 pointer-events-none p-6 md:p-10 bg-gradient-to-b from-background via-background/80 to-transparent">
-        <h1 className="font-display text-4xl md:text-5xl text-foreground drop-shadow-sm">
-          خريطة <span className="text-gradient-gold">الحكايات</span>
-        </h1>
-        <p className="text-muted-foreground mt-2 max-w-md text-sm md:text-base">
-          تجوّل في حارات إربد القديمة، واكتشف قصص أهلها في أماكن حدوثها الحقيقية.
-        </p>
+      {/* Overlay Header */}
+      <div className="absolute inset-x-0 top-0 z-10 pointer-events-none px-6 py-5 md:px-10 md:py-8 bg-gradient-to-b from-background/95 via-background/70 to-transparent">
+        <div className="flex items-start gap-3">
+          <div
+            className="mt-1 w-9 h-9 rounded-lg flex items-center justify-center shrink-0"
+            style={{ background: "oklch(0.42 0.16 25)", boxShadow: "0 4px 16px oklch(0.42 0.16 25 / 0.35)" }}
+          >
+            <MapIcon size={18} color="white" />
+          </div>
+          <div>
+            <h1 className="font-display text-3xl md:text-4xl text-foreground m-0 leading-tight">
+              خريطة الحكايات
+            </h1>
+            <p className="text-muted-foreground mt-1 text-sm md:text-base max-w-md m-0">
+              {isLoading
+                ? "جاري تحميل مواقع الحلقات..."
+                : episodes.length === 0
+                  ? "لا توجد حلقات مضافة بإحداثيات بعد."
+                  : `${episodes.length} حلقة على خارطة إربد — اضغط على الدبوس لاستعراضها`}
+            </p>
+          </div>
+        </div>
       </div>
 
+      {/* Loading Spinner */}
       {isLoading && (
-        <div className="absolute inset-0 z-20 flex items-center justify-center bg-background/50 backdrop-blur-sm">
-          <Loader2 className="animate-spin text-primary w-10 h-10" />
+        <div className="absolute inset-0 z-20 flex items-center justify-center bg-background/60 backdrop-blur-sm">
+          <div className="flex flex-col items-center gap-3">
+            <Loader2 className="animate-spin text-primary w-10 h-10" />
+            <span className="text-sm text-muted-foreground">جاري تحميل الخريطة…</span>
+          </div>
         </div>
       )}
 
-      {/* Map Container - Render only on client to avoid SSR Leaflet issues */}
-      {isClient && (
-        <Suspense fallback={
-          <div className="flex-1 w-full h-full flex items-center justify-center bg-secondary/20">
-            <Loader2 className="animate-spin text-muted-foreground w-8 h-8" />
+      {/* No API Key Warning */}
+      {!GOOGLE_MAPS_API_KEY && isClient && !isLoading && (
+        <div className="absolute inset-0 z-20 flex items-center justify-center bg-background/90 backdrop-blur-sm">
+          <div className="text-center max-w-sm px-6 py-8 bg-card rounded-2xl border border-border shadow-xl">
+            <div className="w-14 h-14 mx-auto rounded-full bg-primary/10 flex items-center justify-center mb-4">
+              <MapIcon size={24} className="text-primary" />
+            </div>
+            <h2 className="font-display text-xl text-foreground mb-2">إعداد الخريطة</h2>
+            <p className="text-sm text-muted-foreground leading-relaxed">
+              يلزمك مفتاح Google Maps API. أضف
+              <code className="mx-1 px-1.5 py-0.5 rounded bg-secondary text-xs">VITE_GOOGLE_MAPS_API_KEY</code>
+              إلى ملف <code className="mx-1 px-1.5 py-0.5 rounded bg-secondary text-xs">.env</code>
+            </p>
           </div>
-        }>
-          <ClientMap episodes={episodes} />
+        </div>
+      )}
+
+      {/* Map — Client-only */}
+      {isClient && (
+        <Suspense
+          fallback={
+            <div className="flex-1 w-full h-full flex items-center justify-center bg-secondary/20">
+              <Loader2 className="animate-spin text-muted-foreground w-8 h-8" />
+            </div>
+          }
+        >
+          <ClientMap episodes={episodes as any} apiKey={GOOGLE_MAPS_API_KEY} />
         </Suspense>
       )}
     </div>
