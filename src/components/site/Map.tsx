@@ -30,7 +30,7 @@ const PIN_COLOR = "#7c1c22";
 const PIN_COLOR_MULTI = "#5a1018"; // Slightly darker for multi-episode pins
 
 // Per-count icon cache to avoid recreating the same DivIcon multiple times
-const iconCache = new Map<number, L.DivIcon>();
+const iconCache = new globalThis.Map<number, L.DivIcon>();
 
 function getCustomIcon(count: number) {
   if (typeof window === "undefined") return undefined;
