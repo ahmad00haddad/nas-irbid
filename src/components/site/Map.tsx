@@ -4,16 +4,25 @@ import L from "leaflet";
 import { Play, Navigation } from "lucide-react";
 
 // Custom Icon for Map Pins (Vintage Ink Style)
-const customIcon = new L.DivIcon({
-  className: "custom-map-pin",
-  html: `<div class="relative flex items-center justify-center w-8 h-8">
-           <div class="absolute inset-0 bg-primary/20 rounded-full animate-ping"></div>
-           <div class="relative z-10 w-4 h-4 bg-primary rounded-full border-2 border-background shadow-glow"></div>
-         </div>`,
-  iconSize: [32, 32],
-  iconAnchor: [16, 16],
-  popupAnchor: [0, -16],
-});
+// Initialized lazily to avoid SSR 'window is not defined' errors
+let customIcon: L.DivIcon | undefined;
+
+function getCustomIcon() {
+  if (typeof window === "undefined") return undefined;
+  if (!customIcon) {
+    customIcon = new L.DivIcon({
+      className: "custom-map-pin",
+      html: `<div class="relative flex items-center justify-center w-8 h-8">
+               <div class="absolute inset-0 bg-primary/20 rounded-full animate-ping"></div>
+               <div class="relative z-10 w-4 h-4 bg-primary rounded-full border-2 border-background shadow-glow"></div>
+             </div>`,
+      iconSize: [32, 32],
+      iconAnchor: [16, 16],
+      popupAnchor: [0, -16],
+    });
+  }
+  return customIcon;
+}
 
 export default function Map({ episodes }: { episodes: any[] }) {
   // Irbid City Center Coordinates
@@ -39,7 +48,7 @@ export default function Map({ episodes }: { episodes: any[] }) {
             <Marker 
               key={ep.id} 
               position={[ep.latitude!, ep.longitude!]} 
-              icon={customIcon}
+              icon={getCustomIcon()!}
             >
               <Popup className="vintage-popup" closeButton={false}>
                 <div className="flex flex-col gap-3 p-1 min-w-[200px]">
