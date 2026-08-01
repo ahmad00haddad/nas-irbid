@@ -1,8 +1,8 @@
-import { useEffect, useRef, useState, useCallback } from "react";
-import mapboxgl from "mapbox-gl";
-import "mapbox-gl/dist/mapbox-gl.css";
-import { Play, Navigation, X, MapPin, ChevronRight, ChevronLeft } from "lucide-react";
-import { createRoot } from "react-dom/client";
+import { MapContainer, TileLayer, Marker, Tooltip, ZoomControl } from "react-leaflet";
+import "leaflet/dist/leaflet.css";
+import L from "leaflet";
+import { Play, Navigation, MapPin } from "lucide-react";
+import { useMemo } from "react";
 
 type Episode = {
   id: string;
@@ -18,380 +18,202 @@ type Episode = {
   longitude: number;
 };
 
-type Group = {
-  lat: number;
-  lng: number;
-  episodes: Episode[];
-};
+// Custom Icon function to prevent SSR issues
+function getCustomIcon(count: number) {
+  if (typeof window === "undefined") return undefined;
+  
+  const pinColor = "#7c1c22"; // Brand burgundy
+  const isSingle = count === 1;
 
-interface MapboxMapProps {
-  episodes: Episode[];
-  accessToken: string;
-}
+  const pinSvg = `
+    <svg xmlns="http://www.w3.org/2000/svg" width="52" height="64" viewBox="0 0 52 64">
+      <filter id="shadow" x="-40%" y="-20%" width="180%" height="180%">
+        <feDropShadow dx="0" dy="4" stdDeviation="4" flood-color="#00000055"/>
+      </filter>
+      <g filter="url(#shadow)">
+        <path d="M26 2C15.5 2 7 10.5 7 21c0 13.5 19 39 19 39s19-25.5 19-39c0-10.5-8.5-19-19-19Z" fill="${pinColor}" />
+        <circle cx="26" cy="21" r="10" fill="white" opacity="0.95"/>
+        ${isSingle ? "" : `<text x="26" y="26" text-anchor="middle" font-family="system-ui" font-size="12" font-weight="bold" fill="${pinColor}">${count}</text>`}
+      </g>
+    </svg>
+  `;
 
-// Cluster nearby coordinates within ~50 meters
-function groupNearby(episodes: Episode[]): Group[] {
-  const groups: Group[] = [];
-  const THRESHOLD = 0.0004;
-  episodes.forEach((ep) => {
-    const existing = groups.find(
-      (g) =>
-        Math.abs(g.lat - ep.latitude) < THRESHOLD &&
-        Math.abs(g.lng - ep.longitude) < THRESHOLD
-    );
-    if (existing) {
-      existing.episodes.push(ep);
-    } else {
-      groups.push({ lat: ep.latitude, lng: ep.longitude, episodes: [ep] });
-    }
+  return new L.DivIcon({
+    className: "custom-map-pin bg-transparent border-0",
+    html: `<div class="relative flex items-center justify-center hover:scale-110 transition-transform duration-300 origin-bottom" style="cursor: pointer;">
+             ${pinSvg}
+           </div>`,
+    iconSize: [52, 64],
+    iconAnchor: [26, 64],
+    tooltipAnchor: [0, -56], // Anchors exactly above the pin
   });
-  return groups;
 }
 
-// Episode Card Component
-function EpisodeCard({
-  group,
-  onClose,
-}: {
-  group: Group;
-  onClose: () => void;
-}) {
-  const [idx, setIdx] = useState(0);
-  const ep = group.episodes[idx];
-  const hasMultiple = group.episodes.length > 1;
+export default function Map({ episodes }: { episodes: Episode[] }) {
+  // Irbid City Center
+  const IRBID_CENTER: [number, number] = [32.551445, 35.851479];
 
-  const img =
-    ep.cover_image_url ??
-    (ep.youtube_id
-      ? `https://img.youtube.com/vi/${ep.youtube_id}/hqdefault.jpg`
-      : null);
-
-  return (
-    <div
-      className="episode-card"
-      style={{
-        width: 290,
-        background: "rgba(253,246,232,0.97)",
-        backdropFilter: "blur(20px)",
-        borderRadius: 20,
-        overflow: "hidden",
-        boxShadow: "0 24px 60px rgba(0,0,0,0.22), 0 4px 12px rgba(0,0,0,0.1)",
-        border: "1px solid rgba(196,164,107,0.25)",
-        direction: "rtl",
-        fontFamily: "'IBM Plex Sans Arabic', sans-serif",
-      }}
-    >
-      {/* Image */}
-      <div style={{ position: "relative", width: "100%", height: 160, overflow: "hidden", background: "#e8d8c0" }}>
-        {img ? (
-          <img
-            src={img}
-            alt={ep.title}
-            style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
-          />
-        ) : (
-          <div style={{ width: "100%", height: "100%", display: "flex", alignItems: "center", justifyContent: "center" }}>
-            <MapPin size={32} color="#c4a46b" />
-          </div>
-        )}
-
-        {/* Close */}
-        <button
-          onClick={onClose}
-          style={{
-            position: "absolute", top: 8, left: 8,
-            width: 28, height: 28, borderRadius: "50%",
-            background: "rgba(253,246,232,0.85)", border: "none",
-            cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center",
-            backdropFilter: "blur(8px)", boxShadow: "0 2px 8px rgba(0,0,0,0.15)",
-          }}
-        >
-          <X size={13} color="#2d1a0e" />
-        </button>
-
-        {/* Decade badge */}
-        {ep.decade && (
-          <div style={{
-            position: "absolute", top: 8, right: 8,
-            background: "rgba(253,246,232,0.9)", backdropFilter: "blur(8px)",
-            padding: "2px 8px", borderRadius: 6, fontSize: 10, fontWeight: 700,
-            color: "#2d1a0e", boxShadow: "0 2px 6px rgba(0,0,0,0.1)"
-          }}>
-            {ep.decade}
-          </div>
-        )}
-
-        {/* Nav arrows for multiple episodes */}
-        {hasMultiple && (
-          <>
-            <button
-              onClick={() => setIdx((i) => (i > 0 ? i - 1 : group.episodes.length - 1))}
-              style={{
-                position: "absolute", right: 8, top: "50%", transform: "translateY(-50%)",
-                width: 28, height: 28, borderRadius: "50%", border: "none",
-                background: "rgba(253,246,232,0.85)", backdropFilter: "blur(8px)",
-                cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center",
-                boxShadow: "0 2px 8px rgba(0,0,0,0.15)"
-              }}
-            >
-              <ChevronRight size={14} color="#2d1a0e" />
-            </button>
-            <button
-              onClick={() => setIdx((i) => (i < group.episodes.length - 1 ? i + 1 : 0))}
-              style={{
-                position: "absolute", left: 40, top: "50%", transform: "translateY(-50%)",
-                width: 28, height: 28, borderRadius: "50%", border: "none",
-                background: "rgba(253,246,232,0.85)", backdropFilter: "blur(8px)",
-                cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center",
-                boxShadow: "0 2px 8px rgba(0,0,0,0.15)"
-              }}
-            >
-              <ChevronLeft size={14} color="#2d1a0e" />
-            </button>
-
-            {/* Dots */}
-            <div style={{ position: "absolute", bottom: 8, left: "50%", transform: "translateX(-50%)", display: "flex", gap: 5 }}>
-              {group.episodes.map((_, i) => (
-                <button
-                  key={i}
-                  onClick={() => setIdx(i)}
-                  style={{
-                    border: "none", cursor: "pointer", padding: 0,
-                    borderRadius: 99,
-                    width: i === idx ? 18 : 6, height: 6,
-                    background: i === idx ? "#7c1c22" : "rgba(255,255,255,0.7)",
-                    transition: "all 0.25s ease",
-                  }}
-                />
-              ))}
-            </div>
-          </>
-        )}
-      </div>
-
-      {/* Content */}
-      <div style={{ padding: "14px 16px" }}>
-        {hasMultiple && (
-          <div style={{
-            marginBottom: 8, fontSize: 10, fontWeight: 600,
-            color: "#7c1c22", background: "rgba(124,28,34,0.08)",
-            display: "inline-block", padding: "2px 8px", borderRadius: 99
-          }}>
-            {group.episodes.length} حلقات في هذا الموقع
-          </div>
-        )}
-
-        <h3 style={{ margin: 0, fontSize: 18, fontFamily: "'Amiri', serif", fontWeight: 700, color: "#1a0e08", lineHeight: 1.3 }}>
-          {ep.title}
-        </h3>
-
-        <p style={{ margin: "5px 0 0", fontSize: 12, color: "#6b4c35", lineHeight: 1.5 }}>
-          {ep.character_name}
-          {ep.profession ? ` · ${ep.profession}` : ""}
-        </p>
-
-        {ep.neighborhood && (
-          <div style={{ display: "flex", alignItems: "center", gap: 4, marginTop: 6 }}>
-            <MapPin size={10} color="#7c1c22" />
-            <span style={{ fontSize: 10, color: "#8a6550" }}>{ep.neighborhood}</span>
-          </div>
-        )}
-
-        {/* Actions */}
-        <div style={{ display: "flex", gap: 8, marginTop: 14 }}>
-          <a
-            href={`/episodes/${ep.slug}`}
-            style={{
-              flex: 1, display: "flex", alignItems: "center", justifyContent: "center",
-              gap: 6, padding: "10px 14px", borderRadius: 12, textDecoration: "none",
-              background: "#7c1c22", color: "white", fontSize: 13, fontWeight: 700,
-              boxShadow: "0 4px 14px rgba(124,28,34,0.35)",
-            }}
-          >
-            <Play size={13} fill="white" color="white" />
-            شاهد الحلقة
-          </a>
-          <a
-            href={`https://www.google.com/maps/dir/?api=1&destination=${group.lat},${group.lng}`}
-            target="_blank"
-            rel="noreferrer"
-            style={{
-              width: 42, height: 42, display: "flex", alignItems: "center", justifyContent: "center",
-              borderRadius: 12, textDecoration: "none",
-              background: "rgba(196,164,107,0.15)", border: "1px solid rgba(196,164,107,0.3)",
-              color: "#2d1a0e", flexShrink: 0,
-            }}
-            title="خذني للمكان"
-          >
-            <Navigation size={15} />
-          </a>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-export default function MapboxMap({ episodes, accessToken }: MapboxMapProps) {
-  const mapContainerRef = useRef<HTMLDivElement>(null);
-  const mapRef = useRef<mapboxgl.Map | null>(null);
-  const markersRef = useRef<mapboxgl.Marker[]>([]);
-  const popupRef = useRef<mapboxgl.Popup | null>(null);
-  const popupRootRef = useRef<ReturnType<typeof createRoot> | null>(null);
-  const [, forceUpdate] = useState(0);
-
-  const closeCard = useCallback(() => {
-    if (popupRef.current) {
-      popupRef.current.remove();
-      popupRef.current = null;
-    }
-  }, []);
-
-  useEffect(() => {
-    if (!mapContainerRef.current || mapRef.current) return;
-
-    mapboxgl.accessToken = accessToken;
-
-    const map = new mapboxgl.Map({
-      container: mapContainerRef.current,
-      style: "mapbox://styles/mapbox/light-v11",
-      center: [35.851479, 32.551445],
-      zoom: 14.5,
-      language: "ar",
-      attributionControl: false,
+  // Group episodes by exact/very close coordinates (~20m) to prevent overlap
+  const groupedEpisodes = useMemo(() => {
+    const groups: { lat: number; lng: number; episodes: Episode[] }[] = [];
+    const THRESHOLD = 0.0002;
+    
+    episodes.forEach((ep) => {
+      const existing = groups.find(
+        (g) =>
+          Math.abs(g.lat - ep.latitude) < THRESHOLD &&
+          Math.abs(g.lng - ep.longitude) < THRESHOLD
+      );
+      if (existing) {
+        existing.episodes.push(ep);
+      } else {
+        groups.push({ lat: ep.latitude, lng: ep.longitude, episodes: [ep] });
+      }
     });
-
-    map.addControl(new mapboxgl.NavigationControl({ showCompass: false }), "bottom-right");
-    map.addControl(new mapboxgl.AttributionControl({ compact: true }), "bottom-left");
-
-    // Close popup on map click
-    map.on("click", () => closeCard());
-
-    mapRef.current = map;
-
-    return () => {
-      map.remove();
-      mapRef.current = null;
-    };
-  }, [accessToken, closeCard]);
-
-  // Add markers when episodes change
-  useEffect(() => {
-    const map = mapRef.current;
-    if (!map) return;
-
-    const addMarkers = () => {
-      // Clear old markers
-      markersRef.current.forEach((m) => m.remove());
-      markersRef.current = [];
-
-      const groups = groupNearby(episodes);
-
-      groups.forEach((group) => {
-        const count = group.episodes.length;
-
-        // Custom pin element
-        const el = document.createElement("div");
-        el.style.cursor = "pointer";
-        el.innerHTML = `
-          <svg xmlns="http://www.w3.org/2000/svg" width="48" height="58" viewBox="0 0 48 58" style="overflow:visible">
-            <filter id="dp" x="-50%" y="-20%" width="200%" height="200%">
-              <feDropShadow dx="0" dy="5" stdDeviation="4" flood-color="#00000040"/>
-            </filter>
-            <g filter="url(#dp)">
-              <path d="M24 2C13.5 2 5 10.5 5 21c0 14 19 36 19 36s19-22 19-36c0-10.5-8.5-19-19-19Z" fill="#7c1c22"/>
-              <circle cx="24" cy="21" r="11" fill="white" opacity="0.95"/>
-              ${count > 1
-                ? `<text x="24" y="26" text-anchor="middle" font-family="system-ui" font-size="11" font-weight="800" fill="#7c1c22">${count}</text>`
-                : `<circle cx="24" cy="21" r="5" fill="#7c1c22" opacity="0.8"/>`
-              }
-            </g>
-          </svg>
-        `;
-
-        // Hover scale effect
-        el.addEventListener("mouseenter", () => {
-          el.style.transform = "scale(1.15)";
-          el.style.transition = "transform 0.2s ease";
-          el.style.zIndex = "10";
-        });
-        el.addEventListener("mouseleave", () => {
-          el.style.transform = "scale(1)";
-        });
-
-        const marker = new mapboxgl.Marker({ element: el, anchor: "bottom" })
-          .setLngLat([group.lng, group.lat])
-          .addTo(map);
-
-        el.addEventListener("click", (e) => {
-          e.stopPropagation();
-
-          // Remove existing popup
-          if (popupRef.current) popupRef.current.remove();
-
-          // Create popup container
-          const container = document.createElement("div");
-
-          const popup = new mapboxgl.Popup({
-            closeButton: false,
-            closeOnClick: false,
-            offset: [0, -52],
-            maxWidth: "none",
-            className: "mapbox-episode-popup",
-          })
-            .setLngLat([group.lng, group.lat])
-            .setDOMContent(container)
-            .addTo(map);
-
-          // Render React card into container
-          if (popupRootRef.current) {
-            popupRootRef.current.unmount();
-          }
-          popupRootRef.current = createRoot(container);
-          popupRootRef.current.render(
-            <EpisodeCard group={group} onClose={() => popup.remove()} />
-          );
-
-          popupRef.current = popup;
-        });
-
-        markersRef.current.push(marker);
-      });
-    };
-
-    if (mapRef.current?.loaded()) {
-      addMarkers();
-    } else {
-      mapRef.current?.on("load", addMarkers);
-    }
+    return groups;
   }, [episodes]);
 
   return (
-    <>
+    <div className="flex-1 w-full h-full min-h-[calc(100vh-80px)] relative z-0">
       <style>{`
-        .mapbox-episode-popup .mapboxgl-popup-content {
-          padding: 0 !important;
-          background: transparent !important;
-          border-radius: 20px !important;
-          box-shadow: none !important;
+        /* Map style overrides */
+        .leaflet-tile-pane {
+          filter: grayscale(0.2) sepia(0.3) contrast(1.1) brightness(1.05) hue-rotate(-10deg);
         }
-        .mapbox-episode-popup .mapboxgl-popup-tip {
+        .leaflet-tooltip-custom {
+          background: transparent !important;
+          border: none !important;
+          box-shadow: none !important;
+          padding: 0 !important;
+        }
+        /* Hide tooltip arrow completely */
+        .leaflet-tooltip-custom::before {
           display: none !important;
         }
-        .mapboxgl-ctrl-group {
-          border-radius: 12px !important;
-          overflow: hidden;
-          box-shadow: 0 4px 16px rgba(0,0,0,0.12) !important;
-          border: 1px solid rgba(196,164,107,0.2) !important;
+        .custom-scrollbar-horizontal::-webkit-scrollbar {
+          height: 6px;
         }
-        .mapboxgl-ctrl-group button {
-          width: 36px !important;
-          height: 36px !important;
+        .custom-scrollbar-horizontal::-webkit-scrollbar-track {
+          background: rgba(196,164,107,0.1);
+          border-radius: 4px;
+        }
+        .custom-scrollbar-horizontal::-webkit-scrollbar-thumb {
+          background: rgba(196,164,107,0.4);
+          border-radius: 4px;
         }
       `}</style>
-      <div
-        ref={mapContainerRef}
-        style={{ width: "100%", height: "100%", minHeight: "calc(100vh - 80px)" }}
-      />
-    </>
+
+      <MapContainer 
+        center={IRBID_CENTER} 
+        zoom={14.5} 
+        zoomControl={false}
+        className="w-full h-full min-h-[calc(100vh-80px)] z-0 absolute inset-0"
+      >
+        <TileLayer
+          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+          url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png"
+        />
+        <ZoomControl position="bottomright" />
+
+        {groupedEpisodes.map((group, index) => {
+          const lat = group.lat;
+          const lng = group.lng;
+          
+          return (
+            <Marker 
+              key={`group-${index}`} 
+              position={[lat, lng]} 
+              icon={getCustomIcon(group.episodes.length)!}
+            >
+              <Tooltip interactive={true} direction="top" offset={[0, 0]} opacity={1} className="leaflet-tooltip-custom">
+                {/* 
+                  Pointer Triangle pointing down to the pin
+                */}
+                <div className="relative flex flex-col items-center pb-[10px]">
+                  <div className="absolute bottom-0 w-0 h-0" style={{
+                    borderLeft: "10px solid transparent",
+                    borderRight: "10px solid transparent",
+                    borderTop: "10px solid rgba(253,246,232,0.97)"
+                  }} />
+                  
+                  {/* Container Box */}
+                  <div 
+                    className="flex flex-row gap-3 p-2 rounded-2xl shadow-2xl max-w-[85vw] md:max-w-[700px] overflow-x-auto snap-x snap-mandatory custom-scrollbar-horizontal relative z-10"
+                    style={{ 
+                      direction: 'rtl',
+                      background: "rgba(253,246,232,0.97)",
+                      backdropFilter: "blur(12px)",
+                      border: "1px solid rgba(196,164,107,0.3)"
+                    }}
+                  >
+                    {group.episodes.map((ep, i) => {
+                      const img = ep.cover_image_url ?? (ep.youtube_id ? `https://img.youtube.com/vi/${ep.youtube_id}/hqdefault.jpg` : null);
+                      return (
+                        <div key={ep.id} className="w-[270px] shrink-0 snap-start flex flex-col bg-white/40 rounded-xl p-2 border border-black/5 transition-colors">
+                          <div className="w-full h-36 rounded-lg overflow-hidden relative shadow-inner mb-3 group/img bg-[#e8d8c0]">
+                            {img ? (
+                              <img src={img} alt={ep.title} className="w-full h-full object-cover group-hover/img:scale-105 transition-transform duration-500" />
+                            ) : (
+                              <div className="w-full h-full flex items-center justify-center">
+                                <MapPin size={32} color="#c4a46b" />
+                              </div>
+                            )}
+                            <div className="absolute top-2 right-2 px-2 py-0.5 rounded text-[10px] font-bold text-[#2d1a0e] shadow-sm"
+                                 style={{ background: "rgba(253,246,232,0.9)", backdropFilter: "blur(8px)" }}>
+                              {ep.decade || "زمان"}
+                            </div>
+                          </div>
+                          
+                          <div className="flex-1 px-2">
+                            <h3 className="font-display text-lg m-0 leading-tight line-clamp-1" style={{ color: "#1a0e08", fontWeight: 700 }}>
+                              {ep.title}
+                            </h3>
+                            <p className="text-xs mt-1 m-0 line-clamp-1" style={{ color: "#6b4c35" }}>
+                              {ep.character_name} {ep.profession ? `· ${ep.profession}` : ""}
+                            </p>
+                            
+                            {ep.neighborhood && (
+                              <div className="flex items-center gap-1 mt-2">
+                                <MapPin size={10} color="#7c1c22" />
+                                <span className="text-[10px]" style={{ color: "#8a6550" }}>{ep.neighborhood}</span>
+                              </div>
+                            )}
+                          </div>
+
+                          <div className="flex gap-2 mt-3 px-1">
+                            <a 
+                              href={`/episodes/${ep.slug}`} 
+                              className="flex-1 flex items-center justify-center gap-1.5 py-2 px-3 rounded-xl text-xs font-bold transition shadow-md !no-underline"
+                              style={{ background: "#7c1c22", color: "white" }}
+                              onMouseOver={(e) => ((e.currentTarget as HTMLAnchorElement).style.filter = "brightness(1.1)")}
+                              onMouseOut={(e) => ((e.currentTarget as HTMLAnchorElement).style.filter = "")}
+                            >
+                              <Play size={12} className="fill-current" />
+                              شاهد
+                            </a>
+                            <a 
+                              href={`https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}`}
+                              target="_blank"
+                              rel="noreferrer"
+                              className="flex items-center justify-center w-10 h-10 rounded-xl transition shadow-sm border shrink-0 !no-underline"
+                              style={{ background: "rgba(196,164,107,0.15)", borderColor: "rgba(196,164,107,0.3)", color: "#2d1a0e" }}
+                              onMouseOver={(e) => ((e.currentTarget as HTMLAnchorElement).style.background = "rgba(196,164,107,0.25)")}
+                              onMouseOut={(e) => ((e.currentTarget as HTMLAnchorElement).style.background = "rgba(196,164,107,0.15)")}
+                              title="الاتجاهات"
+                            >
+                              <Navigation size={14} />
+                            </a>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              </Tooltip>
+            </Marker>
+          );
+        })}
+      </MapContainer>
+    </div>
   );
 }
