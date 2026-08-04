@@ -9,8 +9,9 @@ import {
 } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
-import { Play, Navigation, MapPin, ExternalLink } from "lucide-react";
-import { useEffect, useMemo, useRef } from "react";
+import { Play, Navigation, MapPin, ExternalLink, LocateFixed, X, Hand } from "lucide-react";
+import { useEffect, useMemo, useRef, useState } from "react";
+
 
 type Episode = {
   id: string;
@@ -141,7 +142,7 @@ function EpisodeCard({ ep, lat, lng }: { ep: Episode; lat: number; lng: number }
       </div>
 
       {/* Text */}
-      <div className="flex-1 px-1 min-w-0">
+      <div className="flex-1 px-1 min-w-0 flex flex-col justify-center">
         <h3
           className="font-display text-lg m-0 leading-tight line-clamp-2"
           style={{ color: "#1a0e08", fontWeight: 700 }}
@@ -149,15 +150,15 @@ function EpisodeCard({ ep, lat, lng }: { ep: Episode; lat: number; lng: number }
           {ep.title}
         </h3>
         {(ep.character_name || ep.profession) && (
-          <p className="text-[11px] mt-1 m-0 line-clamp-1" style={{ color: "#6b4c35" }}>
+          <p className="text-[12px] mt-1 m-0 line-clamp-1" style={{ color: "#6b4c35" }}>
             {ep.character_name}
             {ep.profession ? ` · ${ep.profession}` : ""}
           </p>
         )}
         {ep.neighborhood && (
-          <div className="flex items-center gap-1 mt-2">
+          <div className="flex items-center gap-1 mt-2 bg-black/5 self-start px-2 py-0.5 rounded-full">
             <MapPin size={10} color={PIN_COLOR} />
-            <span className="text-[10px] line-clamp-1" style={{ color: "#8a6550" }}>
+            <span className="text-[10px] line-clamp-1 font-bold" style={{ color: "#8a6550" }}>
               {ep.neighborhood}
             </span>
           </div>
@@ -168,10 +169,10 @@ function EpisodeCard({ ep, lat, lng }: { ep: Episode; lat: number; lng: number }
       <div className="flex gap-2 mt-3 px-1 shrink-0">
         <a
           href={`/episodes/${ep.slug}`}
-          className="flex-1 flex items-center justify-center gap-1.5 py-2 px-3 rounded-xl text-xs font-bold shadow-md !no-underline transition-all hover:brightness-110 active:scale-95"
+          className="flex-1 flex items-center justify-center gap-1.5 py-2.5 px-3 rounded-xl text-sm font-bold shadow-md !no-underline transition-all hover:brightness-110 active:scale-95"
           style={{ background: PIN_COLOR, color: "#fff" }}
         >
-          <Play size={12} className="fill-current shrink-0" />
+          <Play size={14} className="fill-current shrink-0" />
           شاهد الحلقة
         </a>
         <a
@@ -180,14 +181,15 @@ function EpisodeCard({ ep, lat, lng }: { ep: Episode; lat: number; lng: number }
           rel="noreferrer"
           aria-label="الاتجاهات على خرائط جوجل"
           title="الاتجاهات"
-          className="flex items-center justify-center w-10 h-10 rounded-xl border shrink-0 !no-underline transition-all hover:brightness-95 active:scale-95"
+          className="flex flex-col items-center justify-center w-[60px] h-[40px] rounded-xl border shrink-0 !no-underline transition-all hover:brightness-95 active:scale-95 bg-white"
           style={{
-            background: "rgba(196,164,107,0.18)",
             borderColor: "rgba(196,164,107,0.35)",
-            color: "#2d1a0e",
+            color: "#4285F4", // Google Maps Blue
+            boxShadow: "0 2px 5px rgba(0,0,0,0.05)"
           }}
         >
-          <Navigation size={14} />
+          <Navigation size={14} className="fill-current mb-0.5" />
+          <span className="text-[9px] font-bold text-slate-600 leading-none">المسار</span>
         </a>
       </div>
     </div>
@@ -213,6 +215,9 @@ export default function Map({ episodes }: { episodes: Episode[] }) {
     });
     return groups;
   }, [episodes]);
+
+  // Keep a reference to the map to allow custom controls outside MapContainer children
+  const [mapObj, setMapObj] = useState<L.Map | null>(null);
 
   return (
     <div className="flex-1 w-full h-full min-h-[calc(100vh-80px)] relative z-0">
@@ -265,14 +270,12 @@ export default function Map({ episodes }: { episodes: Episode[] }) {
           line-height: inherit;
         }
         .leaflet-popup-nas .leaflet-popup-close-button {
-          display: none !important;
+          display: none !important; /* We render our own close button */
         }
 
         /* ── Horizontal scroll ── */
         .nas-scroll-x { scroll-behavior: smooth; }
-        .nas-scroll-x::-webkit-scrollbar { height: 5px; }
-        .nas-scroll-x::-webkit-scrollbar-track { background: rgba(196,164,107,0.1); border-radius: 4px; }
-        .nas-scroll-x::-webkit-scrollbar-thumb { background: rgba(196,164,107,0.45); border-radius: 4px; }
+        .nas-scroll-x::-webkit-scrollbar { height: 0px; display: none; } /* Hide scrollbar for cleaner look on mobile */
 
         /* ── Zoom control ── */
         .leaflet-control-zoom {
@@ -307,6 +310,7 @@ export default function Map({ episodes }: { episodes: Episode[] }) {
         zoom={14}
         zoomControl={false}
         scrollWheelZoom
+        ref={setMapObj}
         className="w-full h-full min-h-[calc(100vh-80px)] z-0 absolute inset-0"
       >
         <TileLayer
@@ -343,7 +347,17 @@ export default function Map({ episodes }: { episodes: Episode[] }) {
                 autoPanPadding={[24, 24]}
                 autoPan
               >
-                <div dir="rtl" className="relative">
+                <div dir="rtl" className="relative pt-3 pb-1">
+                  
+                  {/* Explicit Custom Close Button */}
+                  <button 
+                    onClick={() => mapObj?.closePopup()}
+                    className="absolute top-0 -right-2 w-8 h-8 rounded-full bg-white text-slate-500 shadow-md flex items-center justify-center z-50 hover:bg-slate-100 hover:text-slate-900 border border-slate-200 transition-colors"
+                    aria-label="إغلاق"
+                  >
+                    <X size={18} />
+                  </button>
+
                   {/* Popup outer container */}
                   <div
                     className="flex flex-row gap-3 p-2 rounded-2xl shadow-2xl max-w-[88vw] md:max-w-[740px] overflow-x-auto snap-x snap-mandatory nas-scroll-x"
@@ -356,10 +370,10 @@ export default function Map({ episodes }: { episodes: Episode[] }) {
                     {/* Multi-episode indicator */}
                     {isMulti && (
                       <div
-                        className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-0.5 rounded-full text-[10px] font-bold shadow-sm z-10"
+                        className="absolute -top-1 left-1/2 -translate-x-1/2 px-4 py-1 rounded-full text-[11px] font-bold shadow-md z-10 flex items-center gap-1.5 animate-pulse"
                         style={{ background: PIN_COLOR, color: "white" }}
                       >
-                        {group.episodes.length} حلقات — مرّر لليسار
+                        <Hand size={14} /> مرّر لاستكشاف {group.episodes.length} حلقات
                       </div>
                     )}
 
@@ -373,6 +387,24 @@ export default function Map({ episodes }: { episodes: Episode[] }) {
           );
         })}
       </MapContainer>
+
+      {/* Floating Action Button for Resetting the Map to Irbid */}
+      {mapObj && (
+        <button
+          onClick={() => {
+            if (groupedEpisodes.length === 0) {
+              mapObj.setView(IRBID_CENTER, 14, { animate: true });
+            } else {
+              const bounds = L.latLngBounds(groupedEpisodes.map((g) => [g.lat, g.lng]));
+              mapObj.fitBounds(bounds, { padding: [90, 90], maxZoom: 16, animate: true });
+            }
+          }}
+          className="absolute bottom-6 left-6 z-[1000] flex items-center gap-2 px-4 py-3 bg-white rounded-full shadow-lg border border-slate-200 text-sm font-bold text-slate-700 hover:bg-slate-50 hover:text-black transition-all active:scale-95"
+        >
+          <LocateFixed size={18} className="text-primary" />
+          العودة للمركز
+        </button>
+      )}
     </div>
   );
 }
