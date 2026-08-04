@@ -255,13 +255,21 @@ export default function Map({ episodes }: { episodes: Episode[] }) {
         }
         .leaflet-tooltip-nas::before { display: none !important; }
 
-        /* ── Popup — strip Leaflet chrome ── */
-        .leaflet-popup-nas .leaflet-popup-content-wrapper,
+        /* ── Popup Styling ── */
+        .leaflet-popup-nas .leaflet-popup-content-wrapper {
+          background: rgba(253,246,232,0.98) !important;
+          backdrop-filter: blur(14px) !important;
+          border: 1px solid rgba(196,164,107,0.45) !important;
+          border-radius: 20px !important;
+          box-shadow: 0 12px 36px rgba(0,0,0,0.2) !important;
+          padding: 8px !important;
+        }
         .leaflet-popup-nas .leaflet-popup-tip {
-          background: transparent !important;
-          box-shadow: none !important;
-          padding: 0 !important;
-          border-radius: 0 !important;
+          background: rgba(253,246,232,0.98) !important;
+          /* Adding border to the tip to match the container */
+          border-top: 1px solid rgba(196,164,107,0.45) !important;
+          border-left: 1px solid rgba(196,164,107,0.45) !important;
+          /* Leaflet rotates the tip by 45deg, so top/left borders become top/left of the diamond */
         }
         .leaflet-popup-nas .leaflet-popup-content {
           margin: 0 !important;
@@ -269,13 +277,37 @@ export default function Map({ episodes }: { episodes: Episode[] }) {
           width: auto !important;
           line-height: inherit;
         }
+        
+        /* ── Close Button ── */
         .leaflet-popup-nas .leaflet-popup-close-button {
-          display: none !important; /* We render our own close button */
+          top: 12px !important;
+          right: 12px !important;
+          color: #6b4c35 !important;
+          background: rgba(0,0,0,0.05) !important;
+          border-radius: 50% !important;
+          width: 24px !important;
+          height: 24px !important;
+          display: flex !important;
+          align-items: center !important;
+          justify-content: center !important;
+          font-weight: 900 !important;
+          transition: all 0.2s !important;
+          z-index: 50 !important;
+        }
+        .leaflet-popup-nas .leaflet-popup-close-button:hover {
+          background: rgba(0,0,0,0.1) !important;
+          color: #1a0e08 !important;
+        }
+        .leaflet-popup-nas .leaflet-popup-close-button span {
+          margin-top: -2px; /* Fix vertical alignment of the '×' */
         }
 
         /* ── Horizontal scroll ── */
         .nas-scroll-x { scroll-behavior: smooth; }
-        .nas-scroll-x::-webkit-scrollbar { height: 0px; display: none; } /* Hide scrollbar for cleaner look on mobile */
+        .nas-scroll-x::-webkit-scrollbar { height: 6px; }
+        .nas-scroll-x::-webkit-scrollbar-track { background: rgba(196,164,107,0.1); border-radius: 6px; margin: 0 8px; }
+        .nas-scroll-x::-webkit-scrollbar-thumb { background: rgba(196,164,107,0.4); border-radius: 6px; }
+        .nas-scroll-x::-webkit-scrollbar-thumb:hover { background: rgba(196,164,107,0.7); }
 
         /* ── Zoom control ── */
         .leaflet-control-zoom {
@@ -341,36 +373,20 @@ export default function Map({ episodes }: { episodes: Episode[] }) {
               {/* Click popup — horizontal card slider */}
               <Popup
                 className="leaflet-popup-nas"
-                closeButton={false}
+                closeButton={true}
                 maxWidth={760}
                 minWidth={270}
                 autoPanPadding={[24, 24]}
                 autoPan
               >
-                <div dir="rtl" className="relative pt-3 pb-1">
+                <div dir="rtl" className="relative pt-1 pb-1 px-1">
                   
-                  {/* Explicit Custom Close Button */}
-                  <button 
-                    onClick={() => mapObj?.closePopup()}
-                    className="absolute top-0 -right-2 w-8 h-8 rounded-full bg-white text-slate-500 shadow-md flex items-center justify-center z-50 hover:bg-slate-100 hover:text-slate-900 border border-slate-200 transition-colors"
-                    aria-label="إغلاق"
-                  >
-                    <X size={18} />
-                  </button>
-
-                  {/* Popup outer container */}
-                  <div
-                    className="flex flex-row gap-3 p-2 rounded-2xl shadow-2xl max-w-[88vw] md:max-w-[740px] overflow-x-auto snap-x snap-mandatory nas-scroll-x"
-                    style={{
-                      background: "rgba(253,246,232,0.98)",
-                      backdropFilter: "blur(14px)",
-                      border: "1px solid rgba(196,164,107,0.35)",
-                    }}
-                  >
+                  {/* Popup outer container (scrollable area) */}
+                  <div className="flex flex-row gap-3 overflow-x-auto snap-x snap-mandatory nas-scroll-x pb-2 pt-4">
                     {/* Multi-episode indicator */}
                     {isMulti && (
                       <div
-                        className="absolute -top-1 left-1/2 -translate-x-1/2 px-4 py-1 rounded-full text-[11px] font-bold shadow-md z-10 flex items-center gap-1.5 animate-pulse"
+                        className="absolute top-0 left-1/2 -translate-x-1/2 px-4 py-1 rounded-full text-[11px] font-bold shadow-sm z-10 flex items-center gap-1.5 animate-pulse border border-[rgba(255,255,255,0.2)]"
                         style={{ background: PIN_COLOR, color: "white" }}
                       >
                         <Hand size={14} /> مرّر لاستكشاف {group.episodes.length} حلقات
