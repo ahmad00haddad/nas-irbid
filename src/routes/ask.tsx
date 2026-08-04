@@ -180,7 +180,7 @@ function AskPage() {
                 )}
 
                 {episodes.length > 0 && (
-                  <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                  <div className="flex gap-3 overflow-x-auto pb-4 pt-2 -mx-2 px-2 snap-x snap-mandatory nas-scroll-x">
                     {episodes.map((ep: any) => {
                       const img = ep.cover_image_url ?? (ep.youtube_id ? `https://img.youtube.com/vi/${ep.youtube_id}/mqdefault.jpg` : null);
                       const isSelected = episodeId === ep.id;
@@ -189,34 +189,36 @@ function AskPage() {
                           key={ep.id}
                           type="button"
                           onClick={() => setEpisodeId(ep.id)}
-                          className={`relative overflow-hidden rounded-2xl border-2 text-right transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-primary/40 ${
+                          className={`group relative flex-col shrink-0 snap-center overflow-hidden rounded-xl border-2 text-right transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-primary/40 w-[160px] ${
                             isSelected
-                              ? "border-primary shadow-glow scale-[1.03]"
-                              : "border-border/60 hover:border-primary/50 bg-card"
+                              ? "border-primary shadow-glow scale-105 bg-card/80"
+                              : "border-border/60 hover:border-primary/50 bg-card opacity-80 hover:opacity-100"
                           }`}
                         >
-                          {img && (
-                            <img
-                              src={img}
-                              alt={ep.character_name ?? ep.title}
-                              className="w-full h-20 object-cover"
-                            />
-                          )}
-                          {!img && (
-                            <div className="w-full h-20 bg-secondary flex items-center justify-center">
-                              <User size={28} className="text-muted-foreground/40" />
-                            </div>
-                          )}
-                          <div className="p-2.5">
+                          <div className="relative aspect-video w-full bg-secondary overflow-hidden">
+                            {img ? (
+                              <img
+                                src={img}
+                                alt={ep.character_name ?? ep.title}
+                                className={`w-full h-full object-cover object-[center_20%] transition-transform duration-500 ${isSelected ? "scale-105" : "group-hover:scale-110"}`}
+                              />
+                            ) : (
+                              <div className="w-full h-full flex items-center justify-center">
+                                <User size={28} className="text-muted-foreground/40" />
+                              </div>
+                            )}
+                            <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                          </div>
+                          <div className="p-3">
                             <p className="text-xs font-bold text-foreground leading-tight line-clamp-1">
                               {ep.character_name ?? ep.title}
                             </p>
                             {ep.profession && (
-                              <p className="text-[10px] text-muted-foreground mt-0.5 line-clamp-1">{ep.profession}</p>
+                              <p className="text-[10px] text-muted-foreground mt-1 line-clamp-1">{ep.profession}</p>
                             )}
                           </div>
                           {isSelected && (
-                            <div className="absolute top-2 left-2 w-5 h-5 rounded-full bg-primary flex items-center justify-center">
+                            <div className="absolute top-2 left-2 w-5 h-5 rounded-full bg-primary flex items-center justify-center shadow-md animate-in zoom-in duration-200">
                               <CheckCircle2 size={12} className="text-primary-foreground" />
                             </div>
                           )}

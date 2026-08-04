@@ -104,14 +104,14 @@ function EpisodeCard({ ep, lat, lng }: { ep: Episode; lat: number; lng: number }
       style={{ background: "rgba(255,255,255,0.55)", borderColor: "rgba(0,0,0,0.07)" }}
     >
       {/* Thumbnail */}
-      <div className="w-full h-[136px] rounded-lg overflow-hidden relative mb-3 bg-[#e8d8c0] shrink-0">
+      <div className="w-full aspect-video rounded-lg overflow-hidden relative mb-3 bg-[#e8d8c0] shrink-0 shadow-sm border border-[rgba(0,0,0,0.05)]">
         {img ? (
           <img
             src={img}
             alt={`صورة ${ep.title}`}
             loading="lazy"
             decoding="async"
-            className="w-full h-full object-cover transition-transform duration-500 group-hover/card:scale-105"
+            className="w-full h-full object-cover object-[center_20%] transition-transform duration-500 group-hover/card:scale-105"
           />
         ) : (
           <div className="w-full h-full flex items-center justify-center">
