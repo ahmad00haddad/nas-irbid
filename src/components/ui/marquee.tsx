@@ -20,8 +20,9 @@ export function Marquee({
 }: MarqueeProps) {
   return (
     <div
+      dir="ltr"
       className={cn(
-        "group flex overflow-hidden p-2 [--duration:40s] [--gap:2rem] [gap:var(--gap)]",
+        "group flex overflow-hidden p-2 [--gap:2rem] [gap:var(--gap)]",
         {
           "flex-row": !vertical,
           "flex-col": vertical,
@@ -34,6 +35,7 @@ export function Marquee({
         .map((_, i) => (
           <div
             key={i}
+            dir="rtl"
             className={cn("flex shrink-0 justify-around [gap:var(--gap)] min-w-full", {
               "animate-marquee flex-row": !vertical,
               "group-hover:[animation-play-state:paused]": pauseOnHover,

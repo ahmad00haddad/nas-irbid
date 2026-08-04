@@ -107,18 +107,24 @@ function Index() {
 
       {/* TICKER MARQUEE */}
       <section className="border-b border-border/60 bg-card py-3">
-        <Marquee className="opacity-70 text-sm font-bold tracking-widest text-primary" pauseOnHover>
+        <Marquee className="opacity-70 text-sm font-bold tracking-widest text-primary [--duration:80s]" pauseOnHover>
           <span className="mx-8">المدينةُ ليست حجرًا ولا أسفلتًا، المدينةُ ناسُها</span>
           <span className="mx-8">•</span>
           <span className="mx-8">هنا إربد.. حكايات المهن العتيقة وذاكرة الحارات</span>
           <span className="mx-8">•</span>
-          <span className="mx-8">قصص لم تُكتب.. نرويها بصوت من عاشوها</span>
+          <span className="mx-8">من البارحة إلى اليوم.. قصص لم تُكتب نرويها بصوت من عاشوها</span>
           <span className="mx-8">•</span>
           <span className="mx-8">أرشيف حيّ ينبض بعبق الماضي وأصالة الحاضر</span>
           <span className="mx-8">•</span>
-          <span className="mx-8">وجوه ألِفناها.. وحكايات لم نعرفها بعد</span>
+          <span className="mx-8">وجوه ألِفناها في شوارعنا.. وحكايات لم نعرفها بعد</span>
           <span className="mx-8">•</span>
           <span className="mx-8">لأن الذاكرة الشفوية هي الكنز الحقيقي لأي مدينة</span>
+          <span className="mx-8">•</span>
+          <span className="mx-8">رحلة في أزقة إربد وزواياها المنسية.. لتوثيق ما تبقى من عبق الأمس</span>
+          <span className="mx-8">•</span>
+          <span className="mx-8">برنامج ناس إربد: نافذتك على التاريخ غير المدون للمدينة</span>
+          <span className="mx-8">•</span>
+          <span className="mx-8">بين دكاكين الوسط التجاري وأطراف القرى.. نبحث عن القصة الكاملة</span>
           <span className="mx-8">•</span>
         </Marquee>
       </section>
