@@ -53,7 +53,7 @@ function MapPage() {
   });
 
   return (
-    <div className="relative min-h-[calc(100vh-80px)] w-full flex flex-col bg-background">
+    <div className="relative h-[calc(100vh-80px)] w-full flex flex-col bg-background overflow-hidden">
       {/* Overlay Header */}
       <div className="absolute inset-x-0 top-0 z-10 pointer-events-none px-6 py-5 md:px-10 md:py-8 bg-gradient-to-b from-background/95 via-background/70 to-transparent">
         <div className="flex items-start gap-3">
