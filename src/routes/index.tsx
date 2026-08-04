@@ -110,9 +110,15 @@ function Index() {
         <Marquee className="opacity-70 text-sm font-bold tracking-widest text-primary" pauseOnHover>
           <span className="mx-8">المدينةُ ليست حجرًا ولا أسفلتًا، المدينةُ ناسُها</span>
           <span className="mx-8">•</span>
-          <span className="mx-8">حكايات إربد قبل أن يطويها الزمن</span>
+          <span className="mx-8">هنا إربد.. حكايات المهن العتيقة وذاكرة الحارات</span>
           <span className="mx-8">•</span>
-          <span className="mx-8">ذاكرة شفوية توثق المهن والحارات</span>
+          <span className="mx-8">قصص لم تُكتب.. نرويها بصوت من عاشوها</span>
+          <span className="mx-8">•</span>
+          <span className="mx-8">أرشيف حيّ ينبض بعبق الماضي وأصالة الحاضر</span>
+          <span className="mx-8">•</span>
+          <span className="mx-8">وجوه ألِفناها.. وحكايات لم نعرفها بعد</span>
+          <span className="mx-8">•</span>
+          <span className="mx-8">لأن الذاكرة الشفوية هي الكنز الحقيقي لأي مدينة</span>
           <span className="mx-8">•</span>
         </Marquee>
       </section>
