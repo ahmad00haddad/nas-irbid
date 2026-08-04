@@ -45,14 +45,14 @@ function Index() {
 
   return (
     <>
-      {/* GIF INTRO BAND — compact, blended onto the page background */}
-      <section className="relative w-full overflow-hidden">
-        <div className="container mx-auto flex h-24 items-center justify-center overflow-hidden px-6 md:h-32">
+      {/* GIF INTRO BAND */}
+      <section className="relative w-full pt-8 pb-4 md:pt-12 md:pb-6">
+        <div className="container mx-auto flex items-center justify-center px-6">
           <img
             src={introLogo.url}
             alt="ناس إربد"
             style={{ mixBlendMode: "screen" }}
-            className="h-36 w-auto max-w-full object-contain md:h-48"
+            className="h-28 md:h-40 w-auto max-w-full object-contain"
             fetchPriority="high"
           />
         </div>
