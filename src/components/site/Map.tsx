@@ -340,6 +340,12 @@ export default function Map({ episodes }: { episodes: Episode[] }) {
       <MapContainer
         center={IRBID_CENTER}
         zoom={14}
+        minZoom={10} /* Prevent zooming out too much */
+        maxBounds={[
+          [31.8, 35.0], // South-West (roughly Dead Sea / Jordan Valley)
+          [33.0, 36.5], // North-East (roughly Mafraq / borders)
+        ]} /* Restrict dragging to Northern Jordan area */
+        maxBoundsViscosity={1.0} /* Bounce back strongly if they drag outside */
         zoomControl={false}
         scrollWheelZoom
         ref={setMapObj}
