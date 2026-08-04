@@ -51,10 +51,7 @@ export function PublicEpisodeCard({ episode }: { episode: PublicEpisode }) {
           <Play size={16} fill="currentColor" />
         </div>
         
-        {/* Archive Stamp */}
-        <div className="absolute top-4 right-4 -rotate-[15deg] opacity-80 mix-blend-multiply border-2 border-destructive/80 text-destructive/80 font-display font-bold text-sm px-2 py-0.5 rounded-sm">
-          وُثّق
-        </div>
+
 
         {episode.episode_number && (
           <span className="absolute left-4 top-4 rounded-full border border-card/40 bg-card/90 px-3 py-1 text-[11px] font-bold text-foreground backdrop-blur font-display">
