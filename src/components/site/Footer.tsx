@@ -51,11 +51,12 @@ export function Footer() {
             </a>
           </div>
           <div className="mt-8 pt-6 border-t border-border/50">
-            <div className="text-sm font-semibold text-primary/80 mb-1 opacity-90">
-              فيلم لـ أحمد حداد
+            <div className="text-sm font-semibold text-primary/80 mb-2 opacity-90 flex flex-col gap-1">
+              <span>فيلم لـ أحمد حداد</span>
+              <span>تقديم بسمة الذينات</span>
             </div>
             <p className="text-xs text-muted-foreground leading-relaxed">
-              تقديم بسمة الذينات · جميع الحقوق محفوظة © {new Date().getFullYear()}
+              جميع الحقوق محفوظة © {new Date().getFullYear()}
             </p>
           </div>
         </div>
