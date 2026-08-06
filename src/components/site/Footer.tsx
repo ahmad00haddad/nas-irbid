@@ -50,14 +50,10 @@ export function Footer() {
               <Mail size={18} />
             </a>
           </div>
-          <div className="mt-8 pt-6 border-t border-border/50">
-            <div className="text-sm font-semibold text-primary/80 mb-2 opacity-90 flex flex-col gap-1">
-              <span>فيلم لـ أحمد حداد</span>
-              <span>تقديم بسمة الذينات</span>
-            </div>
-            <p className="text-xs text-muted-foreground leading-relaxed">
-              جميع الحقوق محفوظة © {new Date().getFullYear()}
-            </p>
+          <div className="mt-8 pt-6 border-t border-border/50 text-xs text-muted-foreground leading-relaxed flex flex-col gap-1">
+            <span>فيلم لـ أحمد حداد</span>
+            <span>تقديم بسمة الذينات</span>
+            <span className="mt-1">جميع الحقوق محفوظة © {new Date().getFullYear()}</span>
           </div>
         </div>
       </div>
