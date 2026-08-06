@@ -180,54 +180,50 @@ function AskPage() {
                 )}
 
                 {episodes.length > 0 && (
-                  <div className="flex gap-3 overflow-x-auto pb-4 pt-2 -mx-2 px-2 snap-x snap-mandatory nas-scroll-x">
-                    {episodes.map((ep: any) => {
-                      const img = ep.cover_image_url ?? (ep.youtube_id ? `https://img.youtube.com/vi/${ep.youtube_id}/mqdefault.jpg` : null);
-                      const isSelected = episodeId === ep.id;
-                      return (
-                        <button
-                          key={ep.id}
-                          type="button"
-                          onClick={() => setEpisodeId(ep.id)}
-                          className={`group relative flex-col shrink-0 snap-center overflow-hidden rounded-xl border-2 text-right transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-primary/40 w-[160px] ${
-                            isSelected
-                              ? "border-primary shadow-glow scale-105 bg-card/80"
-                              : "border-border/60 hover:border-primary/50 bg-card opacity-80 hover:opacity-100"
-                          }`}
-                        >
-                          <div className="relative aspect-video w-full bg-secondary overflow-hidden">
-                            {img ? (
-                              <img
-                                src={img}
-                                alt={ep.character_name ?? ep.title}
-                                className={`w-full h-full object-cover object-[center_20%] transition-transform duration-500 ${isSelected ? "scale-105" : "group-hover:scale-110"}`}
-                              />
-                            ) : (
-                              <div className="w-full h-full flex items-center justify-center">
-                                <User size={28} className="text-muted-foreground/40" />
-                              </div>
-                            )}
-                            <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                  <div className="space-y-5">
+                    <div className="relative">
+                      <select
+                        value={episodeId ?? ""}
+                        onChange={(e) => setEpisodeId(e.target.value)}
+                        className="w-full appearance-none px-4 py-3.5 rounded-xl bg-input border border-border/80 focus:border-primary focus:ring-primary/20 text-foreground font-semibold focus:outline-none focus:ring-2 transition text-base cursor-pointer shadow-sm"
+                      >
+                        <option value="" disabled>-- اضغط هنا لاختيار الضيف --</option>
+                        {episodes.map((ep: any) => (
+                          <option key={ep.id} value={ep.id}>
+                            {ep.character_name ?? ep.title} {ep.profession ? `(${ep.profession})` : ""}
+                          </option>
+                        ))}
+                      </select>
+                      <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center px-4 text-primary">
+                        <svg className="h-5 w-5 fill-current" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+                          <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/>
+                        </svg>
+                      </div>
+                    </div>
+
+                    {selected && (
+                      <div className="relative aspect-video w-full max-w-sm mx-auto overflow-hidden rounded-2xl border-2 border-primary/20 shadow-glow bg-secondary animate-in fade-in zoom-in-95 duration-300">
+                        {(selected.cover_image_url || selected.youtube_id) ? (
+                          <img
+                            src={selected.cover_image_url ?? `https://img.youtube.com/vi/${selected.youtube_id}/mqdefault.jpg`}
+                            alt={selected.character_name ?? selected.title}
+                            className="w-full h-full object-cover object-[center_20%]"
+                          />
+                        ) : (
+                          <div className="w-full h-full flex items-center justify-center">
+                            <User size={48} className="text-muted-foreground/30" />
                           </div>
-                          <div className="p-3">
-                            <p className="text-xs font-bold text-foreground leading-tight line-clamp-1">
-                              {ep.character_name ?? ep.title}
-                            </p>
-                            {ep.profession && (
-                              <p className="text-[10px] text-muted-foreground mt-1 line-clamp-1">{ep.profession}</p>
-                            )}
+                        )}
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent flex items-end p-5">
+                          <div className="text-white">
+                            <p className="font-display text-xl font-bold leading-tight">{selected.character_name ?? selected.title}</p>
+                            {selected.profession && <p className="text-xs opacity-90 mt-1 text-primary-100">{selected.profession}</p>}
                           </div>
-                          {isSelected && (
-                            <div className="absolute top-2 left-2 w-5 h-5 rounded-full bg-primary flex items-center justify-center shadow-md animate-in zoom-in duration-200">
-                              <CheckCircle2 size={12} className="text-primary-foreground" />
-                            </div>
-                          )}
-                        </button>
-                      );
-                    })}
+                        </div>
+                      </div>
+                    )}
                   </div>
                 )}
-              </div>
 
               {/* Question */}
               <div className="bg-card border border-border/60 rounded-2xl p-6 md:p-8 shadow-deep space-y-5">
