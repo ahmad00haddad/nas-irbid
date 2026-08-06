@@ -51,8 +51,11 @@ export function Footer() {
             </a>
           </div>
           <div className="mt-8 pt-6 border-t border-border/50 text-xs text-muted-foreground leading-relaxed flex flex-col gap-1">
-            <span>فيلم لـ أحمد حداد</span>
-            <span>تقديم بسمة الذينات</span>
+            <div className="flex gap-2">
+              <span>فيلم لـ أحمد حداد</span>
+              <span>·</span>
+              <span>تقديم بسمة الذينات</span>
+            </div>
             <span className="mt-1">جميع الحقوق محفوظة © {new Date().getFullYear()}</span>
           </div>
         </div>
