@@ -224,6 +224,7 @@ function AskPage() {
                     )}
                   </div>
                 )}
+              </div>
 
               {/* Question */}
               <div className="bg-card border border-border/60 rounded-2xl p-6 md:p-8 shadow-deep space-y-5">
