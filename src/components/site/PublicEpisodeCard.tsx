@@ -19,18 +19,27 @@ export type PublicEpisode = {
   published_at: string | null;
 };
 
-export function PublicEpisodeCard({ episode }: { episode: PublicEpisode }) {
+export function PublicEpisodeCard({ episode, asPreview = false }: { episode: PublicEpisode; asPreview?: boolean }) {
   const image = episode.cover_image_url ?? (episode.youtube_id ? `https://img.youtube.com/vi/${episode.youtube_id}/hqdefault.jpg` : null);
 
+  const Wrapper = asPreview ? (motion.div as any) : MotionLink;
+  const wrapperProps = asPreview
+    ? {}
+    : {
+        to: "/episodes/$slug",
+        params: { slug: episode.slug } as never,
+        whileHover: { y: -6 },
+        whileTap: { scale: 0.97 },
+        "data-cursor-text": "شاهد",
+      };
+
   return (
-    <MotionLink
-      to="/episodes/$slug"
-      params={{ slug: episode.slug } as never}
-      whileHover={{ y: -6 }}
-      whileTap={{ scale: 0.97 }}
+    <Wrapper
+      {...wrapperProps}
       transition={{ type: "spring", stiffness: 400, damping: 25 }}
-      data-cursor-text="شاهد"
-      className="group block overflow-hidden rounded-2xl border border-border/70 bg-card shadow-deep transition-colors duration-300 hover:border-primary/60"
+      className={`group block overflow-hidden rounded-2xl border border-border/70 bg-card shadow-deep transition-colors duration-300 ${
+        asPreview ? "" : "hover:border-primary/60"
+      }`}
     >
       <div className="relative aspect-[4/3] overflow-hidden bg-secondary">
         {/* Photo Corners */}
@@ -86,6 +95,6 @@ export function PublicEpisodeCard({ episode }: { episode: PublicEpisode }) {
           )}
         </div>
       </div>
-    </MotionLink>
+    </Wrapper>
   );
 }

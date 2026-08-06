@@ -8,6 +8,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { motion, AnimatePresence } from "framer-motion";
 import { useSpamGuard, HONEYPOT_INPUT_PROPS } from "@/lib/spam-guard";
 import { trackSiteEvent } from "@/components/site/AnalyticsTracker";
+import { PublicEpisodeCard } from "@/components/site/PublicEpisodeCard";
 
 const askSchema = z.object({
   question: z.string().trim().min(3, "السؤال قصير جداً").max(1000, "السؤال طويل جداً (الحد 1000 حرف)"),
@@ -41,7 +42,7 @@ function AskPage() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("episodes")
-        .select("id, title, character_name, episode_number, cover_image_url, youtube_id, profession")
+        .select("id, slug, title, character_name, profession, neighborhood, youtube_id, cover_image_url, short_description, episode_number, published_at")
         .eq("published", true)
         .order("episode_number", { ascending: false, nullsFirst: false });
       if (error) throw error;
@@ -202,24 +203,8 @@ function AskPage() {
                     </div>
 
                     {selected && (
-                      <div className="relative aspect-video w-full max-w-sm mx-auto overflow-hidden rounded-2xl border-2 border-primary/20 shadow-glow bg-secondary animate-in fade-in zoom-in-95 duration-300">
-                        {(selected.cover_image_url || selected.youtube_id) ? (
-                          <img
-                            src={selected.cover_image_url ?? `https://img.youtube.com/vi/${selected.youtube_id}/mqdefault.jpg`}
-                            alt={selected.character_name ?? selected.title}
-                            className="w-full h-full object-cover object-[center_20%]"
-                          />
-                        ) : (
-                          <div className="w-full h-full flex items-center justify-center">
-                            <User size={48} className="text-muted-foreground/30" />
-                          </div>
-                        )}
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent flex items-end p-5">
-                          <div className="text-white">
-                            <p className="font-display text-xl font-bold leading-tight">{selected.character_name ?? selected.title}</p>
-                            {selected.profession && <p className="text-xs opacity-90 mt-1 text-primary-100">{selected.profession}</p>}
-                          </div>
-                        </div>
+                      <div className="max-w-md mx-auto animate-in fade-in zoom-in-95 duration-300">
+                        <PublicEpisodeCard episode={selected as any} asPreview />
                       </div>
                     )}
                   </div>
