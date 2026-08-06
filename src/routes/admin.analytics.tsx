@@ -99,18 +99,17 @@ function AnalyticsPage() {
 
   const cleanMutation = useMutation({
     mutationFn: async () => {
-      // Delete logs older than 90 days
-      const date90DaysAgo = new Date();
-      date90DaysAgo.setDate(date90DaysAgo.getDate() - 90);
+      // Delete all logs to reset analytics to zero (e.g. before launch)
+      const now = new Date().toISOString();
       const { error } = await supabase
         .from("site_analytics")
         .delete()
-        .lt("created_at", date90DaysAgo.toISOString());
+        .lt("created_at", now);
       if (error) throw error;
     },
     onSuccess: () => {
-      toast.success("تم التنظيف", {
-        description: "تم مسح البيانات القديمة بنجاح للحفاظ على المساحة.",
+      toast.success("تم تصفير البيانات", {
+        description: "تم مسح جميع الإحصائيات وتصفيرها بنجاح.",
       });
       queryClient.invalidateQueries({ queryKey: ["site-analytics"] });
     },
@@ -128,17 +127,17 @@ function AnalyticsPage() {
           onClick={() => {
             if (
               confirm(
-                "هل أنت متأكد من مسح الإحصائيات الأقدم من 3 أشهر لتوفر المساحة؟ (لا يمكن التراجع)",
+                "تحذير هام: هل أنت متأكد من تصفير الإحصائيات بالكامل؟ سيتم مسح جميع البيانات ولن يمكنك التراجع.",
               )
             ) {
               cleanMutation.mutate();
             }
           }}
           disabled={cleanMutation.isPending}
-          className="border-border text-muted-foreground hover:text-destructive"
+          className="border-destructive/30 text-destructive hover:bg-destructive hover:text-destructive-foreground transition-colors"
         >
-          <Trash2 size={16} className="mr-2" />
-          تنظيف البيانات القديمة
+          <Trash2 size={16} className="ml-2" />
+          تصفير الإحصائيات بالكامل
         </Button>
       </div>
 
