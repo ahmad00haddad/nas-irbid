@@ -53,12 +53,13 @@ function AnalyticsPage() {
 
       if (error) throw error;
 
-      // Exclude internal/dev traffic (Lovable preview, localhost, our own testing)
+      // Exclude only dev/preview traffic (Lovable editor preview, localhost)
       const isInternal = (e: (typeof allEvents)[number]) => {
         const d = (e.details ?? {}) as Record<string, string>;
         const blob = `${d.source ?? ""} ${d.referrer ?? ""}`.toLowerCase();
         return (
-          blob.includes("lovable") ||
+          blob.includes("lovableproject.com") ||
+          blob.includes("id-preview") ||
           blob.includes("localhost") ||
           e.path.startsWith("/admin") ||
           e.path.startsWith("/auth")
