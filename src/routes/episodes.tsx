@@ -3,7 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useDeferredValue, useMemo, useState } from "react";
 
 import { supabase } from "@/integrations/supabase/client";
-import { Search, RotateCcw, X } from "lucide-react";
+import { Search, RotateCcw, X, Play, Heart } from "lucide-react";
 import { PublicEpisodeCard, type PublicEpisode } from "@/components/site/PublicEpisodeCard";
 import { Skeleton, EpisodeGridSkeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
@@ -63,6 +63,15 @@ function EpisodesPage() {
     });
   }, [episodes, deferredQuery]);
 
+  const formatCount = (num: number) => {
+    if (num >= 1000000) return (num / 1000000).toFixed(1).replace(/\.0$/, "") + "M";
+    if (num >= 1000) return (num / 1000).toFixed(1).replace(/\.0$/, "") + "K";
+    return num.toString();
+  };
+
+  const totalViews = useMemo(() => episodes.reduce((acc, ep) => acc + (ep.instagram_views || 0), 0), [episodes]);
+  const totalLikes = useMemo(() => episodes.reduce((acc, ep) => acc + (ep.instagram_likes || 0), 0), [episodes]);
+
   return (
     <div className="container mx-auto px-6 py-20">
       <FadeIn className="max-w-3xl mb-14">
@@ -70,6 +79,24 @@ function EpisodesPage() {
         <h1 className="font-display text-5xl md:text-6xl mt-3 mb-5 text-foreground">
           أرشيف <span className="text-gradient-gold">الحلقات</span>
         </h1>
+        {(totalViews > 0 || totalLikes > 0) && (
+          <div className="flex items-center gap-4 mb-6">
+            {totalViews > 0 && (
+              <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-primary/10 text-primary border border-primary/20">
+                <Play size={13} className="fill-current" />
+                <span className="text-sm font-bold tracking-wide" dir="ltr">{formatCount(totalViews)}</span>
+                <span className="text-xs font-semibold ms-1">مشاهدة</span>
+              </div>
+            )}
+            {totalLikes > 0 && (
+              <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-destructive/10 text-destructive border border-destructive/20">
+                <Heart size={13} className="fill-current" />
+                <span className="text-sm font-bold tracking-wide" dir="ltr">{formatCount(totalLikes)}</span>
+                <span className="text-xs font-semibold ms-1">إعجاب</span>
+              </div>
+            )}
+          </div>
+        )}
         <p className="text-lg text-muted-foreground leading-relaxed">
           كل حلقات «ناس إربد» في مكان واحد. شاهدها بجودة عالية، اقرأ ملخصها التاريخي،
           واكتشف ما لم يظهر في المونتاج.
