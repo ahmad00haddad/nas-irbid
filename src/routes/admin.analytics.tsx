@@ -46,12 +46,25 @@ function AnalyticsPage() {
   } = useQuery({
     queryKey: ["site-analytics"],
     queryFn: async () => {
-      const { data: rawEvents, error } = await supabase
+      const { data: allEvents, error } = await supabase
         .from("site_analytics")
         .select("*")
         .order("created_at", { ascending: false });
 
       if (error) throw error;
+
+      // Exclude internal/dev traffic (Lovable preview, localhost, our own testing)
+      const isInternal = (e: (typeof allEvents)[number]) => {
+        const d = (e.details ?? {}) as Record<string, string>;
+        const blob = `${d.source ?? ""} ${d.referrer ?? ""}`.toLowerCase();
+        return (
+          blob.includes("lovable") ||
+          blob.includes("localhost") ||
+          e.path.startsWith("/admin") ||
+          e.path.startsWith("/auth")
+        );
+      };
+      const rawEvents = allEvents.filter((e) => !isInternal(e));
 
       const views = rawEvents.filter((e) => e.event_type === "page_view");
       const ctaClicks = rawEvents.filter((e) => e.event_type === "cta_click");

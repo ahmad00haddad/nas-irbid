@@ -60,6 +60,8 @@ export type Database = {
           episode_number: number | null
           gallery_urls: string[] | null
           id: string
+          instagram_likes: number | null
+          instagram_views: number | null
           latitude: number | null
           longitude: number | null
           neighborhood: string | null
@@ -83,6 +85,8 @@ export type Database = {
           episode_number?: number | null
           gallery_urls?: string[] | null
           id?: string
+          instagram_likes?: number | null
+          instagram_views?: number | null
           latitude?: number | null
           longitude?: number | null
           neighborhood?: string | null
@@ -106,6 +110,8 @@ export type Database = {
           episode_number?: number | null
           gallery_urls?: string[] | null
           id?: string
+          instagram_likes?: number | null
+          instagram_views?: number | null
           latitude?: number | null
           longitude?: number | null
           neighborhood?: string | null
