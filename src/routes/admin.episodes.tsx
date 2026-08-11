@@ -28,13 +28,15 @@ type Episode = {
   season: number | null;
   latitude: number | null;
   longitude: number | null;
+  instagram_views: number | null;
+  instagram_likes: number | null;
   published: boolean;
 };
 
 const empty: Partial<Episode> = {
   slug: "", title: "", character_name: "", profession: "", neighborhood: "",
   decade: "", youtube_id: "", cover_image_url: "", short_description: "", story: "",
-  behind_the_scenes: "", episode_number: null, season: 1, latitude: null, longitude: null, published: false,
+  behind_the_scenes: "", episode_number: null, season: 1, latitude: null, longitude: null, instagram_views: null, instagram_likes: null, published: false,
 };
 
 /** Sanitize a slug: lowercase, strip non-alphanumeric (except hyphens), collapse hyphens */
@@ -383,6 +385,11 @@ function EpisodeEditor({
           <Textarea label="وصف قصير" rows={2} value={v.short_description ?? ""} onChange={(e) => set("short_description", e.target.value)} />
           <Textarea label="قصة الشخصية" rows={5} value={v.story ?? ""} onChange={(e) => set("story", e.target.value)} />
           <Textarea label="ما لم يظهر في الحلقة (خلف الكواليس)" rows={5} value={v.behind_the_scenes ?? ""} onChange={(e) => set("behind_the_scenes", e.target.value)} />
+
+          <div className="grid sm:grid-cols-2 gap-4">
+            <Input label="إجمالي المشاهدات (إنستاجرام)" type="number" placeholder="مثال: 120500" value={v.instagram_views ?? ""} onChange={(e) => set("instagram_views", e.target.value ? Number(e.target.value) : null)} />
+            <Input label="إجمالي الإعجابات (إنستاجرام)" type="number" placeholder="مثال: 5400" value={v.instagram_likes ?? ""} onChange={(e) => set("instagram_likes", e.target.value ? Number(e.target.value) : null)} />
+          </div>
 
           <label className="flex items-center gap-3 p-3 rounded-lg bg-background/40 border border-border cursor-pointer">
             <input type="checkbox" checked={v.published ?? false} onChange={(e) => set("published", e.target.checked)} className="accent-[var(--gold)]" />

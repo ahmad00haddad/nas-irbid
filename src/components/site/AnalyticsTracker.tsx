@@ -4,8 +4,16 @@ import { supabase } from "@/integrations/supabase/client";
 
 // Exported helper to track custom events (e.g. clicks, form submits) anywhere in the app
 export const trackSiteEvent = async (eventType: string, path: string, details?: any) => {
-  // Ignore admin events
-  if (path.startsWith("/admin") || path.startsWith("/auth")) return;
+  // Ignore admin events and internal/dev platforms
+  if (
+    path.startsWith("/admin") ||
+    path.startsWith("/auth") ||
+    window.location.hostname.includes("lovableproject.com") ||
+    window.location.hostname.includes("lovable.app") ||
+    window.location.hostname === "localhost"
+  ) {
+    return;
+  }
 
   try {
     let sessionId = sessionStorage.getItem("nas_session_id");
@@ -47,7 +55,13 @@ export function AnalyticsTracker() {
 
   useEffect(() => {
     // 1. Ignore admin traffic and auth routes completely
-    if (location.pathname.startsWith("/admin") || location.pathname.startsWith("/auth")) {
+    if (
+      location.pathname.startsWith("/admin") ||
+      location.pathname.startsWith("/auth") ||
+      window.location.hostname.includes("lovableproject.com") ||
+      window.location.hostname.includes("lovable.app") ||
+      window.location.hostname === "localhost"
+    ) {
       return;
     }
 

@@ -43,6 +43,24 @@ function Index() {
     },
   });
 
+  const { data: totalViews = 0 } = useQuery({
+    queryKey: ["total-instagram-views"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("episodes")
+        .select("instagram_views")
+        .eq("published", true);
+      if (error) throw error;
+      return data.reduce((acc, ep) => acc + (ep.instagram_views || 0), 0);
+    },
+  });
+
+  const formatCount = (num: number) => {
+    if (num >= 1000000) return (num / 1000000).toFixed(1).replace(/\.0$/, "") + "M";
+    if (num >= 1000) return (num / 1000).toFixed(1).replace(/\.0$/, "") + "K";
+    return num.toString();
+  };
+
   return (
     <>
       {/* GIF INTRO BAND */}
@@ -101,6 +119,23 @@ function Index() {
                 </MotionLink>
               </Magnetic>
             </div>
+            
+            {totalViews > 0 && (
+              <motion.div 
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.5, duration: 0.8 }}
+                className="mt-12 flex flex-col items-center justify-center"
+              >
+                <div className="inline-flex items-center gap-2 text-muted-foreground/80 mb-1.5">
+                  <Play size={14} className="fill-current" />
+                  <span className="text-sm font-semibold tracking-wide">إجمالي مشاهدات البرنامج</span>
+                </div>
+                <div className="font-display text-4xl md:text-5xl font-bold text-primary drop-shadow-sm tracking-tight" dir="ltr">
+                  +{formatCount(totalViews)}
+                </div>
+              </motion.div>
+            )}
           </FadeIn>
         </div>
       </section>
@@ -169,6 +204,12 @@ function Index() {
                     <img src={episodes[0].cover_image_url ?? `https://img.youtube.com/vi/${episodes[0].youtube_id}/hqdefault.jpg`} alt={`صورة الحلقة المميزة ${episodes[0].title}`} className="h-full w-full object-cover transition duration-700 group-hover:scale-105" />
                     <div className="absolute inset-0 bg-gradient-to-t from-foreground/60 via-transparent to-transparent" />
                     <div className="absolute bottom-6 right-6 flex h-14 w-14 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-glow transition group-hover:scale-110"><Play size={20} fill="currentColor" /></div>
+                    {episodes[0].instagram_views && episodes[0].instagram_views > 0 ? (
+                      <div className="absolute bottom-6 left-6 flex items-center gap-1.5 z-10 text-xs font-bold text-white drop-shadow-md">
+                        <Play size={12} fill="currentColor" className="opacity-90" />
+                        <span dir="ltr">{formatCount(episodes[0].instagram_views)}</span>
+                      </div>
+                    ) : null}
                   </div>
                   <div className="flex flex-col justify-center p-7 md:p-10">
                     <span className="text-xs font-bold tracking-widest text-primary">الحلقة المميزة · {episodes[0].episode_number ? `رقم ${episodes[0].episode_number}` : "الأحدث"}</span>

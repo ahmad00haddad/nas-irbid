@@ -100,11 +100,10 @@ function AnalyticsPage() {
   const cleanMutation = useMutation({
     mutationFn: async () => {
       // Delete all logs to reset analytics to zero (e.g. before launch)
-      const now = new Date().toISOString();
       const { error } = await supabase
         .from("site_analytics")
         .delete()
-        .lt("created_at", now);
+        .not("id", "is", null);
       if (error) throw error;
     },
     onSuccess: () => {

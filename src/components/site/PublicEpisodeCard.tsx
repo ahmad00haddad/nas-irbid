@@ -17,7 +17,15 @@ export type PublicEpisode = {
   short_description: string | null;
   episode_number: number | null;
   published_at: string | null;
+  instagram_views?: number | null;
+  instagram_likes?: number | null;
 };
+
+function formatCount(num: number): string {
+  if (num >= 1000000) return (num / 1000000).toFixed(1).replace(/\.0$/, "") + "M";
+  if (num >= 1000) return (num / 1000).toFixed(1).replace(/\.0$/, "") + "K";
+  return num.toString();
+}
 
 export function PublicEpisodeCard({ episode, asPreview = false }: { episode: PublicEpisode; asPreview?: boolean }) {
   const image = episode.cover_image_url ?? (episode.youtube_id ? `https://img.youtube.com/vi/${episode.youtube_id}/hqdefault.jpg` : null);
@@ -60,7 +68,12 @@ export function PublicEpisodeCard({ episode, asPreview = false }: { episode: Pub
           <Play size={16} fill="currentColor" />
         </div>
         
-
+        {episode.instagram_views && episode.instagram_views > 0 ? (
+          <div className="absolute bottom-4 left-4 flex items-center gap-1.5 z-10 text-[11px] font-bold text-white drop-shadow-md">
+            <Play size={10} fill="currentColor" className="opacity-90" />
+            <span dir="ltr">{formatCount(episode.instagram_views)}</span>
+          </div>
+        ) : null}
 
         {episode.episode_number && (
           <span className="absolute left-4 top-4 rounded-full border border-card/40 bg-card/90 px-3 py-1 text-[11px] font-bold text-foreground backdrop-blur font-display">

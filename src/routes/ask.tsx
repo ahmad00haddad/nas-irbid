@@ -42,7 +42,7 @@ function AskPage() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("episodes")
-        .select("id, slug, title, character_name, profession, neighborhood, youtube_id, cover_image_url, short_description, episode_number, published_at")
+        .select("id, slug, title, character_name, profession, neighborhood, youtube_id, cover_image_url, short_description, episode_number, published_at, instagram_views, instagram_likes")
         .eq("published", true)
         .order("episode_number", { ascending: false, nullsFirst: false });
       if (error) throw error;
