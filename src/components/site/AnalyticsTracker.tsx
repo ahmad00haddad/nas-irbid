@@ -2,16 +2,23 @@ import { useEffect } from "react";
 import { useLocation } from "@tanstack/react-router";
 import { supabase } from "@/integrations/supabase/client";
 
+// Dev/preview environments we never want in real analytics.
+// NOTE: the live site is nas-irbid.lovable.app, so we must NOT exclude all *.lovable.app
+export const isInternalHost = () => {
+  const h = window.location.hostname;
+  return (
+    h.includes("lovableproject.com") ||
+    h.startsWith("id-preview") ||
+    h.includes("--50ee44a8") ||
+    h === "localhost" ||
+    h === "127.0.0.1"
+  );
+};
+
 // Exported helper to track custom events (e.g. clicks, form submits) anywhere in the app
 export const trackSiteEvent = async (eventType: string, path: string, details?: any) => {
   // Ignore admin events and internal/dev platforms
-  if (
-    path.startsWith("/admin") ||
-    path.startsWith("/auth") ||
-    window.location.hostname.includes("lovableproject.com") ||
-    window.location.hostname.includes("lovable.app") ||
-    window.location.hostname === "localhost"
-  ) {
+  if (path.startsWith("/admin") || path.startsWith("/auth") || isInternalHost()) {
     return;
   }
 
@@ -58,9 +65,7 @@ export function AnalyticsTracker() {
     if (
       location.pathname.startsWith("/admin") ||
       location.pathname.startsWith("/auth") ||
-      window.location.hostname.includes("lovableproject.com") ||
-      window.location.hostname.includes("lovable.app") ||
-      window.location.hostname === "localhost"
+      isInternalHost()
     ) {
       return;
     }
