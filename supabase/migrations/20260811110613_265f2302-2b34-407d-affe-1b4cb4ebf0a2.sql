@@ -1,0 +1,2 @@
+GRANT DELETE ON public.site_analytics TO authenticated;
+CREATE POLICY "admins delete analytics" ON public.site_analytics FOR DELETE TO authenticated USING (has_role(auth.uid(), 'admin'::app_role) OR has_role(auth.uid(), 'editor'::app_role));
