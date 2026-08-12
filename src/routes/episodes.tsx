@@ -3,7 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useDeferredValue, useMemo, useState } from "react";
 
 import { supabase } from "@/integrations/supabase/client";
-import { Search, RotateCcw, X, Play, Heart } from "lucide-react";
+import { Search, RotateCcw, X, Play, Heart, ArrowDownUp, Eye, Clock } from "lucide-react";
 import { PublicEpisodeCard, type PublicEpisode } from "@/components/site/PublicEpisodeCard";
 import { Skeleton, EpisodeGridSkeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
