@@ -3,7 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useDeferredValue, useMemo, useState } from "react";
 
 import { supabase } from "@/integrations/supabase/client";
-import { Search, RotateCcw, X, Play, Heart } from "lucide-react";
+import { Search, RotateCcw, X, Play, Heart, Eye, Clock } from "lucide-react";
 import { PublicEpisodeCard, type PublicEpisode } from "@/components/site/PublicEpisodeCard";
 import { Skeleton, EpisodeGridSkeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
@@ -24,8 +24,11 @@ export const Route = createFileRoute("/episodes")({
   }),
 });
 
+type SortMode = "latest" | "views";
+
 function EpisodesPage() {
   const [query, setQuery] = useState("");
+  const [sort, setSort] = useState<SortMode>("latest");
   const deferredQuery = useDeferredValue(query);
 
   const { data: episodes = [], isLoading, isError, refetch } = useQuery({
@@ -53,15 +56,31 @@ function EpisodesPage() {
   const filtered = useMemo(() => {
     if (!episodes || episodes.length === 0) return [];
     const needle = normalize(deferredQuery);
-    if (!needle) return episodes;
-    return episodes.filter((ep) => {
-      const haystack = normalize(
-        [ep.title, ep.character_name, ep.profession, ep.neighborhood, ep.short_description, ep.story]
-          .filter(Boolean).join(" ")
-      );
-      return haystack.includes(needle);
+    const base = needle
+      ? episodes.filter((ep) => {
+          const haystack = normalize(
+            [ep.title, ep.character_name, ep.profession, ep.neighborhood, ep.short_description, ep.story]
+              .filter(Boolean).join(" ")
+          );
+          return haystack.includes(needle);
+        })
+      : [...episodes];
+
+    return base.sort((a, b) => {
+      if (sort === "views") {
+        const viewsA = a.instagram_views ?? 0;
+        const viewsB = b.instagram_views ?? 0;
+        if (viewsB !== viewsA) return viewsB - viewsA;
+      }
+      // fallback / latest: episode_number desc, then published_at desc
+      const numA = a.episode_number ?? 0;
+      const numB = b.episode_number ?? 0;
+      if (numB !== numA) return numB - numA;
+      const dateA = a.published_at ? new Date(a.published_at).getTime() : 0;
+      const dateB = b.published_at ? new Date(b.published_at).getTime() : 0;
+      return dateB - dateA;
     });
-  }, [episodes, deferredQuery]);
+  }, [episodes, deferredQuery, sort]);
 
   const formatCount = (num: number) => {
     if (num >= 1000000) return (num / 1000000).toFixed(1).replace(/\.0$/, "") + "M";
@@ -104,27 +123,58 @@ function EpisodesPage() {
       </FadeIn>
 
       <FadeIn delay={0.1} className="mb-6">
-        <label className="relative block">
-          <Search className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none" size={17} />
-          <span className="sr-only">ابحث في الحلقات</span>
-          <input
-            type="search"
-            value={query}
-            onChange={(event) => setQuery(event.target.value)}
-            placeholder="ابحث باسم الشخصية، المهنة، الحي أو الحكاية…"
-            className="min-h-12 w-full rounded-xl border border-border bg-input py-3 pl-11 pr-11 text-sm text-foreground outline-none focus:border-primary focus:ring-2 focus:ring-primary/20"
-          />
-          {query && (
+        <div className="flex flex-col sm:flex-row gap-3">
+          <label className="relative block flex-1">
+            <Search className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none" size={17} />
+            <span className="sr-only">ابحث في الحلقات</span>
+            <input
+              type="search"
+              value={query}
+              onChange={(event) => setQuery(event.target.value)}
+              placeholder="ابحث باسم الشخصية، المهنة، الحي أو الحكاية…"
+              className="min-h-12 w-full rounded-xl border border-border bg-input py-3 pl-11 pr-11 text-sm text-foreground outline-none focus:border-primary focus:ring-2 focus:ring-primary/20"
+            />
+            {query && (
+              <button
+                type="button"
+                onClick={() => setQuery("")}
+                aria-label="مسح البحث"
+                className="absolute left-3 top-1/2 -translate-y-1/2 rounded-full p-1.5 text-muted-foreground hover:bg-secondary hover:text-foreground transition-colors"
+              >
+                <X size={15} />
+              </button>
+            )}
+          </label>
+
+          <div className="inline-flex items-center rounded-xl border border-border bg-card p-1 gap-1">
             <button
               type="button"
-              onClick={() => setQuery("")}
-              aria-label="مسح البحث"
-              className="absolute left-3 top-1/2 -translate-y-1/2 rounded-full p-1.5 text-muted-foreground hover:bg-secondary hover:text-foreground transition-colors"
+              onClick={() => setSort("latest")}
+              aria-pressed={sort === "latest"}
+              className={`inline-flex items-center gap-1.5 rounded-lg px-3 py-2 text-xs font-semibold transition-colors ${
+                sort === "latest"
+                  ? "bg-primary text-primary-foreground"
+                  : "text-muted-foreground hover:text-foreground hover:bg-secondary"
+              }`}
             >
-              <X size={15} />
+              <Clock size={13} />
+              الأحدث
             </button>
-          )}
-        </label>
+            <button
+              type="button"
+              onClick={() => setSort("views")}
+              aria-pressed={sort === "views"}
+              className={`inline-flex items-center gap-1.5 rounded-lg px-3 py-2 text-xs font-semibold transition-colors ${
+                sort === "views"
+                  ? "bg-primary text-primary-foreground"
+                  : "text-muted-foreground hover:text-foreground hover:bg-secondary"
+              }`}
+            >
+              <Eye size={13} />
+              الأعلى مشاهدة
+            </button>
+          </div>
+        </div>
         {query.trim() && !isLoading && (
           <p className="mt-3 text-xs text-muted-foreground">
             {filtered.length > 0
