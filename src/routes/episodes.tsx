@@ -56,15 +56,31 @@ function EpisodesPage() {
   const filtered = useMemo(() => {
     if (!episodes || episodes.length === 0) return [];
     const needle = normalize(deferredQuery);
-    if (!needle) return episodes;
-    return episodes.filter((ep) => {
-      const haystack = normalize(
-        [ep.title, ep.character_name, ep.profession, ep.neighborhood, ep.short_description, ep.story]
-          .filter(Boolean).join(" ")
-      );
-      return haystack.includes(needle);
+    const base = needle
+      ? episodes.filter((ep) => {
+          const haystack = normalize(
+            [ep.title, ep.character_name, ep.profession, ep.neighborhood, ep.short_description, ep.story]
+              .filter(Boolean).join(" ")
+          );
+          return haystack.includes(needle);
+        })
+      : [...episodes];
+
+    return base.sort((a, b) => {
+      if (sort === "views") {
+        const viewsA = a.instagram_views ?? 0;
+        const viewsB = b.instagram_views ?? 0;
+        if (viewsB !== viewsA) return viewsB - viewsA;
+      }
+      // fallback / latest: episode_number desc, then published_at desc
+      const numA = a.episode_number ?? 0;
+      const numB = b.episode_number ?? 0;
+      if (numB !== numA) return numB - numA;
+      const dateA = a.published_at ? new Date(a.published_at).getTime() : 0;
+      const dateB = b.published_at ? new Date(b.published_at).getTime() : 0;
+      return dateB - dateA;
     });
-  }, [episodes, deferredQuery]);
+  }, [episodes, deferredQuery, sort]);
 
   const formatCount = (num: number) => {
     if (num >= 1000000) return (num / 1000000).toFixed(1).replace(/\.0$/, "") + "M";
