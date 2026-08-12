@@ -24,8 +24,11 @@ export const Route = createFileRoute("/episodes")({
   }),
 });
 
+type SortMode = "latest" | "views";
+
 function EpisodesPage() {
   const [query, setQuery] = useState("");
+  const [sort, setSort] = useState<SortMode>("latest");
   const deferredQuery = useDeferredValue(query);
 
   const { data: episodes = [], isLoading, isError, refetch } = useQuery({
