@@ -123,27 +123,58 @@ function EpisodesPage() {
       </FadeIn>
 
       <FadeIn delay={0.1} className="mb-6">
-        <label className="relative block">
-          <Search className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none" size={17} />
-          <span className="sr-only">ابحث في الحلقات</span>
-          <input
-            type="search"
-            value={query}
-            onChange={(event) => setQuery(event.target.value)}
-            placeholder="ابحث باسم الشخصية، المهنة، الحي أو الحكاية…"
-            className="min-h-12 w-full rounded-xl border border-border bg-input py-3 pl-11 pr-11 text-sm text-foreground outline-none focus:border-primary focus:ring-2 focus:ring-primary/20"
-          />
-          {query && (
+        <div className="flex flex-col sm:flex-row gap-3">
+          <label className="relative block flex-1">
+            <Search className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none" size={17} />
+            <span className="sr-only">ابحث في الحلقات</span>
+            <input
+              type="search"
+              value={query}
+              onChange={(event) => setQuery(event.target.value)}
+              placeholder="ابحث باسم الشخصية، المهنة، الحي أو الحكاية…"
+              className="min-h-12 w-full rounded-xl border border-border bg-input py-3 pl-11 pr-11 text-sm text-foreground outline-none focus:border-primary focus:ring-2 focus:ring-primary/20"
+            />
+            {query && (
+              <button
+                type="button"
+                onClick={() => setQuery("")}
+                aria-label="مسح البحث"
+                className="absolute left-3 top-1/2 -translate-y-1/2 rounded-full p-1.5 text-muted-foreground hover:bg-secondary hover:text-foreground transition-colors"
+              >
+                <X size={15} />
+              </button>
+            )}
+          </label>
+
+          <div className="inline-flex items-center rounded-xl border border-border bg-card p-1 gap-1">
             <button
               type="button"
-              onClick={() => setQuery("")}
-              aria-label="مسح البحث"
-              className="absolute left-3 top-1/2 -translate-y-1/2 rounded-full p-1.5 text-muted-foreground hover:bg-secondary hover:text-foreground transition-colors"
+              onClick={() => setSort("latest")}
+              aria-pressed={sort === "latest"}
+              className={`inline-flex items-center gap-1.5 rounded-lg px-3 py-2 text-xs font-semibold transition-colors ${
+                sort === "latest"
+                  ? "bg-primary text-primary-foreground"
+                  : "text-muted-foreground hover:text-foreground hover:bg-secondary"
+              }`}
             >
-              <X size={15} />
+              <Clock size={13} />
+              الأحدث
             </button>
-          )}
-        </label>
+            <button
+              type="button"
+              onClick={() => setSort("views")}
+              aria-pressed={sort === "views"}
+              className={`inline-flex items-center gap-1.5 rounded-lg px-3 py-2 text-xs font-semibold transition-colors ${
+                sort === "views"
+                  ? "bg-primary text-primary-foreground"
+                  : "text-muted-foreground hover:text-foreground hover:bg-secondary"
+              }`}
+            >
+              <Eye size={13} />
+              الأعلى مشاهدة
+            </button>
+          </div>
+        </div>
         {query.trim() && !isLoading && (
           <p className="mt-3 text-xs text-muted-foreground">
             {filtered.length > 0
