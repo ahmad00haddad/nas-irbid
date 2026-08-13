@@ -78,7 +78,8 @@ function Index() {
 
       {/* HERO TEXT */}
       <section className="relative overflow-hidden border-b border-border/60">
-        <div className="container mx-auto px-6 py-14 md:py-20">
+        <div className="arch-backdrop" aria-hidden="true" />
+        <div className="container relative z-[1] mx-auto px-6 py-14 md:py-20">
           <FadeIn delay={0.2} className="max-w-3xl mx-auto text-center">
             <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary/10 border border-primary/30 mb-6">
               <span className="w-2 h-2 rounded-full bg-primary animate-pulse" />
@@ -88,13 +89,14 @@ function Index() {
               as="h1"
               by="word"
               delay={0.3}
-              className="font-display text-5xl md:text-7xl lg:text-8xl leading-[1.15] mb-6 text-foreground"
+              className="font-display type-display mb-6 text-foreground"
             >
               {settings?.hero_title ?? "نوثّقُ إربد بصوت أهلها"}
             </TextReveal>
-            <p className="text-lg md:text-xl text-muted-foreground leading-relaxed max-w-2xl mx-auto mb-10">
+            <p className="type-lead text-muted-foreground measure mx-auto mb-10">
               {settings?.hero_subtitle ?? "برنامج وثائقي مستقل يحفظ ذاكرة المدينة وحكايات ناسها"}
             </p>
+
             <div className="flex flex-wrap gap-4 justify-center">
               <Magnetic>
                 <MotionLink
@@ -137,8 +139,24 @@ function Index() {
               </motion.div>
             )}
           </FadeIn>
+          <motion.div
+            aria-hidden="true"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 1.2 }}
+            className="mt-14 hidden justify-center md:flex"
+          >
+            <motion.span
+              animate={{ y: [0, 8, 0] }}
+              transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+              className="flex h-10 w-6 items-start justify-center rounded-full border border-primary/30 p-1.5"
+            >
+              <span className="h-2 w-1 rounded-full bg-primary/70" />
+            </motion.span>
+          </motion.div>
         </div>
       </section>
+
 
       {/* TICKER MARQUEE */}
       <section className="border-b border-border/60 bg-card py-3">
