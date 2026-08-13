@@ -145,8 +145,10 @@ function RootComponent() {
         <div className="film-grain" />
         <Cursor />
         <RippleEffect />
+        <ScrollToTop />
         <AnalyticsTracker />
         <Toaster position="top-center" richColors />
+
       </AuthProvider>
     </QueryClientProvider>
   );
