@@ -17,6 +17,8 @@ import { Toaster } from "@/components/ui/sonner";
 import { AuthProvider } from "@/lib/auth";
 import { Cursor } from "@/components/ui/cursor";
 import { RippleEffect } from "@/components/ui/ripple-effect";
+import { ScrollToTop } from "@/components/ui/scroll-to-top";
+
 import { AnalyticsTracker } from "@/components/site/AnalyticsTracker";
 
 function NotFoundComponent() {
