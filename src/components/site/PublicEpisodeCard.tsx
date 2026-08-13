@@ -50,33 +50,35 @@ export function PublicEpisodeCard({ episode, asPreview = false }: { episode: Pub
       }`}
     >
       <div className="relative aspect-[4/3] overflow-hidden bg-secondary">
-        {/* Photo Corners */}
-        <div className="absolute top-2 left-2 w-4 h-4 border-t-2 border-l-2 border-primary/40 z-10 mix-blend-overlay" />
-        <div className="absolute top-2 right-2 w-4 h-4 border-t-2 border-r-2 border-primary/40 z-10 mix-blend-overlay" />
-        <div className="absolute bottom-2 left-2 w-4 h-4 border-b-2 border-l-2 border-primary/40 z-10 mix-blend-overlay" />
-        <div className="absolute bottom-2 right-2 w-4 h-4 border-b-2 border-r-2 border-primary/40 z-10 mix-blend-overlay" />
-
         {image ? (
-          <img src={image} alt={`صورة حلقة ${episode.title}`} loading="lazy" width={480} height={360} className="h-full w-full object-cover transition duration-700 group-hover:scale-105 sepia-[0.15]" />
+          <img src={image} alt={`صورة حلقة ${episode.title}`} loading="lazy" width={480} height={360} className="h-full w-full object-cover transition duration-[900ms] ease-out group-hover:scale-[1.07] sepia-[0.12]" />
         ) : (
           <div className="flex h-full items-center justify-center pattern-geo" aria-hidden="true">
             <Play className="text-primary/50" size={36} />
           </div>
         )}
-        <div className="absolute inset-0 bg-gradient-to-t from-foreground/70 via-transparent to-transparent" />
-        <div className="absolute bottom-4 right-4 flex h-11 w-11 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-glow transition group-hover:scale-110">
+        <div className="absolute inset-0 bg-gradient-to-t from-foreground/75 via-foreground/10 to-transparent" />
+
+        {/* hover CTA */}
+        {!asPreview && (
+          <span className="pointer-events-none absolute inset-x-0 bottom-0 flex translate-y-3 items-center justify-center gap-2 pb-16 text-sm font-bold text-white opacity-0 transition-all duration-500 group-hover:translate-y-0 group-hover:opacity-100">
+            شاهد الحلقة
+          </span>
+        )}
+
+        <div className="absolute bottom-4 right-4 flex h-11 w-11 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-glow transition duration-500 group-hover:scale-110">
           <Play size={16} fill="currentColor" />
         </div>
-        
+
         {episode.instagram_views && episode.instagram_views > 0 ? (
-          <div className="absolute bottom-4 left-4 flex items-center gap-1.5 z-10 text-[11px] font-bold text-white drop-shadow-md">
+          <div className="absolute bottom-4 left-4 z-10 flex items-center gap-1.5 text-[11px] font-bold text-white drop-shadow-md">
             <Play size={10} fill="currentColor" className="opacity-90" />
             <span dir="ltr">{formatCount(episode.instagram_views)}</span>
           </div>
         ) : null}
 
         {episode.episode_number && (
-          <span className="absolute left-4 top-4 rounded-full border border-card/40 bg-card/90 px-3 py-1 text-[11px] font-bold text-foreground backdrop-blur font-display">
+          <span className="absolute left-4 top-4 rounded-full border border-primary/20 bg-card/85 px-3 py-1 font-display text-[11px] font-bold text-primary backdrop-blur">
             الحلقة {toArabicNumerals(episode.episode_number)}
           </span>
         )}
@@ -84,30 +86,27 @@ export function PublicEpisodeCard({ episode, asPreview = false }: { episode: Pub
       <div className="p-5">
         <h2 className="font-display text-xl leading-tight text-foreground transition-colors group-hover:text-primary">{episode.title}</h2>
         {episode.short_description && <p className="mt-2 line-clamp-2 text-sm leading-relaxed text-muted-foreground">{episode.short_description}</p>}
-        <div className="mt-4 flex flex-wrap gap-2 border-t border-border/50 pt-4 text-xs text-muted-foreground">
-          {episode.character_name && (
-            <span className="font-bold text-foreground px-2.5 py-1 rounded-md bg-secondary/80 border border-border/50">
-              {episode.character_name}
-            </span>
-          )}
+        <div className="mt-4 flex flex-wrap items-center gap-x-3 gap-y-2 border-t border-border/50 pt-4 text-xs text-muted-foreground">
+          {episode.character_name && <span className="font-bold text-foreground">{episode.character_name}</span>}
           {episode.profession && (
-            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-muted/50 border border-border/40">
-              <BriefcaseBusiness size={12} className="opacity-70" /> {episode.profession}
+            <span className="inline-flex items-center gap-1.5">
+              <BriefcaseBusiness size={12} className="opacity-60" /> {episode.profession}
             </span>
           )}
           {episode.neighborhood && (
-            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-muted/50 border border-border/40">
-              <MapPin size={12} className="opacity-70" /> {episode.neighborhood}
+            <span className="inline-flex items-center gap-1.5">
+              <MapPin size={12} className="opacity-60" /> {episode.neighborhood}
             </span>
           )}
           {episode.published_at && (
-            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-muted/50 border border-border/40 ms-auto text-primary/70">
-              <CalendarDays size={12} className="opacity-70" /> 
+            <span className="ms-auto inline-flex items-center gap-1.5 opacity-80">
+              <CalendarDays size={12} className="opacity-60" />
               {new Date(episode.published_at).toLocaleDateString("ar-JO", { year: "numeric", month: "short" })}
             </span>
           )}
         </div>
       </div>
+
     </Wrapper>
   );
 }
