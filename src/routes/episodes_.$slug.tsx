@@ -168,6 +168,9 @@ function EpisodeDetail() {
         </div>
       </div>
 
+      {/* Prev / next episode */}
+      <EpisodeNav current={ep} />
+
       {/* Related episodes — moved AFTER the story so the main content leads the page */}
       {related.length > 0 && (
         <section className="container mx-auto border-t border-border/60 px-6 py-16">
@@ -178,6 +181,7 @@ function EpisodeDetail() {
           <div className="grid gap-6 md:grid-cols-3">{related.map((item) => <PublicEpisodeCard key={item.id} episode={item as PublicEpisode} />)}</div>
         </section>
       )}
+
 
       {/* Question bank */}
       <div className="container mx-auto px-6 py-16 border-t border-border/60">
