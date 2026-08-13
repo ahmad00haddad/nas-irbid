@@ -202,7 +202,54 @@ function EpisodeDetail() {
   );
 }
 
+function EpisodeNav({ current }: { current: PublicEpisode & Record<string, any> }) {
+  const { data } = useQuery({
+    queryKey: ["episode-nav", current.id],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("episodes")
+        .select("slug,title,episode_number")
+        .eq("published", true)
+        .order("episode_number", { ascending: true, nullsFirst: false });
+      if (error) throw error;
+      const idx = data.findIndex((e) => e.slug === current.slug);
+      return {
+        prev: idx > 0 ? data[idx - 1] : null,
+        next: idx >= 0 && idx < data.length - 1 ? data[idx + 1] : null,
+      };
+    },
+  });
+
+  if (!data || (!data.prev && !data.next)) return null;
+
+  return (
+    <nav className="container mx-auto grid gap-4 border-t border-border/60 px-6 py-10 sm:grid-cols-2" aria-label="التنقل بين الحلقات">
+      {data.prev ? (
+        <Link
+          to="/episodes/$slug"
+          params={{ slug: data.prev.slug } as never}
+          className="lift group rounded-2xl border border-border/60 bg-card p-5 hover:border-primary/50"
+        >
+          <span className="text-xs font-bold tracking-widest text-primary">الحلقة السابقة</span>
+          <div className="mt-2 font-display text-lg text-foreground group-hover:text-primary">{data.prev.title}</div>
+        </Link>
+      ) : <span />}
+      {data.next ? (
+        <Link
+          to="/episodes/$slug"
+          params={{ slug: data.next.slug } as never}
+          className="lift group rounded-2xl border border-border/60 bg-card p-5 text-end hover:border-primary/50"
+        >
+          <span className="text-xs font-bold tracking-widest text-primary">الحلقة التالية</span>
+          <div className="mt-2 font-display text-lg text-foreground group-hover:text-primary">{data.next.title}</div>
+        </Link>
+      ) : null}
+    </nav>
+  );
+}
+
 function ShareActions({ title, slug }: { title: string; slug: string }) {
+
   const url = `https://nas-irbid.lovable.app/episodes/${slug}`;
   const copy = async () => {
     await navigator.clipboard.writeText(url);
