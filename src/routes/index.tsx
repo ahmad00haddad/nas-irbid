@@ -139,8 +139,24 @@ function Index() {
               </motion.div>
             )}
           </FadeIn>
+          <motion.div
+            aria-hidden="true"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 1.2 }}
+            className="mt-14 hidden justify-center md:flex"
+          >
+            <motion.span
+              animate={{ y: [0, 8, 0] }}
+              transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+              className="flex h-10 w-6 items-start justify-center rounded-full border border-primary/30 p-1.5"
+            >
+              <span className="h-2 w-1 rounded-full bg-primary/70" />
+            </motion.span>
+          </motion.div>
         </div>
       </section>
+
 
       {/* TICKER MARQUEE */}
       <section className="border-b border-border/60 bg-card py-3">
