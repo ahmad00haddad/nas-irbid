@@ -187,8 +187,8 @@
 
   pointer-events: none;
   border-radius: 9999px 9999px 2rem 2rem;
-  border: 1px solid oklch(0.42 0.16 25 / 0.16);
-  box-shadow: inset 0 0 0 12px oklch(0.42 0.16 25 / 0.045);
+  border: 1px solid oklch(0.42 0.16 25 / 0.10);
+  box-shadow: inset 0 0 0 10px oklch(0.42 0.16 25 / 0.025);
   background: radial-gradient(ellipse at 50% 30%, oklch(0.42 0.09 165 / 0.06), transparent 65%);
   z-index: 0;
 }
