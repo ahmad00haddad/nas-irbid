@@ -179,11 +179,12 @@
 /* ── Arch backdrop (Islamic architecture motif) ───────────────────────── */
 .arch-backdrop {
   position: absolute;
-  inset-inline-start: 50%;
-  top: -4%;
-  translate: -50% 0;
-  width: min(46rem, 92vw);
-  height: min(46rem, 92vw);
+  left: 50%;
+  top: 2rem;
+  transform: translateX(-50%);
+  width: min(40rem, 88vw);
+  height: min(40rem, 88vw);
+
   pointer-events: none;
   border-radius: 9999px 9999px 2rem 2rem;
   border: 1px solid oklch(0.42 0.16 25 / 0.16);
