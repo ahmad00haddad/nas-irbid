@@ -232,7 +232,7 @@ function Index() {
                   <div className="flex flex-col justify-center p-7 md:p-10">
                     <span className="text-xs font-bold tracking-widest text-primary">الحلقة المميزة · {episodes[0].episode_number ? `رقم ${episodes[0].episode_number}` : "الأحدث"}</span>
                     <h3 className="mt-3 font-display text-3xl leading-tight text-foreground md:text-4xl">{episodes[0].title}</h3>
-                    {episodes[0].short_description && <p className="mt-4 leading-relaxed text-muted-foreground">{episodes[0].short_description}</p>}
+                    {episodes[0].short_description && <p className="mt-4 line-clamp-4 leading-relaxed text-muted-foreground">{episodes[0].short_description}</p>}
                     <div className="mt-6 flex flex-wrap gap-4 text-sm text-muted-foreground">
                       {episodes[0].character_name && <strong className="text-foreground">{episodes[0].character_name}</strong>}
                       {episodes[0].neighborhood && <span className="inline-flex items-center gap-1"><MapPin size={14} />{episodes[0].neighborhood}</span>}
