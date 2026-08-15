@@ -71,7 +71,3 @@ export function TextReveal({
     </Tag>
   );
 }
-      </motion.span>
-    </Tag>
-  );
-}
