@@ -59,7 +59,7 @@ export function TextReveal({
         aria-hidden
       >
         {tokens.map((token, i) => (
-          <span key={i} className="inline-block overflow-hidden leading-[1.15]">
+          <span key={i} className="inline-block overflow-hidden leading-[1.45] py-[0.22em] -my-[0.22em]">
             <motion.span
               variants={item}
               className="inline-block"

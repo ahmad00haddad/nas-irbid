@@ -152,8 +152,8 @@
   .pattern-geo { background-image: var(--pattern-geo); }
 
   /* Fluid editorial type scale */
-  .type-display { font-size: clamp(2.4rem, 7vw, 5.5rem); line-height: 1.12; letter-spacing: -0.015em; }
-  .type-title { font-size: clamp(1.9rem, 4.2vw, 3.2rem); line-height: 1.2; }
+  .type-display { font-size: clamp(2.4rem, 7vw, 5.5rem); line-height: 1.45; letter-spacing: 0; }
+  .type-title { font-size: clamp(1.9rem, 4.2vw, 3.2rem); line-height: 1.4; }
   .type-lead { font-size: clamp(1.02rem, 1.6vw, 1.3rem); line-height: 1.9; }
   .measure { max-width: 68ch; }
 
