@@ -36,11 +36,10 @@ export function TextReveal({
   };
 
   const item: Variants = {
-    hidden: { y: "110%", opacity: 0, rotate: 2 },
+    hidden: { y: "0.35em", opacity: 0 },
     show: {
-      y: "0%",
+      y: "0em",
       opacity: 1,
-      rotate: 0,
       transition: {
         duration: 0.65,
         ease: [0.22, 1, 0.36, 1] as [number, number, number, number],
@@ -59,7 +58,7 @@ export function TextReveal({
         aria-hidden
       >
         {tokens.map((token, i) => (
-          <span key={i} className="inline-block overflow-hidden leading-[1.45] py-[0.22em] -my-[0.22em]">
+          <span key={i} className="inline-block leading-[1.6]">
             <motion.span
               variants={item}
               className="inline-block"
@@ -68,6 +67,10 @@ export function TextReveal({
             </motion.span>
           </span>
         ))}
+      </motion.span>
+    </Tag>
+  );
+}
       </motion.span>
     </Tag>
   );
