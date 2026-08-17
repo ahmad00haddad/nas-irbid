@@ -20,6 +20,7 @@ import { RippleEffect } from "@/components/ui/ripple-effect";
 import { ScrollToTop } from "@/components/ui/scroll-to-top";
 
 import { AnalyticsTracker } from "@/components/site/AnalyticsTracker";
+import { Preloader } from "@/components/site/Preloader";
 
 function NotFoundComponent() {
   return (
@@ -158,6 +159,7 @@ function RootComponent() {
         <RippleEffect />
         <ScrollToTop />
         <AnalyticsTracker />
+        <Preloader />
         <Toaster position="top-center" richColors />
 
       </AuthProvider>
