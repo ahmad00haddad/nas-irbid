@@ -2,6 +2,7 @@ import { Link } from "@tanstack/react-router";
 import { BriefcaseBusiness, CalendarDays, MapPin, Play } from "lucide-react";
 import { motion } from "framer-motion";
 import { toArabicNumerals } from "@/lib/utils";
+import { BlurImage } from "@/components/ui/blur-image";
 
 const MotionLink = motion.create(Link);
 
