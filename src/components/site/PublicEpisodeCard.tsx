@@ -51,7 +51,14 @@ export function PublicEpisodeCard({ episode, asPreview = false }: { episode: Pub
     >
       <div className="relative aspect-[4/3] overflow-hidden bg-secondary">
         {image ? (
-          <img src={image} alt={`صورة حلقة ${episode.title}`} loading="lazy" width={480} height={360} className="h-full w-full object-cover transition duration-[900ms] ease-out group-hover:scale-[1.07] sepia-[0.12]" />
+          <BlurImage
+            src={image}
+            youtubeId={episode.cover_image_url ? null : episode.youtube_id}
+            alt={`صورة حلقة ${episode.title}`}
+            width={480}
+            height={360}
+            className="h-full w-full object-cover ease-out group-hover:scale-[1.07] sepia-[0.12] duration-[900ms]"
+          />
         ) : (
           <div className="flex h-full items-center justify-center pattern-geo" aria-hidden="true">
             <Play className="text-primary/50" size={36} />
