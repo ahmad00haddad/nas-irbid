@@ -20,19 +20,29 @@ import { RippleEffect } from "@/components/ui/ripple-effect";
 import { ScrollToTop } from "@/components/ui/scroll-to-top";
 
 import { AnalyticsTracker } from "@/components/site/AnalyticsTracker";
+import { Preloader } from "@/components/site/Preloader";
 
 function NotFoundComponent() {
   return (
-    <div className="flex min-h-[70vh] items-center justify-center bg-background px-4">
-      <div className="max-w-md text-center">
-        <h1 className="font-display text-8xl text-gradient-gold">٤٠٤</h1>
-        <h2 className="mt-4 font-display text-3xl text-foreground">الصفحة غير موجودة</h2>
-        <p className="mt-4 text-muted-foreground leading-relaxed">
-          يبدو أن هذه الحكاية لم تُروَ بعد، أو أن الرابط الذي تبحث عنه غير صحيح.
+    <div className="relative flex min-h-[80vh] items-center justify-center overflow-hidden bg-background px-4">
+      <div className="arch-backdrop" aria-hidden="true" />
+      <div className="pattern-geo pointer-events-none absolute inset-0 opacity-40" aria-hidden="true" />
+      <div className="relative z-[1] max-w-lg text-center">
+        <h1 className="font-display text-[clamp(4rem,16vw,9rem)] leading-[1.2] text-gradient-gold">٤٠٤</h1>
+        <h2 className="mt-2 font-display text-3xl leading-[1.6] text-foreground">
+          ضاع الطريق في حواري إربد
+        </h2>
+        <p className="mt-4 leading-loose text-muted-foreground">
+          الصفحة التي تبحث عنها غير موجودة، أو أن هذه الحكاية لم تُروَ بعد. جرّب العودة للبداية أو تصفّح أرشيف الحلقات.
         </p>
-        <Link to="/" className="mt-8 inline-flex px-8 py-3.5 rounded-full bg-gradient-warm text-primary-foreground font-bold shadow-glow hover:opacity-90 transition">
-          العودة للرئيسية
-        </Link>
+        <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
+          <Link to="/" className="inline-flex rounded-full bg-gradient-warm px-8 py-3.5 font-bold text-primary-foreground shadow-glow transition hover:opacity-90">
+            العودة للرئيسية
+          </Link>
+          <Link to="/episodes" className="inline-flex rounded-full border-2 border-primary/40 px-8 py-3.5 font-bold text-foreground transition hover:bg-primary/10">
+            أرشيف الحلقات
+          </Link>
+        </div>
       </div>
     </div>
   );
@@ -149,6 +159,7 @@ function RootComponent() {
         <RippleEffect />
         <ScrollToTop />
         <AnalyticsTracker />
+        <Preloader />
         <Toaster position="top-center" richColors />
 
       </AuthProvider>

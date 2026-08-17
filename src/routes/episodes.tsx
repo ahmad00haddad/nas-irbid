@@ -12,16 +12,55 @@ import { ErrorState } from "@/components/ui/error-state";
 
 export const Route = createFileRoute("/episodes")({
   component: EpisodesPage,
-  head: () => ({
-    meta: [
-      { title: "أرشيف الحلقات · ناس إربد" },
-      { name: "description", content: "كل حلقات برنامج ناس إربد الوثائقي، مرتبة ومفهرسة حسب الشخصية والحي والمهنة." },
-      { property: "og:title", content: "أرشيف الحلقات · ناس إربد" },
-      { property: "og:description", content: "كل حلقات البرنامج بجودة عالية، مع تفاصيل خلف الكواليس." },
-      { property: "og:url", content: "https://nas-irbid.lovable.app/episodes" },
-    ],
-    links: [{ rel: "canonical", href: "https://nas-irbid.lovable.app/episodes" }],
-  }),
+  loader: async () => {
+    const { data } = await supabase
+      .from("episodes")
+      .select("slug,title,short_description,youtube_id,cover_image_url,published_at,created_at")
+      .eq("published", true)
+      .order("episode_number", { ascending: false, nullsFirst: false })
+      .limit(50);
+    return { list: data ?? [] };
+  },
+  head: ({ loaderData }) => {
+    const list = loaderData?.list ?? [];
+    return {
+      meta: [
+        { title: "أرشيف الحلقات · ناس إربد" },
+        { name: "description", content: "كل حلقات برنامج ناس إربد الوثائقي، مرتبة ومفهرسة حسب الشخصية والحي والمهنة." },
+        { property: "og:title", content: "أرشيف الحلقات · ناس إربد" },
+        { property: "og:description", content: "كل حلقات البرنامج بجودة عالية، مع تفاصيل خلف الكواليس." },
+        { property: "og:url", content: "https://nas-irbid.lovable.app/episodes" },
+      ],
+      links: [{ rel: "canonical", href: "https://nas-irbid.lovable.app/episodes" }],
+      scripts: [
+        {
+          type: "application/ld+json",
+          children: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "ItemList",
+            name: "أرشيف حلقات ناس إربد",
+            itemListElement: list.map((ep, i) => ({
+              "@type": "ListItem",
+              position: i + 1,
+              item: {
+                "@type": "VideoObject",
+                name: ep.title,
+                description: ep.short_description ?? ep.title,
+                url: `https://nas-irbid.lovable.app/episodes/${ep.slug}`,
+                thumbnailUrl: ep.cover_image_url
+                  ? [ep.cover_image_url]
+                  : ep.youtube_id
+                    ? [`https://i.ytimg.com/vi/${ep.youtube_id}/maxresdefault.jpg`]
+                    : undefined,
+                uploadDate: ep.published_at ?? ep.created_at,
+                embedUrl: ep.youtube_id ? `https://www.youtube.com/embed/${ep.youtube_id}` : undefined,
+              },
+            })),
+          }),
+        },
+      ],
+    };
+  },
 });
 
 type SortMode = "latest" | "views";
