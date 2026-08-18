@@ -4,6 +4,7 @@ import introLogo from "@/assets/intro-logo.gif.asset.json";
 import { toArabicNumerals } from "@/lib/utils";
 
 const KEY = "nas-irbid-intro-seen";
+let started = false; // guards React StrictMode double-mount
 
 export function Preloader() {
   const [visible, setVisible] = useState(false);
@@ -12,7 +13,9 @@ export function Preloader() {
   useEffect(() => {
     if (typeof window === "undefined") return;
     if (window.location.pathname !== "/") return;
+    if (started) return;
     if (sessionStorage.getItem(KEY)) return;
+    started = true;
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
       sessionStorage.setItem(KEY, "1");
       return;
@@ -33,10 +36,7 @@ export function Preloader() {
     };
     raf = requestAnimationFrame(tick);
 
-    return () => {
-      cancelAnimationFrame(raf);
-      document.body.style.overflow = "";
-    };
+    void raf;
   }, []);
 
   useEffect(() => {
@@ -64,15 +64,19 @@ export function Preloader() {
           />
 
           <div className="relative flex flex-col items-center gap-6">
-            <motion.img
-              src={introLogo.url}
-              alt=""
-              style={{ mixBlendMode: "screen" }}
-              className="h-28 w-auto object-contain md:h-40"
+            <motion.div
+              className="rounded-3xl bg-foreground px-8 py-4 shadow-deep"
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.7, ease: "easeOut" }}
-            />
+            >
+              <img
+                src={introLogo.url}
+                alt=""
+                style={{ mixBlendMode: "screen" }}
+                className="h-24 w-auto object-contain md:h-32"
+              />
+            </motion.div>
 
             <div className="flex flex-col items-center gap-3">
               <span className="font-display text-4xl text-primary tabular-nums">
