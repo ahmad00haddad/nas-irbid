@@ -36,10 +36,7 @@ export function Preloader() {
     };
     raf = requestAnimationFrame(tick);
 
-    return () => {
-      cancelAnimationFrame(raf);
-      document.body.style.overflow = "";
-    };
+    void raf;
   }, []);
 
   useEffect(() => {
