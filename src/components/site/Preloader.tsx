@@ -4,6 +4,7 @@ import introLogo from "@/assets/intro-logo.gif.asset.json";
 import { toArabicNumerals } from "@/lib/utils";
 
 const KEY = "nas-irbid-intro-seen";
+let started = false; // guards React StrictMode double-mount
 
 export function Preloader() {
   const [visible, setVisible] = useState(false);
@@ -12,7 +13,9 @@ export function Preloader() {
   useEffect(() => {
     if (typeof window === "undefined") return;
     if (window.location.pathname !== "/") return;
+    if (started) return;
     if (sessionStorage.getItem(KEY)) return;
+    started = true;
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
       sessionStorage.setItem(KEY, "1");
       return;
