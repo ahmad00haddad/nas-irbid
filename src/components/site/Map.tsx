@@ -349,69 +349,47 @@ export default function Map({ episodes }: { episodes: Episode[] }) {
 
   // ── Trail / filter state ────────────────────────────────────────────────────
   const [selectedDecade, setSelectedDecade] = useState<string | null>(null);
-  const [selectedTrail, setSelectedTrail] = useState<string | null>(null); // neighborhood name
   const [tourIndex, setTourIndex] = useState<number | null>(null);
   const [showTrailPanel, setShowTrailPanel] = useState(false);
 
-  // Unique decades that have map coordinates
+  // Unique decades present in mapped episodes, sorted
   const decades = useMemo(() => {
     const d = new Set(episodes.map((e) => e.decade).filter(Boolean) as string[]);
     return Array.from(d).sort();
   }, [episodes]);
 
-  // Unique neighborhoods that have at least 2 episodes (worth a trail)
-  const neighborhoodTrails = useMemo(() => {
-    const map = new globalThis.Map<string, Episode[]>();
-    episodes.forEach((ep) => {
-      if (!ep.neighborhood) return;
-      const arr = map.get(ep.neighborhood) ?? [];
-      arr.push(ep);
-      map.set(ep.neighborhood, arr);
-    });
-    return Array.from(map.entries())
-      .filter(([, eps]) => eps.length >= 1)
-      .sort((a, b) => b[1].length - a[1].length);
-  }, [episodes]);
-
-  // Filtered episodes based on active decade pill
+  // Episodes filtered by selected decade
   const filteredEpisodes = useMemo(() => {
-    let eps = episodes;
-    if (selectedDecade) eps = eps.filter((e) => e.decade === selectedDecade);
-    if (selectedTrail) eps = eps.filter((e) => e.neighborhood === selectedTrail);
-    return eps;
-  }, [episodes, selectedDecade, selectedTrail]);
+    if (!selectedDecade) return episodes;
+    return episodes.filter((e) => e.decade === selectedDecade);
+  }, [episodes, selectedDecade]);
 
-  // Trail polyline points (ordered by episode_number if available, else insertion order)
-  const trailPolyline = useMemo((): [number, number][] => {
-    if (!selectedTrail) return [];
+  // Trail episodes ordered by episode_number for polyline + tour
+  const trailEpisodes = useMemo(() => {
+    if (!selectedDecade) return [];
     return filteredEpisodes
       .slice()
-      .sort((a, b) => (a as any).episode_number - (b as any).episode_number)
-      .map((ep) => [ep.latitude, ep.longitude]);
-  }, [filteredEpisodes, selectedTrail]);
+      .sort((a, b) => ((a as any).episode_number ?? 999) - ((b as any).episode_number ?? 999));
+  }, [filteredEpisodes, selectedDecade]);
 
-  // Tour: auto-fly between trail episodes
-  const tourEpisodes = useMemo(() => {
-    if (!selectedTrail) return [];
-    return filteredEpisodes
-      .slice()
-      .sort((a, b) => (a as any).episode_number - (b as any).episode_number);
-  }, [filteredEpisodes, selectedTrail]);
+  // Polyline coords
+  const trailPolyline = useMemo((): [number, number][] =>
+    trailEpisodes.map((ep) => [ep.latitude, ep.longitude])
+  , [trailEpisodes]);
 
+  // Auto-tour: fly to each episode in sequence
   useEffect(() => {
-    if (tourIndex === null || !mapObj || tourEpisodes.length === 0) return;
-    const ep = tourEpisodes[tourIndex];
+    if (tourIndex === null || !mapObj || trailEpisodes.length === 0) return;
+    const ep = trailEpisodes[tourIndex];
     if (!ep) return;
     mapObj.flyTo([ep.latitude, ep.longitude], 17, { animate: true, duration: 1.4 });
-  }, [tourIndex, mapObj, tourEpisodes]);
+  }, [tourIndex, mapObj, trailEpisodes]);
 
-  const startTour = () => {
-    if (tourEpisodes.length === 0) return;
-    setTourIndex(0);
-  };
-  const nextTourStop = () => setTourIndex((i) => (i !== null ? Math.min(i + 1, tourEpisodes.length - 1) : 0));
+  const startTour = () => { if (trailEpisodes.length > 0) setTourIndex(0); };
+  const nextTourStop = () => setTourIndex((i) => (i !== null ? Math.min(i + 1, trailEpisodes.length - 1) : 0));
   const prevTourStop = () => setTourIndex((i) => (i !== null ? Math.max(i - 1, 0) : 0));
   const endTour = () => setTourIndex(null);
+  const clearTrail = () => { setSelectedDecade(null); setTourIndex(null); };
 
 
   // Newest episode id (for pulse animation)
@@ -746,40 +724,15 @@ export default function Map({ episodes }: { episodes: Episode[] }) {
         onClose={() => setActiveGroup(null)}
       />
 
-      {/* ── Decade Filter Pills ── */}
-      {decades.length > 0 && (
-        <div
-          className="absolute top-20 md:top-auto md:bottom-6 right-4 z-[1000] flex flex-col md:flex-row gap-1.5 items-end md:items-center"
-          dir="rtl"
-        >
-          {(selectedDecade || selectedTrail) && (
-            <button
-              onClick={() => { setSelectedDecade(null); setSelectedTrail(null); setTourIndex(null); }}
-              className="flex items-center gap-1 px-3 py-1.5 rounded-full text-xs font-bold bg-destructive/90 text-white shadow-md hover:bg-destructive transition active:scale-95"
-            >
-              <X size={11} /> مسح الفلتر
-            </button>
-          )}
-          {decades.map((d) => (
-            <button
-              key={d}
-              onClick={() => { setSelectedDecade(selectedDecade === d ? null : d); setSelectedTrail(null); setTourIndex(null); }}
-              className="px-3 py-1.5 rounded-full text-xs font-bold shadow-md transition active:scale-95"
-              style={{
-                background: selectedDecade === d ? PIN_COLOR : "rgba(253,246,232,0.95)",
-                color: selectedDecade === d ? "white" : "#2d1a0e",
-                border: `1px solid ${selectedDecade === d ? PIN_COLOR : "rgba(196,164,107,0.4)"}`
-              }}
-            >
-              {d}
-            </button>
-          ))}
-        </div>
-      )}
-
-      {/* ── Story Trails Panel Toggle ── */}
-      {neighborhoodTrails.length > 0 && (
+      {/* ── Story Trails Panel (decade-based) ── */}
+      {/* 
+        [LOVABLE NOTE]: تم إخفاء ميزة "مسارات الحكايات" مؤقتاً لأن جميع الحلقات الحالية مصورة في نفس العقد الزمني.
+        لتفعيل الميزة مستقبلاً بشكل صحيح: يجب إضافة حقل `trail_tag` في قاعدة البيانات لتصنيف الحلقات يدوياً 
+        (مثل: "الحرفيون"، "أقدم المحلات")، وبناء المسارات بناءً عليه، ثم تحويل false إلى true هنا.
+      */}
+      {false && decades.length > 0 && (
         <>
+          {/* Toggle button */}
           <button
             onClick={() => setShowTrailPanel((v) => !v)}
             className="absolute top-20 left-4 z-[1000] flex items-center gap-2 px-4 py-2.5 rounded-full shadow-lg border text-sm font-bold transition-all active:scale-95"
@@ -795,50 +748,61 @@ export default function Map({ episodes }: { episodes: Episode[] }) {
 
           {showTrailPanel && (
             <div
-              className="absolute top-36 left-4 z-[1000] w-56 rounded-2xl shadow-2xl overflow-hidden"
+              className="absolute top-36 left-4 z-[1000] w-60 rounded-2xl shadow-2xl overflow-hidden"
               style={{ background: "rgba(253,246,232,0.98)", border: "1px solid rgba(196,164,107,0.4)" }}
               dir="rtl"
             >
+              {/* Header */}
               <div className="px-4 pt-3 pb-2 border-b" style={{ borderColor: "rgba(196,164,107,0.25)" }}>
-                <p className="text-[11px] font-bold" style={{ color: PIN_COLOR }}>اختر جولة موضوعية</p>
+                <p className="text-xs font-bold" style={{ color: PIN_COLOR }}>سافر عبر الزمن</p>
+                <p className="text-[10px] mt-0.5" style={{ color: "#8a6550" }}>اختر حقبة لترى حكاياتها على الخريطة وتجول بينها</p>
               </div>
-              <div className="p-2 flex flex-col gap-1 max-h-60 overflow-y-auto">
-                {neighborhoodTrails.map(([neighborhood, eps]) => (
-                  <button
-                    key={neighborhood}
-                    onClick={() => {
-                      const next = selectedTrail === neighborhood ? null : neighborhood;
-                      setSelectedTrail(next);
-                      setSelectedDecade(null);
-                      setTourIndex(null);
-                      if (next && mapObj) {
-                        const bounds = L.latLngBounds(eps.map((e) => [e.latitude, e.longitude]));
-                        mapObj.fitBounds(bounds, { padding: [80, 80], maxZoom: 16, animate: true });
-                      }
-                    }}
-                    className="flex items-center justify-between gap-2 px-3 py-2 rounded-xl text-xs font-bold text-right transition-all active:scale-95"
-                    style={{
-                      background: selectedTrail === neighborhood ? PIN_COLOR : "rgba(196,164,107,0.1)",
-                      color: selectedTrail === neighborhood ? "white" : "#2d1a0e"
-                    }}
-                  >
-                    <span className="flex items-center gap-1.5">
-                      <MapPin size={11} />
-                      {neighborhood}
-                    </span>
-                    <span
-                      className="text-[10px] px-1.5 py-0.5 rounded-full"
+
+              {/* Decade cards */}
+              <div className="p-2 flex flex-col gap-1">
+                {decades.map((d) => {
+                  const count = episodes.filter((e) => e.decade === d).length;
+                  const isActive = selectedDecade === d;
+                  return (
+                    <button
+                      key={d}
+                      onClick={() => {
+                        const next = isActive ? null : d;
+                        setSelectedDecade(next);
+                        setTourIndex(null);
+                        if (next && mapObj) {
+                          const eps = episodes.filter((e) => e.decade === next);
+                          if (eps.length === 1) mapObj.flyTo([eps[0].latitude, eps[0].longitude], 16, { animate: true, duration: 1.2 });
+                          else if (eps.length > 1) {
+                            const bounds = L.latLngBounds(eps.map((e) => [e.latitude, e.longitude]));
+                            mapObj.fitBounds(bounds, { padding: [80, 80], maxZoom: 16, animate: true });
+                          }
+                        }
+                      }}
+                      className="flex items-center justify-between gap-2 px-3 py-2.5 rounded-xl text-sm font-bold text-right transition-all active:scale-95"
                       style={{
-                        background: selectedTrail === neighborhood ? "rgba(255,255,255,0.2)" : "rgba(124,28,34,0.12)",
-                        color: selectedTrail === neighborhood ? "white" : PIN_COLOR
+                        background: isActive ? PIN_COLOR : "rgba(196,164,107,0.12)",
+                        color: isActive ? "white" : "#2d1a0e",
+                        border: `1px solid ${isActive ? PIN_COLOR : "transparent"}`
                       }}
                     >
-                      {eps.length} حلقات
-                    </span>
-                  </button>
-                ))}
+                      <span>{d}</span>
+                      <span
+                        className="text-[10px] px-2 py-0.5 rounded-full font-bold"
+                        style={{
+                          background: isActive ? "rgba(255,255,255,0.2)" : "rgba(124,28,34,0.12)",
+                          color: isActive ? "white" : PIN_COLOR
+                        }}
+                      >
+                        {count} حلقة
+                      </span>
+                    </button>
+                  );
+                })}
               </div>
-              {selectedTrail && tourEpisodes.length > 0 && (
+
+              {/* Tour controls — only when a decade is selected */}
+              {selectedDecade && trailEpisodes.length > 0 && (
                 <div className="p-3 border-t" style={{ borderColor: "rgba(196,164,107,0.25)" }}>
                   {tourIndex === null ? (
                     <button
@@ -849,29 +813,40 @@ export default function Map({ episodes }: { episodes: Episode[] }) {
                       <Play size={12} fill="white" /> ابدأ الجولة التلقائية
                     </button>
                   ) : (
-                    <div className="flex items-center gap-1">
-                      <button onClick={prevTourStop} disabled={tourIndex === 0} className="flex-1 flex items-center justify-center gap-1 py-1.5 rounded-lg text-[11px] font-bold bg-black/6 hover:bg-black/10 disabled:opacity-40 transition">
-                        <ChevronRight size={13} /> السابق
+                    <>
+                      <div className="flex items-center gap-1 mb-1">
+                        <button onClick={prevTourStop} disabled={tourIndex === 0} className="flex-1 flex items-center justify-center gap-1 py-1.5 rounded-lg text-[11px] font-bold bg-black/6 hover:bg-black/10 disabled:opacity-40 transition">
+                          <ChevronRight size={13} /> السابق
+                        </button>
+                        <span className="text-[10px] font-bold px-1" style={{ color: PIN_COLOR }}>
+                          {tourIndex + 1}/{trailEpisodes.length}
+                        </span>
+                        <button onClick={nextTourStop} disabled={tourIndex === trailEpisodes.length - 1} className="flex-1 flex items-center justify-center gap-1 py-1.5 rounded-lg text-[11px] font-bold bg-black/6 hover:bg-black/10 disabled:opacity-40 transition">
+                          التالي <ChevronLeft size={13} />
+                        </button>
+                      </div>
+                      {trailEpisodes[tourIndex] && (
+                        <p className="text-[10px] text-center font-bold line-clamp-1" style={{ color: "#6b4c35" }}>
+                          {trailEpisodes[tourIndex].title}
+                        </p>
+                      )}
+                      <button onClick={endTour} className="w-full mt-1.5 py-1 text-[10px] text-center text-red-500 hover:underline">
+                        إنهاء الجولة
                       </button>
-                      <span className="text-[10px] font-bold px-1" style={{ color: PIN_COLOR }}>
-                        {tourIndex + 1}/{tourEpisodes.length}
-                      </span>
-                      <button onClick={nextTourStop} disabled={tourIndex === tourEpisodes.length - 1} className="flex-1 flex items-center justify-center gap-1 py-1.5 rounded-lg text-[11px] font-bold bg-black/6 hover:bg-black/10 disabled:opacity-40 transition">
-                        التالي <ChevronLeft size={13} />
-                      </button>
-                    </div>
-                  )}
-                  {tourIndex !== null && (
-                    <button onClick={endTour} className="w-full mt-1 py-1 text-[10px] text-center text-red-600 hover:underline">
-                      إنهاء الجولة
-                    </button>
-                  )}
-                  {tourIndex !== null && tourEpisodes[tourIndex] && (
-                    <p className="text-[10px] text-center mt-1 font-bold" style={{ color: "#6b4c35" }}>
-                      {tourEpisodes[tourIndex].title}
-                    </p>
+                    </>
                   )}
                 </div>
+              )}
+
+              {/* Clear */}
+              {selectedDecade && (
+                <button
+                  onClick={clearTrail}
+                  className="w-full py-2 text-[11px] font-bold text-center border-t transition hover:bg-black/5"
+                  style={{ borderColor: "rgba(196,164,107,0.25)", color: "#8a6550" }}
+                >
+                  عرض جميع الحلقات
+                </button>
               )}
             </div>
           )}
