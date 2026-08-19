@@ -5,12 +5,13 @@ import {
   Popup,
   Tooltip,
   ZoomControl,
+  Polyline,
   useMap,
   useMapEvents,
 } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
-import { Play, Navigation, MapPin, LocateFixed, Maximize, Minimize, Hand, X } from "lucide-react";
+import { Play, Navigation, MapPin, LocateFixed, Maximize, Minimize, Hand, X, Route, ChevronRight, ChevronLeft } from "lucide-react";
 import { useEffect, useMemo, useRef, useState, useCallback } from "react";
 
 type Episode = {
@@ -346,11 +347,78 @@ export default function Map({ episodes }: { episodes: Episode[] }) {
   const containerRef = useRef<HTMLDivElement>(null);
   const isMobile = typeof window !== "undefined" && window.innerWidth < 768;
 
+  // ── Trail / filter state ────────────────────────────────────────────────────
+  const [selectedDecade, setSelectedDecade] = useState<string | null>(null);
+  const [selectedTrail, setSelectedTrail] = useState<string | null>(null); // neighborhood name
+  const [tourIndex, setTourIndex] = useState<number | null>(null);
+  const [showTrailPanel, setShowTrailPanel] = useState(false);
+
+  // Unique decades that have map coordinates
+  const decades = useMemo(() => {
+    const d = new Set(episodes.map((e) => e.decade).filter(Boolean) as string[]);
+    return Array.from(d).sort();
+  }, [episodes]);
+
+  // Unique neighborhoods that have at least 2 episodes (worth a trail)
+  const neighborhoodTrails = useMemo(() => {
+    const map = new globalThis.Map<string, Episode[]>();
+    episodes.forEach((ep) => {
+      if (!ep.neighborhood) return;
+      const arr = map.get(ep.neighborhood) ?? [];
+      arr.push(ep);
+      map.set(ep.neighborhood, arr);
+    });
+    return Array.from(map.entries())
+      .filter(([, eps]) => eps.length >= 1)
+      .sort((a, b) => b[1].length - a[1].length);
+  }, [episodes]);
+
+  // Filtered episodes based on active decade pill
+  const filteredEpisodes = useMemo(() => {
+    let eps = episodes;
+    if (selectedDecade) eps = eps.filter((e) => e.decade === selectedDecade);
+    if (selectedTrail) eps = eps.filter((e) => e.neighborhood === selectedTrail);
+    return eps;
+  }, [episodes, selectedDecade, selectedTrail]);
+
+  // Trail polyline points (ordered by episode_number if available, else insertion order)
+  const trailPolyline = useMemo((): [number, number][] => {
+    if (!selectedTrail) return [];
+    return filteredEpisodes
+      .slice()
+      .sort((a, b) => (a as any).episode_number - (b as any).episode_number)
+      .map((ep) => [ep.latitude, ep.longitude]);
+  }, [filteredEpisodes, selectedTrail]);
+
+  // Tour: auto-fly between trail episodes
+  const tourEpisodes = useMemo(() => {
+    if (!selectedTrail) return [];
+    return filteredEpisodes
+      .slice()
+      .sort((a, b) => (a as any).episode_number - (b as any).episode_number);
+  }, [filteredEpisodes, selectedTrail]);
+
+  useEffect(() => {
+    if (tourIndex === null || !mapObj || tourEpisodes.length === 0) return;
+    const ep = tourEpisodes[tourIndex];
+    if (!ep) return;
+    mapObj.flyTo([ep.latitude, ep.longitude], 17, { animate: true, duration: 1.4 });
+  }, [tourIndex, mapObj, tourEpisodes]);
+
+  const startTour = () => {
+    if (tourEpisodes.length === 0) return;
+    setTourIndex(0);
+  };
+  const nextTourStop = () => setTourIndex((i) => (i !== null ? Math.min(i + 1, tourEpisodes.length - 1) : 0));
+  const prevTourStop = () => setTourIndex((i) => (i !== null ? Math.max(i - 1, 0) : 0));
+  const endTour = () => setTourIndex(null);
+
+
   // Newest episode id (for pulse animation)
   const newestId = useMemo(() => episodes[0]?.id ?? null, [episodes]);
 
-  // Dynamic clustering based on current zoom
-  const groupedEpisodes = useMemo(() => clusterEpisodes(episodes, zoom), [episodes, zoom]);
+  // Dynamic clustering based on FILTERED episodes
+  const groupedEpisodes = useMemo(() => clusterEpisodes(filteredEpisodes, zoom), [filteredEpisodes, zoom]);
 
   // Fullscreen toggle
   const toggleFullscreen = useCallback(() => {
@@ -595,12 +663,20 @@ export default function Map({ episodes }: { episodes: Episode[] }) {
           maxZoom={20}
         />
         <ZoomControl position="bottomright" />
-        <FitToMarkers episodes={episodes} />
+        <FitToMarkers episodes={filteredEpisodes} />
         <ZoomWatcher onZoom={setZoom} />
 
         {/* User location marker */}
         {userPos && userIcon && (
           <Marker position={userPos} icon={userIcon} />
+        )}
+
+        {/* Trail polyline */}
+        {trailPolyline.length >= 2 && (
+          <Polyline
+            positions={trailPolyline}
+            pathOptions={{ color: "#c4a46b", weight: 3, dashArray: "8 6", opacity: 0.85 }}
+          />
         )}
 
         {groupedEpisodes.map((group, index) => {
@@ -669,6 +745,138 @@ export default function Map({ episodes }: { episodes: Episode[] }) {
         userPos={userPos}
         onClose={() => setActiveGroup(null)}
       />
+
+      {/* ── Decade Filter Pills ── */}
+      {decades.length > 0 && (
+        <div
+          className="absolute top-20 md:top-auto md:bottom-6 right-4 z-[1000] flex flex-col md:flex-row gap-1.5 items-end md:items-center"
+          dir="rtl"
+        >
+          {(selectedDecade || selectedTrail) && (
+            <button
+              onClick={() => { setSelectedDecade(null); setSelectedTrail(null); setTourIndex(null); }}
+              className="flex items-center gap-1 px-3 py-1.5 rounded-full text-xs font-bold bg-destructive/90 text-white shadow-md hover:bg-destructive transition active:scale-95"
+            >
+              <X size={11} /> مسح الفلتر
+            </button>
+          )}
+          {decades.map((d) => (
+            <button
+              key={d}
+              onClick={() => { setSelectedDecade(selectedDecade === d ? null : d); setSelectedTrail(null); setTourIndex(null); }}
+              className="px-3 py-1.5 rounded-full text-xs font-bold shadow-md transition active:scale-95"
+              style={{
+                background: selectedDecade === d ? PIN_COLOR : "rgba(253,246,232,0.95)",
+                color: selectedDecade === d ? "white" : "#2d1a0e",
+                border: `1px solid ${selectedDecade === d ? PIN_COLOR : "rgba(196,164,107,0.4)"}`
+              }}
+            >
+              {d}
+            </button>
+          ))}
+        </div>
+      )}
+
+      {/* ── Story Trails Panel Toggle ── */}
+      {neighborhoodTrails.length > 0 && (
+        <>
+          <button
+            onClick={() => setShowTrailPanel((v) => !v)}
+            className="absolute top-20 left-4 z-[1000] flex items-center gap-2 px-4 py-2.5 rounded-full shadow-lg border text-sm font-bold transition-all active:scale-95"
+            style={{
+              background: showTrailPanel ? PIN_COLOR : "rgba(253,246,232,0.97)",
+              color: showTrailPanel ? "white" : "#2d1a0e",
+              borderColor: showTrailPanel ? PIN_COLOR : "rgba(196,164,107,0.4)"
+            }}
+          >
+            <Route size={16} />
+            <span className="hidden sm:inline">مسارات الحكايات</span>
+          </button>
+
+          {showTrailPanel && (
+            <div
+              className="absolute top-36 left-4 z-[1000] w-56 rounded-2xl shadow-2xl overflow-hidden"
+              style={{ background: "rgba(253,246,232,0.98)", border: "1px solid rgba(196,164,107,0.4)" }}
+              dir="rtl"
+            >
+              <div className="px-4 pt-3 pb-2 border-b" style={{ borderColor: "rgba(196,164,107,0.25)" }}>
+                <p className="text-[11px] font-bold" style={{ color: PIN_COLOR }}>اختر جولة موضوعية</p>
+              </div>
+              <div className="p-2 flex flex-col gap-1 max-h-60 overflow-y-auto">
+                {neighborhoodTrails.map(([neighborhood, eps]) => (
+                  <button
+                    key={neighborhood}
+                    onClick={() => {
+                      const next = selectedTrail === neighborhood ? null : neighborhood;
+                      setSelectedTrail(next);
+                      setSelectedDecade(null);
+                      setTourIndex(null);
+                      if (next && mapObj) {
+                        const bounds = L.latLngBounds(eps.map((e) => [e.latitude, e.longitude]));
+                        mapObj.fitBounds(bounds, { padding: [80, 80], maxZoom: 16, animate: true });
+                      }
+                    }}
+                    className="flex items-center justify-between gap-2 px-3 py-2 rounded-xl text-xs font-bold text-right transition-all active:scale-95"
+                    style={{
+                      background: selectedTrail === neighborhood ? PIN_COLOR : "rgba(196,164,107,0.1)",
+                      color: selectedTrail === neighborhood ? "white" : "#2d1a0e"
+                    }}
+                  >
+                    <span className="flex items-center gap-1.5">
+                      <MapPin size={11} />
+                      {neighborhood}
+                    </span>
+                    <span
+                      className="text-[10px] px-1.5 py-0.5 rounded-full"
+                      style={{
+                        background: selectedTrail === neighborhood ? "rgba(255,255,255,0.2)" : "rgba(124,28,34,0.12)",
+                        color: selectedTrail === neighborhood ? "white" : PIN_COLOR
+                      }}
+                    >
+                      {eps.length} حلقات
+                    </span>
+                  </button>
+                ))}
+              </div>
+              {selectedTrail && tourEpisodes.length > 0 && (
+                <div className="p-3 border-t" style={{ borderColor: "rgba(196,164,107,0.25)" }}>
+                  {tourIndex === null ? (
+                    <button
+                      onClick={startTour}
+                      className="w-full flex items-center justify-center gap-1.5 py-2 rounded-xl text-xs font-bold text-white transition active:scale-95"
+                      style={{ background: PIN_COLOR }}
+                    >
+                      <Play size={12} fill="white" /> ابدأ الجولة التلقائية
+                    </button>
+                  ) : (
+                    <div className="flex items-center gap-1">
+                      <button onClick={prevTourStop} disabled={tourIndex === 0} className="flex-1 flex items-center justify-center gap-1 py-1.5 rounded-lg text-[11px] font-bold bg-black/6 hover:bg-black/10 disabled:opacity-40 transition">
+                        <ChevronRight size={13} /> السابق
+                      </button>
+                      <span className="text-[10px] font-bold px-1" style={{ color: PIN_COLOR }}>
+                        {tourIndex + 1}/{tourEpisodes.length}
+                      </span>
+                      <button onClick={nextTourStop} disabled={tourIndex === tourEpisodes.length - 1} className="flex-1 flex items-center justify-center gap-1 py-1.5 rounded-lg text-[11px] font-bold bg-black/6 hover:bg-black/10 disabled:opacity-40 transition">
+                        التالي <ChevronLeft size={13} />
+                      </button>
+                    </div>
+                  )}
+                  {tourIndex !== null && (
+                    <button onClick={endTour} className="w-full mt-1 py-1 text-[10px] text-center text-red-600 hover:underline">
+                      إنهاء الجولة
+                    </button>
+                  )}
+                  {tourIndex !== null && tourEpisodes[tourIndex] && (
+                    <p className="text-[10px] text-center mt-1 font-bold" style={{ color: "#6b4c35" }}>
+                      {tourEpisodes[tourIndex].title}
+                    </p>
+                  )}
+                </div>
+              )}
+            </div>
+          )}
+        </>
+      )}
 
       {/* ── Floating Controls ── */}
       {mapObj && (
