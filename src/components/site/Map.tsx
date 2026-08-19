@@ -125,21 +125,22 @@ function ZoomWatcher({ onZoom }: { onZoom: (z: number) => void }) {
   return null;
 }
 
-// ── Fit map to all markers on first load ──────────────────────────────────────
-function FitToMarkers({ groups }: { groups: { lat: number; lng: number }[] }) {
+// ── Fit map to all markers ONCE on first load only ──────────────────────────
+function FitToMarkers({ episodes }: { episodes: Episode[] }) {
   const map = useMap();
-  const key = groups.map((g) => `${g.lat},${g.lng}`).join("|");
+  const hasFit = useRef(false);
 
   useEffect(() => {
-    if (groups.length === 0) return;
-    if (groups.length === 1) {
-      map.setView([groups[0].lat, groups[0].lng], 16, { animate: true });
+    if (hasFit.current || episodes.length === 0) return;
+    hasFit.current = true;
+    if (episodes.length === 1) {
+      map.setView([episodes[0].latitude, episodes[0].longitude], 16, { animate: true });
       return;
     }
-    const bounds = L.latLngBounds(groups.map((g) => [g.lat, g.lng]));
+    const bounds = L.latLngBounds(episodes.map((ep) => [ep.latitude, ep.longitude]));
     map.fitBounds(bounds, { padding: [90, 90], maxZoom: 16, animate: true });
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [map, key]);
+  }, [map, episodes.length]);
 
   return null;
 }
@@ -594,7 +595,7 @@ export default function Map({ episodes }: { episodes: Episode[] }) {
           maxZoom={20}
         />
         <ZoomControl position="bottomright" />
-        <FitToMarkers groups={groupedEpisodes} />
+        <FitToMarkers episodes={episodes} />
         <ZoomWatcher onZoom={setZoom} />
 
         {/* User location marker */}
