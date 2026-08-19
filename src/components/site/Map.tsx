@@ -6,12 +6,12 @@ import {
   Tooltip,
   ZoomControl,
   useMap,
+  useMapEvents,
 } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
-import { Play, Navigation, MapPin, ExternalLink, LocateFixed, X, Hand } from "lucide-react";
-import { useEffect, useMemo, useRef, useState } from "react";
-
+import { Play, Navigation, MapPin, LocateFixed, Maximize, Minimize, Hand, X } from "lucide-react";
+import { useEffect, useMemo, useRef, useState, useCallback } from "react";
 
 type Episode = {
   id: string;
@@ -28,54 +28,103 @@ type Episode = {
 };
 
 const PIN_COLOR = "#7c1c22";
-const PIN_COLOR_MULTI = "#5a1018"; // Slightly darker for multi-episode pins
+const PIN_COLOR_MULTI = "#5a1018";
 
-// Per-count icon cache to avoid recreating the same DivIcon multiple times
-const iconCache = new globalThis.Map<number, L.DivIcon>();
+// ── Clustering: merge pins within a zoom-dependent radius ──────────────────────
+function clusterEpisodes(
+  episodes: Episode[],
+  zoom: number
+): { lat: number; lng: number; episodes: Episode[] }[] {
+  // Threshold shrinks as you zoom in (more granular at high zoom)
+  const threshold = zoom >= 16 ? 0.0001 : zoom >= 14 ? 0.0003 : zoom >= 12 ? 0.001 : 0.005;
+  const groups: { lat: number; lng: number; episodes: Episode[] }[] = [];
 
-function getCustomIcon(count: number) {
-  if (typeof window === "undefined") return undefined;
-  if (iconCache.has(count)) return iconCache.get(count)!;
+  episodes.forEach((ep) => {
+    const existing = groups.find(
+      (g) =>
+        Math.abs(g.lat - ep.latitude) < threshold &&
+        Math.abs(g.lng - ep.longitude) < threshold
+    );
+    if (existing) existing.episodes.push(ep);
+    else groups.push({ lat: ep.latitude, lng: ep.longitude, episodes: [ep] });
+  });
+  return groups;
+}
 
-  const isSingle = count === 1;
-  const fillColor = isSingle ? PIN_COLOR : PIN_COLOR_MULTI;
+// ── Per-zoom, per-count icon cache ────────────────────────────────────────────
+const iconCache = new globalThis.Map<string, L.DivIcon>();
 
-  const pinSvg = `
-    <svg xmlns="http://www.w3.org/2000/svg" width="52" height="64" viewBox="0 0 52 64">
-      <defs>
-        <filter id="pin-shadow-${count}" x="-40%" y="-20%" width="180%" height="180%">
-          <feDropShadow dx="0" dy="4" stdDeviation="4" flood-color="#00000060"/>
-        </filter>
-      </defs>
-      <g filter="url(#pin-shadow-${count})">
-        <path d="M26 2C15.5 2 7 10.5 7 21c0 13.5 19 39 19 39s19-25.5 19-39c0-10.5-8.5-19-19-19Z" fill="${fillColor}" />
-        <circle cx="26" cy="21" r="10" fill="#fdf6e8" opacity="0.97"/>
-        ${
-          isSingle
-            ? `<circle cx="26" cy="21" r="4.5" fill="${fillColor}"/>`
-            : `<text x="26" y="26" text-anchor="middle" font-family="system-ui,sans-serif" font-size="12" font-weight="800" fill="${fillColor}">${count}</text>`
-        }
-      </g>
-    </svg>
+function getThumbnailPin(ep: Episode, isPulse: boolean): L.DivIcon {
+  const img =
+    ep.cover_image_url ??
+    (ep.youtube_id ? `https://img.youtube.com/vi/${ep.youtube_id}/hqdefault.jpg` : null);
+  const cacheKey = `thumb-${ep.id}-${isPulse}`;
+  if (iconCache.has(cacheKey)) return iconCache.get(cacheKey)!;
+
+  const pulseRing = isPulse
+    ? `<div class="nas-pin-pulse"></div>`
+    : "";
+
+  const inner = img
+    ? `<img src="${img}" alt="${ep.title}" class="nas-thumb-img" />`
+    : `<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="white"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>`;
+
+  const html = `
+    <div class="nas-thumb-pin" style="border-color:${PIN_COLOR}">
+      ${pulseRing}
+      <div class="nas-thumb-inner">${inner}</div>
+      <div class="nas-thumb-tail" style="background:${PIN_COLOR}"></div>
+    </div>
   `;
 
   const icon = new L.DivIcon({
     className: "custom-map-pin bg-transparent border-0",
-    html: `<div class="nas-pin">${pinSvg}</div>`,
-    iconSize: [52, 64],
-    iconAnchor: [26, 64],
-    popupAnchor: [0, -62],
+    html,
+    iconSize: [52, 62],
+    iconAnchor: [26, 62],
+    popupAnchor: [0, -64],
     tooltipAnchor: [0, -66],
   });
 
-  iconCache.set(count, icon);
+  iconCache.set(cacheKey, icon);
   return icon;
 }
 
-/** Fits viewport to all markers — uses a stable dep to prevent infinite loops */
+function getClusterIcon(count: number): L.DivIcon {
+  const cacheKey = `cluster-${count}`;
+  if (iconCache.has(cacheKey)) return iconCache.get(cacheKey)!;
+
+  const html = `
+    <div class="nas-cluster-pin" style="background:${PIN_COLOR_MULTI}">
+      <span class="nas-cluster-count">${count}</span>
+      <div class="nas-thumb-tail" style="background:${PIN_COLOR_MULTI}"></div>
+    </div>
+  `;
+
+  const icon = new L.DivIcon({
+    className: "custom-map-pin bg-transparent border-0",
+    html,
+    iconSize: [52, 62],
+    iconAnchor: [26, 62],
+    popupAnchor: [0, -64],
+    tooltipAnchor: [0, -66],
+  });
+
+  iconCache.set(cacheKey, icon);
+  return icon;
+}
+
+// ── Track zoom level for dynamic clustering ───────────────────────────────────
+function ZoomWatcher({ onZoom }: { onZoom: (z: number) => void }) {
+  useMapEvents({
+    zoomend: (e) => onZoom(e.target.getZoom()),
+  });
+  return null;
+}
+
+// ── Fit map to all markers on first load ──────────────────────────────────────
 function FitToMarkers({ groups }: { groups: { lat: number; lng: number }[] }) {
   const map = useMap();
-  // Stringify just the lat/lng pairs for stable comparison
   const key = groups.map((g) => `${g.lat},${g.lng}`).join("|");
 
   useEffect(() => {
@@ -92,11 +141,25 @@ function FitToMarkers({ groups }: { groups: { lat: number; lng: number }[] }) {
   return null;
 }
 
-/** Episode card inside the popup */
-function EpisodeCard({ ep, lat, lng }: { ep: Episode; lat: number; lng: number }) {
+// ── Episode card inside popup / bottom sheet ──────────────────────────────────
+function EpisodeCard({ ep, lat, lng, userPos }: { ep: Episode; lat: number; lng: number; userPos: [number, number] | null }) {
   const img =
     ep.cover_image_url ??
     (ep.youtube_id ? `https://img.youtube.com/vi/${ep.youtube_id}/hqdefault.jpg` : null);
+
+  const distanceKm = userPos
+    ? (() => {
+        const R = 6371;
+        const dLat = ((lat - userPos[0]) * Math.PI) / 180;
+        const dLng = ((lng - userPos[1]) * Math.PI) / 180;
+        const a =
+          Math.sin(dLat / 2) ** 2 +
+          Math.cos((userPos[0] * Math.PI) / 180) *
+            Math.cos((lat * Math.PI) / 180) *
+            Math.sin(dLng / 2) ** 2;
+        return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+      })()
+    : null;
 
   return (
     <div
@@ -128,7 +191,6 @@ function EpisodeCard({ ep, lat, lng }: { ep: Episode; lat: number; lng: number }
           </div>
         )}
 
-        {/* YouTube play indicator */}
         {ep.youtube_id && !ep.cover_image_url && (
           <div className="absolute inset-0 flex items-center justify-center">
             <div
@@ -137,6 +199,16 @@ function EpisodeCard({ ep, lat, lng }: { ep: Episode; lat: number; lng: number }
             >
               <Play size={16} fill="white" color="white" />
             </div>
+          </div>
+        )}
+
+        {/* Distance badge */}
+        {distanceKm !== null && (
+          <div
+            className="absolute bottom-2 left-2 px-2 py-0.5 rounded-full text-[10px] font-bold backdrop-blur-md shadow-sm"
+            style={{ background: "rgba(20,20,20,0.7)", color: "white" }}
+          >
+            {distanceKm < 1 ? `${Math.round(distanceKm * 1000)} م` : `${distanceKm.toFixed(1)} كم`}
           </div>
         )}
       </div>
@@ -184,7 +256,7 @@ function EpisodeCard({ ep, lat, lng }: { ep: Episode; lat: number; lng: number }
           className="flex flex-col items-center justify-center w-[60px] h-[40px] rounded-xl border shrink-0 !no-underline transition-all hover:brightness-95 active:scale-95 bg-white"
           style={{
             borderColor: "rgba(196,164,107,0.35)",
-            color: "#4285F4", // Google Maps Blue
+            color: "#4285F4",
             boxShadow: "0 2px 5px rgba(0,0,0,0.05)"
           }}
         >
@@ -196,51 +268,226 @@ function EpisodeCard({ ep, lat, lng }: { ep: Episode; lat: number; lng: number }
   );
 }
 
-export default function Map({ episodes }: { episodes: Episode[] }) {
-  const IRBID_CENTER: [number, number] = [32.551445, 35.851479];
+// ── Bottom Sheet (mobile) ─────────────────────────────────────────────────────
+function BottomSheet({
+  group,
+  userPos,
+  onClose,
+}: {
+  group: { lat: number; lng: number; episodes: Episode[] } | null;
+  userPos: [number, number] | null;
+  onClose: () => void;
+}) {
+  const [visible, setVisible] = useState(false);
 
-  // Group near-identical coordinates (~20 m radius) to prevent overlapping pins
-  const groupedEpisodes = useMemo(() => {
-    const groups: { lat: number; lng: number; episodes: Episode[] }[] = [];
-    const THRESHOLD = 0.0002;
+  useEffect(() => {
+    if (group) setTimeout(() => setVisible(true), 10);
+    else setVisible(false);
+  }, [group]);
 
-    episodes.forEach((ep) => {
-      const existing = groups.find(
-        (g) =>
-          Math.abs(g.lat - ep.latitude) < THRESHOLD &&
-          Math.abs(g.lng - ep.longitude) < THRESHOLD
-      );
-      if (existing) existing.episodes.push(ep);
-      else groups.push({ lat: ep.latitude, lng: ep.longitude, episodes: [ep] });
-    });
-    return groups;
-  }, [episodes]);
-
-  // Keep a reference to the map to allow custom controls outside MapContainer children
-  const [mapObj, setMapObj] = useState<L.Map | null>(null);
+  if (!group) return null;
 
   return (
-    <div className="flex-1 w-full h-full min-h-[calc(100vh-80px)] relative z-0">
+    <div
+      className="absolute inset-x-0 bottom-0 z-[1100] md:hidden transition-transform duration-300 ease-out"
+      style={{ transform: visible ? "translateY(0)" : "translateY(110%)" }}
+    >
+      <div
+        className="rounded-t-2xl shadow-2xl border-t border-x overflow-hidden"
+        style={{ background: "rgba(253,246,232,0.99)", borderColor: "rgba(196,164,107,0.4)" }}
+      >
+        {/* Handle + close */}
+        <div className="flex items-center justify-between px-4 pt-3 pb-1">
+          <div className="w-10 h-1 rounded-full bg-black/15 mx-auto absolute left-1/2 -translate-x-1/2 top-2" />
+          <div />
+          <button
+            onClick={onClose}
+            className="w-7 h-7 rounded-full flex items-center justify-center bg-black/8 hover:bg-black/15 transition"
+          >
+            <X size={14} color="#6b4c35" />
+          </button>
+        </div>
+
+        {group.episodes.length > 1 && (
+          <div className="px-4 pb-1">
+            <span className="text-[11px] font-bold" style={{ color: PIN_COLOR }}>
+              {group.episodes.length} حلقات في هذا الموقع — مرّر للاستكشاف
+            </span>
+          </div>
+        )}
+
+        {/* Horizontal episode scroll */}
+        <div
+          className="flex gap-3 overflow-x-auto snap-x snap-mandatory pb-4 pt-2 px-4 nas-scroll-x"
+          dir="rtl"
+        >
+          {group.episodes.map((ep) => (
+            <EpisodeCard key={ep.id} ep={ep} lat={group.lat} lng={group.lng} userPos={userPos} />
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ── Main Map component ────────────────────────────────────────────────────────
+export default function Map({ episodes }: { episodes: Episode[] }) {
+  const IRBID_CENTER: [number, number] = [32.551445, 35.851479];
+  const [mapObj, setMapObj] = useState<L.Map | null>(null);
+  const [zoom, setZoom] = useState(14);
+  const [isFullscreen, setIsFullscreen] = useState(false);
+  const [userPos, setUserPos] = useState<[number, number] | null>(null);
+  const [locating, setLocating] = useState(false);
+  const [activeGroup, setActiveGroup] = useState<{ lat: number; lng: number; episodes: Episode[] } | null>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const isMobile = typeof window !== "undefined" && window.innerWidth < 768;
+
+  // Newest episode id (for pulse animation)
+  const newestId = useMemo(() => episodes[0]?.id ?? null, [episodes]);
+
+  // Dynamic clustering based on current zoom
+  const groupedEpisodes = useMemo(() => clusterEpisodes(episodes, zoom), [episodes, zoom]);
+
+  // Fullscreen toggle
+  const toggleFullscreen = useCallback(() => {
+    const el = containerRef.current;
+    if (!el) return;
+    if (!document.fullscreenElement) {
+      el.requestFullscreen().then(() => setIsFullscreen(true)).catch(() => {});
+    } else {
+      document.exitFullscreen().then(() => setIsFullscreen(false)).catch(() => {});
+    }
+  }, []);
+
+  useEffect(() => {
+    const handler = () => setIsFullscreen(!!document.fullscreenElement);
+    document.addEventListener("fullscreenchange", handler);
+    return () => document.removeEventListener("fullscreenchange", handler);
+  }, []);
+
+  // Geolocate user
+  const locateUser = useCallback(() => {
+    if (!mapObj) return;
+    setLocating(true);
+    mapObj.locate({ setView: true, maxZoom: 16 });
+    mapObj.once("locationfound", (e) => {
+      setUserPos([e.latlng.lat, e.latlng.lng]);
+      setLocating(false);
+    });
+    mapObj.once("locationerror", () => setLocating(false));
+  }, [mapObj]);
+
+  // User position marker icon
+  const userIcon = useMemo(() => {
+    if (typeof window === "undefined") return undefined;
+    return new L.DivIcon({
+      className: "bg-transparent border-0",
+      html: `<div style="width:14px;height:14px;border-radius:50%;background:#4285F4;border:2px solid white;box-shadow:0 0 0 4px rgba(66,133,244,0.25)"></div>`,
+      iconSize: [14, 14],
+      iconAnchor: [7, 7],
+    });
+  }, []);
+
+  return (
+    <div
+      ref={containerRef}
+      className="flex-1 w-full h-full min-h-[calc(100vh-80px)] relative z-0"
+    >
+      {/* ── preconnect for tile server (perf) ── */}
+      <link rel="preconnect" href="https://a.basemaps.cartocdn.com" crossOrigin="anonymous" />
+      <link rel="preconnect" href="https://b.basemaps.cartocdn.com" crossOrigin="anonymous" />
+      <link rel="preconnect" href="https://c.basemaps.cartocdn.com" crossOrigin="anonymous" />
+
+      {/* ── noscript / SEO text list ── */}
+      <noscript>
+        <div dir="rtl" style={{ padding: "1rem", fontFamily: "sans-serif" }}>
+          <h2>مواقع حلقات ناس إربد</h2>
+          <ul>
+            {episodes.map((ep) => (
+              <li key={ep.id}>
+                <a href={`/episodes/${ep.slug}`}>{ep.title}</a>
+                {ep.neighborhood ? ` — ${ep.neighborhood}` : ""}
+                {ep.character_name ? ` (${ep.character_name})` : ""}
+              </li>
+            ))}
+          </ul>
+        </div>
+      </noscript>
+
       <style>{`
-        /* ── Tile pane vintage colour grade ── */
+        /* ── Tile vintage grade ── */
         .leaflet-tile-pane {
           filter: grayscale(0.15) sepia(0.28) contrast(1.08) brightness(1.06) hue-rotate(-8deg);
         }
 
-        /* ── Pin styles ── */
-        .nas-pin {
+        /* ── Thumbnail pin ── */
+        .nas-thumb-pin {
           position: relative;
-          display: flex;
-          align-items: center;
-          justify-content: center;
+          width: 52px;
+          height: 52px;
+          border-radius: 50% 50% 50% 4px;
+          border: 3px solid ${PIN_COLOR};
+          overflow: hidden;
+          background: #fdf6e8;
+          box-shadow: 0 6px 20px rgba(0,0,0,0.32);
           cursor: pointer;
           transform-origin: bottom center;
           transition: transform .25s cubic-bezier(.34,1.56,.64,1);
           will-change: transform;
         }
-        .custom-map-pin:hover .nas-pin { transform: scale(1.18) translateY(-2px); }
+        .custom-map-pin:hover .nas-thumb-pin { transform: scale(1.18) translateY(-3px); }
+        .nas-thumb-inner { width: 100%; height: 100%; }
+        .nas-thumb-img { width: 100%; height: 100%; object-fit: cover; object-position: center 20%; }
+        .nas-thumb-tail {
+          position: absolute;
+          bottom: -10px;
+          left: 50%;
+          transform: translateX(-50%);
+          width: 10px;
+          height: 10px;
+          clip-path: polygon(50% 100%, 0 0, 100% 0);
+        }
 
-        /* ── Tooltip — compact label ── */
+        /* ── Cluster pin ── */
+        .nas-cluster-pin {
+          position: relative;
+          width: 52px;
+          height: 52px;
+          border-radius: 50% 50% 50% 4px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          box-shadow: 0 6px 20px rgba(0,0,0,0.32);
+          cursor: pointer;
+          transform-origin: bottom center;
+          transition: transform .25s cubic-bezier(.34,1.56,.64,1);
+        }
+        .custom-map-pin:hover .nas-cluster-pin { transform: scale(1.18) translateY(-3px); }
+        .nas-cluster-count {
+          font-family: system-ui, sans-serif;
+          font-size: 18px;
+          font-weight: 900;
+          color: white;
+          line-height: 1;
+        }
+
+        /* ── Pulse ring on newest pin ── */
+        @keyframes nas-pulse {
+          0%   { transform: scale(1);   opacity: .7; }
+          70%  { transform: scale(2.1); opacity: 0; }
+          100% { transform: scale(2.1); opacity: 0; }
+        }
+        .nas-pin-pulse {
+          position: absolute;
+          inset: -6px;
+          border-radius: 50%;
+          border: 3px solid ${PIN_COLOR};
+          animation: nas-pulse 2.4s ease-out infinite;
+          pointer-events: none;
+          z-index: -1;
+        }
+
+        /* ── Tooltip ── */
         .leaflet-tooltip-nas {
           background: rgba(253,246,232,0.97) !important;
           border: 1px solid rgba(196,164,107,0.45) !important;
@@ -255,7 +502,7 @@ export default function Map({ episodes }: { episodes: Episode[] }) {
         }
         .leaflet-tooltip-nas::before { display: none !important; }
 
-        /* ── Popup Styling ── */
+        /* ── Popup ── */
         .leaflet-popup-nas .leaflet-popup-content-wrapper {
           background: rgba(253,246,232,0.98) !important;
           backdrop-filter: blur(14px) !important;
@@ -266,10 +513,8 @@ export default function Map({ episodes }: { episodes: Episode[] }) {
         }
         .leaflet-popup-nas .leaflet-popup-tip {
           background: rgba(253,246,232,0.98) !important;
-          /* Adding border to the tip to match the container */
           border-top: 1px solid rgba(196,164,107,0.45) !important;
           border-left: 1px solid rgba(196,164,107,0.45) !important;
-          /* Leaflet rotates the tip by 45deg, so top/left borders become top/left of the diamond */
         }
         .leaflet-popup-nas .leaflet-popup-content {
           margin: 0 !important;
@@ -277,8 +522,6 @@ export default function Map({ episodes }: { episodes: Episode[] }) {
           width: auto !important;
           line-height: inherit;
         }
-        
-        /* ── Close Button ── */
         .leaflet-popup-nas .leaflet-popup-close-button {
           top: 12px !important;
           right: 12px !important;
@@ -297,9 +540,6 @@ export default function Map({ episodes }: { episodes: Episode[] }) {
         .leaflet-popup-nas .leaflet-popup-close-button:hover {
           background: rgba(0,0,0,0.1) !important;
           color: #1a0e08 !important;
-        }
-        .leaflet-popup-nas .leaflet-popup-close-button span {
-          margin-top: -2px; /* Fix vertical alignment of the '×' */
         }
 
         /* ── Horizontal scroll ── */
@@ -339,13 +579,13 @@ export default function Map({ episodes }: { episodes: Episode[] }) {
 
       <MapContainer
         center={IRBID_CENTER}
-        zoom={14}
-        minZoom={10} /* Prevent zooming out too much */
+        zoom={zoom}
+        minZoom={10}
         maxBounds={[
-          [31.8, 35.0], // South-West (roughly Dead Sea / Jordan Valley)
-          [33.0, 36.5], // North-East (roughly Mafraq / borders)
-        ]} /* Restrict dragging to Northern Jordan area */
-        maxBoundsViscosity={1.0} /* Bounce back strongly if they drag outside */
+          [31.8, 35.0],
+          [33.0, 36.5],
+        ]}
+        maxBoundsViscosity={1.0}
         zoomControl={false}
         scrollWheelZoom
         ref={setMapObj}
@@ -358,74 +598,121 @@ export default function Map({ episodes }: { episodes: Episode[] }) {
         />
         <ZoomControl position="bottomright" />
         <FitToMarkers groups={groupedEpisodes} />
+        <ZoomWatcher onZoom={setZoom} />
+
+        {/* User location marker */}
+        {userPos && userIcon && (
+          <Marker position={userPos} icon={userIcon} />
+        )}
 
         {groupedEpisodes.map((group, index) => {
           const { lat, lng } = group;
           const isMulti = group.episodes.length > 1;
+          const isNewest = !isMulti && group.episodes[0].id === newestId;
+          const icon = isMulti
+            ? getClusterIcon(group.episodes.length)
+            : getThumbnailPin(group.episodes[0], isNewest);
 
           return (
             <Marker
               key={`group-${index}`}
               position={[lat, lng]}
-              icon={getCustomIcon(group.episodes.length)!}
+              icon={icon}
+              eventHandlers={
+                isMobile
+                  ? {
+                      click: () => setActiveGroup(group),
+                    }
+                  : {}
+              }
             >
-              {/* Hover label */}
+              {/* Hover tooltip */}
               <Tooltip direction="top" opacity={1} className="leaflet-tooltip-nas" offset={[0, -4]}>
                 {isMulti
                   ? `${group.episodes.length} حلقات في هذا المكان`
                   : group.episodes[0].title}
               </Tooltip>
 
-              {/* Click popup — horizontal card slider */}
-              <Popup
-                className="leaflet-popup-nas"
-                closeButton={true}
-                maxWidth={760}
-                minWidth={270}
-                autoPanPadding={[24, 24]}
-                autoPan
-              >
-                <div dir="rtl" className="relative pt-1 pb-1 px-1">
-                  
-                  {/* Popup outer container (scrollable area) */}
-                  <div className="flex flex-row gap-3 overflow-x-auto snap-x snap-mandatory nas-scroll-x pb-2 pt-4">
-                    {/* Multi-episode indicator */}
-                    {isMulti && (
-                      <div
-                        className="absolute top-0 left-1/2 -translate-x-1/2 px-4 py-1 rounded-full text-[11px] font-bold shadow-sm z-10 flex items-center gap-1.5 animate-pulse border border-[rgba(255,255,255,0.2)]"
-                        style={{ background: PIN_COLOR, color: "white" }}
-                      >
-                        <Hand size={14} /> مرّر لاستكشاف {group.episodes.length} حلقات
-                      </div>
-                    )}
-
-                    {group.episodes.map((ep) => (
-                      <EpisodeCard key={ep.id} ep={ep} lat={lat} lng={lng} />
-                    ))}
+              {/* Desktop popup only */}
+              {!isMobile && (
+                <Popup
+                  className="leaflet-popup-nas"
+                  closeButton={true}
+                  maxWidth={760}
+                  minWidth={270}
+                  autoPanPadding={[24, 24]}
+                  autoPan
+                >
+                  <div dir="rtl" className="relative pt-1 pb-1 px-1">
+                    <div className="flex flex-row gap-3 overflow-x-auto snap-x snap-mandatory nas-scroll-x pb-2 pt-4">
+                      {isMulti && (
+                        <div
+                          className="absolute top-0 left-1/2 -translate-x-1/2 px-4 py-1 rounded-full text-[11px] font-bold shadow-sm z-10 flex items-center gap-1.5 border border-[rgba(255,255,255,0.2)]"
+                          style={{ background: PIN_COLOR, color: "white" }}
+                        >
+                          <Hand size={14} /> مرّر لاستكشاف {group.episodes.length} حلقات
+                        </div>
+                      )}
+                      {group.episodes.map((ep) => (
+                        <EpisodeCard key={ep.id} ep={ep} lat={lat} lng={lng} userPos={userPos} />
+                      ))}
+                    </div>
                   </div>
-                </div>
-              </Popup>
+                </Popup>
+              )}
             </Marker>
           );
         })}
       </MapContainer>
 
-      {/* Floating Action Button for Resetting the Map to Irbid */}
+      {/* ── Bottom Sheet (mobile) ── */}
+      <BottomSheet
+        group={activeGroup}
+        userPos={userPos}
+        onClose={() => setActiveGroup(null)}
+      />
+
+      {/* ── Floating Controls ── */}
       {mapObj && (
-        <button
-          onClick={() => {
-            if (groupedEpisodes.length === 0) {
-              mapObj.setView(IRBID_CENTER, 14, { animate: true });
-            } else {
-              const bounds = L.latLngBounds(groupedEpisodes.map((g) => [g.lat, g.lng]));
-              mapObj.fitBounds(bounds, { padding: [90, 90], maxZoom: 16, animate: true });
-            }
-          }}
-          className="absolute bottom-6 left-6 z-[1000] flex items-center gap-2 px-4 py-3 bg-white rounded-full shadow-lg border border-slate-200 text-sm font-bold text-slate-700 hover:bg-slate-50 hover:text-black transition-all active:scale-95"
-        >
-          <LocateFixed size={18} className="text-primary" />
-          العودة للمركز
-        </button>
+        <div className="absolute bottom-6 left-4 z-[1000] flex flex-col gap-2">
+          {/* Reset / recenter */}
+          <button
+            onClick={() => {
+              setActiveGroup(null);
+              if (groupedEpisodes.length === 0) {
+                mapObj.setView(IRBID_CENTER, 14, { animate: true });
+              } else {
+                const bounds = L.latLngBounds(groupedEpisodes.map((g) => [g.lat, g.lng]));
+                mapObj.fitBounds(bounds, { padding: [90, 90], maxZoom: 16, animate: true });
+              }
+            }}
+            className="flex items-center gap-2 px-4 py-2.5 bg-white rounded-full shadow-lg border border-slate-200 text-sm font-bold text-slate-700 hover:bg-slate-50 hover:text-black transition-all active:scale-95"
+          >
+            <LocateFixed size={17} className="text-primary" />
+            <span className="hidden sm:inline">العودة للمركز</span>
+          </button>
+
+          {/* Locate me */}
+          <button
+            onClick={locateUser}
+            disabled={locating}
+            title="موقعي الحالي"
+            className="flex items-center gap-2 px-4 py-2.5 bg-white rounded-full shadow-lg border border-slate-200 text-sm font-bold text-blue-600 hover:bg-blue-50 transition-all active:scale-95 disabled:opacity-60"
+          >
+            <Navigation size={17} className={locating ? "animate-spin" : ""} />
+            <span className="hidden sm:inline">{locating ? "جاري التحديد…" : "موقعي"}</span>
+          </button>
+
+          {/* Fullscreen */}
+          <button
+            onClick={toggleFullscreen}
+            title={isFullscreen ? "إنهاء ملء الشاشة" : "ملء الشاشة"}
+            className="flex items-center gap-2 px-4 py-2.5 bg-white rounded-full shadow-lg border border-slate-200 text-sm font-bold text-slate-700 hover:bg-slate-50 transition-all active:scale-95"
+          >
+            {isFullscreen ? <Minimize size={17} /> : <Maximize size={17} />}
+            <span className="hidden sm:inline">{isFullscreen ? "تصغير" : "ملء الشاشة"}</span>
+          </button>
+        </div>
       )}
     </div>
   );
