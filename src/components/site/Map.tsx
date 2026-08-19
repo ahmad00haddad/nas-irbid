@@ -54,7 +54,7 @@ function clusterEpisodes(
 // ── Per-zoom, per-count icon cache ────────────────────────────────────────────
 const iconCache = new globalThis.Map<string, L.DivIcon>();
 
-function getThumbnailPin(ep: Episode, isPulse: boolean): L.DivIcon {
+function getThumbnailPin(ep: Episode, isPulse: boolean, isNewest: boolean = false): L.DivIcon {
   const img =
     ep.cover_image_url ??
     (ep.youtube_id ? `https://img.youtube.com/vi/${ep.youtube_id}/hqdefault.jpg` : null);
@@ -90,12 +90,15 @@ function getThumbnailPin(ep: Episode, isPulse: boolean): L.DivIcon {
   return icon;
 }
 
-function getClusterIcon(count: number): L.DivIcon {
-  const cacheKey = `cluster-${count}`;
+function getClusterIcon(count: number, isPulse: boolean = false): L.DivIcon {
+  const cacheKey = `cluster-${count}-${isPulse}`;
   if (iconCache.has(cacheKey)) return iconCache.get(cacheKey)!;
+
+  const pulseRing = isPulse ? `<div class="nas-pin-pulse"></div>` : "";
 
   const html = `
     <div class="nas-cluster-pin" style="background:${PIN_COLOR_MULTI}">
+      ${pulseRing}
       <span class="nas-cluster-count">${count}</span>
       <div class="nas-thumb-tail" style="background:${PIN_COLOR_MULTI}"></div>
     </div>
@@ -580,12 +583,6 @@ export default function Map({ episodes }: { episodes: Episode[] }) {
       <MapContainer
         center={IRBID_CENTER}
         zoom={zoom}
-        minZoom={10}
-        maxBounds={[
-          [31.8, 35.0],
-          [33.0, 36.5],
-        ]}
-        maxBoundsViscosity={1.0}
         zoomControl={false}
         scrollWheelZoom
         ref={setMapObj}
@@ -608,10 +605,10 @@ export default function Map({ episodes }: { episodes: Episode[] }) {
         {groupedEpisodes.map((group, index) => {
           const { lat, lng } = group;
           const isMulti = group.episodes.length > 1;
-          const isNewest = !isMulti && group.episodes[0].id === newestId;
+          const containsNewest = group.episodes.some((ep) => ep.id === newestId);
           const icon = isMulti
-            ? getClusterIcon(group.episodes.length)
-            : getThumbnailPin(group.episodes[0], isNewest);
+            ? getClusterIcon(group.episodes.length, containsNewest)
+            : getThumbnailPin(group.episodes[0], containsNewest, containsNewest);
 
           return (
             <Marker
@@ -674,7 +671,7 @@ export default function Map({ episodes }: { episodes: Episode[] }) {
 
       {/* ── Floating Controls ── */}
       {mapObj && (
-        <div className="absolute bottom-6 left-4 z-[1000] flex flex-col gap-2">
+        <div className="fixed bottom-6 left-4 z-[100000] flex flex-col gap-2">
           {/* Reset / recenter */}
           <button
             onClick={() => {
