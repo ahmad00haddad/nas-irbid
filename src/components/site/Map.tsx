@@ -337,9 +337,10 @@ function BottomSheet({
 
 function MapInteractionWatcher({ onInteract }: { onInteract: () => void }) {
   useMapEvents({
-    dragstart: onInteract,
-    zoomstart: onInteract,
-    click: onInteract,
+    mousedown: onInteract,
+    touchstart: onInteract,
+    wheel: onInteract,
+    keydown: onInteract,
   });
   return null;
 }
