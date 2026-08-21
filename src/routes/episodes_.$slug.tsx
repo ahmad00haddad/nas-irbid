@@ -134,7 +134,7 @@ function EpisodeDetail() {
           </div>
           {ep.story && (
             <div 
-              className="absolute -bottom-2 left-1/2 -translate-x-1/2 flex flex-col items-center justify-center gap-2 cursor-pointer group animate-[bounce_2.5s_infinite]"
+              className="mt-6 mx-auto flex flex-col items-center justify-center gap-2 cursor-pointer group animate-[bounce_2.5s_infinite] relative z-20"
               onClick={() => {
                 const tabs = document.getElementById("story-content");
                 tabs?.scrollIntoView({ behavior: "smooth", block: "start" });
