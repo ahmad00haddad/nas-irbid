@@ -65,6 +65,40 @@ export const Route = createFileRoute("/episodes")({
 
 type SortMode = "latest" | "views";
 
+function useTypewriterPlaceholder(texts: string[], speed = 100, pause = 2000) {
+  const [displayText, setDisplayText] = useState("");
+  const [index, setIndex] = useState(0);
+  const [isDeleting, setIsDeleting] = useState(false);
+
+  useEffect(() => {
+    let timer: NodeJS.Timeout;
+
+    const currentText = texts[index];
+    if (isDeleting) {
+      timer = setTimeout(() => {
+        setDisplayText((prev) => currentText.substring(0, prev.length - 1));
+      }, speed / 2);
+    } else {
+      timer = setTimeout(() => {
+        setDisplayText((prev) => currentText.substring(0, prev.length + 1));
+      }, speed);
+    }
+
+    if (!isDeleting && displayText === currentText) {
+      clearTimeout(timer);
+      timer = setTimeout(() => setIsDeleting(true), pause);
+    } else if (isDeleting && displayText === "") {
+      clearTimeout(timer);
+      setIsDeleting(false);
+      setIndex((i) => (i + 1) % texts.length);
+    }
+
+    return () => clearTimeout(timer);
+  }, [displayText, isDeleting, index, texts, speed, pause]);
+
+  return displayText || " "; // Return space when empty to preserve height
+}
+
 function EpisodesPage() {
   const [query, setQuery] = useState("");
   const [sort, setSort] = useState<SortMode>("latest");
@@ -82,6 +116,13 @@ function EpisodesPage() {
       return data ?? [];
     },
   });
+
+  const searchPlaceholder = useTypewriterPlaceholder([
+    "ابحث عن اسم عائلة...",
+    "ابحث عن مهنة قديمة...",
+    "جرب البحث عن حي أو شارع...",
+    "ابحث باسم الشخصية..."
+  ], 80, 2500);
 
   const normalize = (s: string) =>
     s.toLocaleLowerCase("ar")
@@ -170,8 +211,8 @@ function EpisodesPage() {
               type="search"
               value={query}
               onChange={(event) => setQuery(event.target.value)}
-              placeholder="ابحث باسم الشخصية، المهنة، الحي أو الحكاية…"
-              className="min-h-12 w-full rounded-xl border border-border bg-input py-3 pl-11 pr-11 text-sm text-foreground outline-none focus:border-primary focus:ring-2 focus:ring-primary/20"
+              placeholder={query ? "" : searchPlaceholder}
+              className="min-h-12 w-full rounded-xl border border-border bg-input py-3 pl-11 pr-11 text-sm text-foreground outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 placeholder:text-muted-foreground/70"
             />
             {query && (
               <button
