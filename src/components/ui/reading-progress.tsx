@@ -11,7 +11,7 @@ export function ReadingProgressBar() {
       const docHeight = document.documentElement.scrollHeight - window.innerHeight;
       if (docHeight <= 0) return;
 
-      const progress = Math.min((scrollTop / docHeight) * 100, 100);
+      const progress = Math.min((scrollTop / docHeight), 1);
       rawProgress.set(progress);
       setIsVisible(scrollTop > 100);
     };
