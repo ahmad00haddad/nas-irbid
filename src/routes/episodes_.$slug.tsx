@@ -122,8 +122,8 @@ function EpisodeDetail() {
 
       {/* Video — main content, right after hero */}
       {ep.youtube_id && (
-        <div className="container mx-auto px-6 py-10">
-          <div className="mx-auto w-full max-w-md md:max-w-lg lg:max-w-xl aspect-[9/16] max-h-[85vh] rounded-2xl overflow-hidden bg-foreground shadow-deep">
+        <div className="container mx-auto px-6 py-10 relative">
+          <div className="mx-auto w-full max-w-md md:max-w-lg lg:max-w-xl aspect-[9/16] max-h-[85vh] rounded-2xl overflow-hidden bg-foreground shadow-deep relative z-10">
             <iframe
               src={`https://www.youtube.com/embed/${ep.youtube_id}`}
               title={ep.title}
@@ -132,11 +132,25 @@ function EpisodeDetail() {
               allowFullScreen
             />
           </div>
+          {ep.story && (
+            <div 
+              className="absolute -bottom-2 left-1/2 -translate-x-1/2 flex flex-col items-center justify-center gap-2 cursor-pointer group animate-[bounce_2.5s_infinite]"
+              onClick={() => {
+                const tabs = document.getElementById("story-content");
+                tabs?.scrollIntoView({ behavior: "smooth", block: "start" });
+              }}
+            >
+              <span className="text-[10px] font-bold text-muted-foreground transition-colors group-hover:text-primary">اسحب لتقرأ الحكاية الكامـلة</span>
+              <div className="w-6 h-6 rounded-full border border-border/60 flex items-center justify-center bg-card shadow-sm transition-colors group-hover:border-primary/40 group-hover:bg-primary/5">
+                <ArrowRight size={12} className="rotate-90 text-muted-foreground transition-colors group-hover:text-primary" />
+              </div>
+            </div>
+          )}
         </div>
       )}
 
       {/* Story & Behind the Scenes via Tabs */}
-      <div className="container mx-auto px-6 py-12">
+      <div id="story-content" className="container mx-auto px-6 py-12">
         <div className="max-w-3xl mx-auto">
           {ep.story && (
             <Tabs defaultValue="story" className="w-full">

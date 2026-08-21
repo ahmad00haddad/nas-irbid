@@ -284,10 +284,15 @@ function EpisodesPage() {
           <p className="text-sm text-muted-foreground">حلقات الموسم الأول قيد التصوير. تابعنا لتكون أول من يشاهد.</p>
         </div>
       ) : filtered.length === 0 ? (
-        <div className="mx-auto max-w-xl rounded-2xl border border-dashed border-border bg-card p-12 text-center">
-          <p className="font-display text-xl text-foreground">لا توجد نتائج مطابقة</p>
-          <p className="mt-2 text-sm text-muted-foreground">جرّب كلمة أخرى.</p>
-          <Button variant="outline" className="mt-5 rounded-full" onClick={() => setQuery("")}><RotateCcw size={15} /> مسح البحث</Button>
+        <div className="mx-auto max-w-xl rounded-2xl border border-dashed border-primary/20 bg-card p-12 text-center relative overflow-hidden">
+          <div className="absolute inset-0 bg-primary/5 pointer-events-none" />
+          <p className="font-display text-xl text-foreground relative z-10">هذا البحث قيد التوثيق حالياً...</p>
+          <p className="mt-2 text-sm text-muted-foreground relative z-10 leading-relaxed">
+            لا توجد نتائج مطابقة لـ <span className="font-bold text-foreground">"{query}"</span> حتى الآن. هل جربت استكشاف <button onClick={() => setQuery("خياط")} className="font-bold text-primary underline underline-offset-4 hover:text-primary/80">مهنة الخياط</button> أو البحث في <button onClick={() => setQuery("شارع السينما")} className="font-bold text-primary underline underline-offset-4 hover:text-primary/80">شارع السينما</button>؟
+          </p>
+          <Button variant="outline" className="mt-6 rounded-full relative z-10 bg-background" onClick={() => setQuery("")}>
+            <RotateCcw size={15} className="ml-2" /> مسح البحث وإظهار الكل
+          </Button>
         </div>
       ) : (
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
