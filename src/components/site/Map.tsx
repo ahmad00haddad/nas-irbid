@@ -335,6 +335,15 @@ function BottomSheet({
   );
 }
 
+function MapInteractionWatcher({ onInteract }: { onInteract: () => void }) {
+  useMapEvents({
+    dragstart: onInteract,
+    zoomstart: onInteract,
+    click: onInteract,
+  });
+  return null;
+}
+
 // ── Main Map component ────────────────────────────────────────────────────────
 export default function Map({ episodes }: { episodes: Episode[] }) {
   const IRBID_CENTER: [number, number] = [32.551445, 35.851479];
@@ -344,6 +353,7 @@ export default function Map({ episodes }: { episodes: Episode[] }) {
   const [userPos, setUserPos] = useState<[number, number] | null>(null);
   const [locating, setLocating] = useState(false);
   const [activeGroup, setActiveGroup] = useState<{ lat: number; lng: number; episodes: Episode[] } | null>(null);
+  const [hasInteracted, setHasInteracted] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const isMobile = typeof window !== "undefined" && window.innerWidth < 768;
 
@@ -627,6 +637,18 @@ export default function Map({ episodes }: { episodes: Episode[] }) {
         }
       `}</style>
 
+      {/* ── Contextual Hint (disappears on interaction) ── */}
+      <div
+        className={`absolute inset-0 z-[500] pointer-events-none flex items-center justify-center transition-opacity duration-1000 ${
+          hasInteracted ? "opacity-0" : "opacity-100"
+        }`}
+      >
+        <div className="bg-black/60 backdrop-blur-sm text-white px-5 py-3 rounded-full flex items-center gap-3 shadow-2xl animate-pulse">
+          <Hand size={18} className="animate-bounce" />
+          <span className="font-bold text-sm">اسحب الخريطة لاستكشاف حكايات إربد</span>
+        </div>
+      </div>
+
       <MapContainer
         center={IRBID_CENTER}
         zoom={zoom}
@@ -635,6 +657,7 @@ export default function Map({ episodes }: { episodes: Episode[] }) {
         ref={setMapObj}
         className="w-full h-full min-h-[calc(100vh-80px)] z-0 absolute inset-0"
       >
+        <MapInteractionWatcher onInteract={() => setHasInteracted(true)} />
         <TileLayer
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank">OpenStreetMap</a>'
           url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png"
