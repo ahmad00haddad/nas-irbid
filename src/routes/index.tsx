@@ -28,6 +28,26 @@ export const Route = createFileRoute("/")({
   }),
 });
 
+import { animate } from "framer-motion";
+import { useEffect, useState } from "react";
+
+function AnimatedCounter({ from, to, formatter }: { from: number; to: number; formatter: (val: number) => string }) {
+  const [displayValue, setDisplayValue] = useState(formatter(from));
+
+  useEffect(() => {
+    const controls = animate(from, to, {
+      duration: 2.5,
+      ease: "easeOut",
+      onUpdate(value) {
+        setDisplayValue(formatter(value));
+      }
+    });
+    return controls.stop;
+  }, [from, to, formatter]);
+
+  return <>{displayValue}</>;
+}
+
 function Index() {
   const { data: settings } = useSiteSettings();
   const { data: episodes = [], isLoading, isError, refetch } = useQuery({
@@ -59,6 +79,13 @@ function Index() {
     if (num >= 1000000) return (num / 1000000).toFixed(1).replace(/\.0$/, "") + "M";
     if (num >= 1000) return (num / 1000).toFixed(1).replace(/\.0$/, "") + "K";
     return num.toString();
+  };
+
+  const getGreeting = () => {
+    const hour = new Date().getHours();
+    if (hour >= 5 && hour < 12) return "صباح الخير";
+    if (hour >= 12 && hour < 17) return "طاب نهاركم";
+    return "مساء الخير";
   };
 
   return (
@@ -94,7 +121,7 @@ function Index() {
               {settings?.hero_title ?? "نوثّقُ إربد بصوت أهلها"}
             </TextReveal>
             <p className="type-lead text-muted-foreground measure mx-auto mb-10">
-              {settings?.hero_subtitle ?? "برنامج وثائقي مستقل يحفظ ذاكرة المدينة وحكايات ناسها"}
+              <span className="font-bold text-foreground">{getGreeting()}،</span> {settings?.hero_subtitle ?? "هذا المستودع يحفظ ذاكرة المدينة وحكايات ناسها."}
             </p>
 
             <div className="flex flex-wrap gap-4 justify-center">
@@ -134,7 +161,7 @@ function Index() {
                   <span className="text-sm font-semibold tracking-wide">إجمالي مشاهدات البرنامج</span>
                 </div>
                 <div className="font-display text-4xl md:text-5xl font-bold text-primary drop-shadow-sm tracking-tight" dir="ltr">
-                  +{formatCount(totalViews)}
+                  +<AnimatedCounter from={0} to={totalViews} formatter={formatCount} />
                 </div>
               </motion.div>
             )}

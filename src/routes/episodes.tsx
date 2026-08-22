@@ -255,6 +255,23 @@ function EpisodesPage() {
             </button>
           </div>
         </div>
+
+        {/* ── Quick Search Bubbles (Empty State) ── */}
+        {!query.trim() && !isLoading && episodes.length > 0 && (
+          <div className="mt-4 flex flex-wrap items-center gap-2">
+            <span className="text-xs text-muted-foreground me-1">اكتشف سريعاً:</span>
+            {["حرف يدوية", "شارع السينما", "وسط البلد", "الثمانينات"].map((term) => (
+              <button
+                key={term}
+                onClick={() => setQuery(term)}
+                className="text-[11px] font-semibold px-3 py-1.5 rounded-full bg-secondary/50 text-foreground border border-border/50 hover:bg-primary hover:text-primary-foreground hover:border-primary transition-colors"
+              >
+                {term}
+              </button>
+            ))}
+          </div>
+        )}
+
         {query.trim() && !isLoading && (
           <p className="mt-3 text-xs text-muted-foreground">
             {filtered.length > 0

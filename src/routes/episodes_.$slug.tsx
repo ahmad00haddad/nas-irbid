@@ -3,7 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { ArrowRight, MapPin, Calendar, User, HelpCircle, Send, Share2, Link2, MessageCircle } from "lucide-react";
+import { ArrowRight, MapPin, Calendar, User, HelpCircle, Send, Share2, Link2, MessageCircle, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { PublicEpisodeCard, type PublicEpisode } from "@/components/site/PublicEpisodeCard";
 import { ReadingProgressBar } from "@/components/ui/reading-progress";
@@ -263,12 +263,16 @@ function EpisodeNav({ current }: { current: PublicEpisode & Record<string, any> 
 }
 
 function ShareActions({ title, slug }: { title: string; slug: string }) {
-
+  const [copied, setCopied] = useState(false);
   const url = `https://nas-irbid.lovable.app/episodes/${slug}`;
+  
   const copy = async () => {
     await navigator.clipboard.writeText(url);
+    setCopied(true);
     toast.success("تم نسخ رابط الحلقة");
+    setTimeout(() => setCopied(false), 2000);
   };
+  
   const share = async () => {
     if (navigator.share) await navigator.share({ title, url });
     else await copy();
@@ -277,7 +281,14 @@ function ShareActions({ title, slug }: { title: string; slug: string }) {
   return (
     <div className="mt-7 flex flex-wrap gap-2" aria-label="مشاركة الحلقة">
       <Button variant="outline" className="rounded-full" onClick={share}><Share2 size={15} /> مشاركة</Button>
-      <Button variant="outline" className="rounded-full" onClick={copy}><Link2 size={15} /> نسخ الرابط</Button>
+      <Button 
+        variant="outline" 
+        className={`rounded-full transition-all duration-300 ${copied ? "border-green-500/50 bg-green-500/10 text-green-600" : ""}`} 
+        onClick={copy}
+      >
+        {copied ? <Check size={15} className="animate-in zoom-in duration-300" /> : <Link2 size={15} className="animate-in zoom-in duration-300" />} 
+        {copied ? "تم النسخ" : "نسخ الرابط"}
+      </Button>
       <Button asChild variant="outline" className="rounded-full"><a href={`https://wa.me/?text=${encodeURIComponent(`${title} — ${url}`)}`} target="_blank" rel="noreferrer"><MessageCircle size={15} /> واتساب</a></Button>
     </div>
   );

@@ -131,12 +131,35 @@ function RootShell({ children }: { children: React.ReactNode }) {
   );
 }
 
+import { useEffect, useRef } from "react";
+
+function SmartTitle() {
+  const originalTitle = useRef(typeof document !== "undefined" ? document.title : "ناس إربد");
+
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (document.hidden) {
+        originalTitle.current = document.title;
+        document.title = "لا تفوت باقي الحكاية! 🎬";
+      } else {
+        document.title = originalTitle.current;
+      }
+    };
+
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+    return () => document.removeEventListener("visibilitychange", handleVisibilityChange);
+  }, []);
+
+  return null;
+}
+
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
   const location = useLocation();
 
   return (
     <QueryClientProvider client={queryClient}>
+      <SmartTitle />
       <AuthProvider>
         <div className="min-h-screen flex flex-col relative z-[2]">
           <Header />
