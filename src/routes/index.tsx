@@ -81,13 +81,6 @@ function Index() {
     return num.toString();
   };
 
-  const getGreeting = () => {
-    const hour = new Date().getHours();
-    if (hour >= 5 && hour < 12) return "صباح الخير";
-    if (hour >= 12 && hour < 17) return "طاب نهاركم";
-    return "مساء الخير";
-  };
-
   return (
     <>
       {/* GIF INTRO BAND */}
@@ -121,7 +114,7 @@ function Index() {
               {settings?.hero_title ?? "نوثّقُ إربد بصوت أهلها"}
             </TextReveal>
             <p className="type-lead text-muted-foreground measure mx-auto mb-10">
-              <span className="font-bold text-foreground">{getGreeting()}،</span> {settings?.hero_subtitle ?? "هذا المستودع يحفظ ذاكرة المدينة وحكايات ناسها."}
+              {settings?.hero_subtitle ?? "برنامج وثائقي مستقل يحفظ ذاكرة المدينة وحكايات ناسها"}
             </p>
 
             <div className="flex flex-wrap gap-4 justify-center">
