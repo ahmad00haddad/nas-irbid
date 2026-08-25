@@ -472,8 +472,8 @@ function SectionHeader({ eyebrow, title, description, id }: { eyebrow: string; t
 
   return (
     <div className="max-w-2xl mx-auto text-center group">
-      <span className="text-xs font-bold text-primary tracking-widest">{eyebrow}</span>
-      <h2 className="font-display text-3xl md:text-5xl mt-3 mb-4 text-foreground relative inline-flex items-center justify-center gap-3">
+      <span className="block text-xs font-bold text-primary tracking-widest mb-3">{eyebrow}</span>
+      <h2 className="font-display text-3xl md:text-5xl mb-4 text-foreground relative flex items-center justify-center gap-3">
         {title}
         {id && (
           <button 
