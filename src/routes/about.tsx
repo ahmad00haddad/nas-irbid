@@ -66,7 +66,6 @@ function GlowCard({ children, className }: { children: React.ReactNode; classNam
 function AboutPage() {
   const { data: settings } = useSiteSettings();
   const contactEmail = settings?.contact_email ?? "ahmad000haddad@gmail.com";
-  const [showScrollTop, setShowScrollTop] = useState(false);
   const [emailCopied, setEmailCopied] = useState(false);
   
   // Exit intent logic
@@ -86,12 +85,6 @@ function AboutPage() {
     return () => document.removeEventListener("mouseleave", handleMouseLeave);
   }, []);
 
-  useEffect(() => {
-    const handleScroll = () => setShowScrollTop(window.scrollY > 400);
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
-
   const copyEmail = async () => {
     await navigator.clipboard.writeText(contactEmail);
     setEmailCopied(true);
@@ -100,21 +93,9 @@ function AboutPage() {
   };
 
   return (
-    <div className="relative">
+    <div className="relative overflow-x-hidden">
       <ReadingProgressBar />
       
-      {showScrollTop && (
-        <motion.button
-          initial={{ opacity: 0, scale: 0.5, y: 20 }}
-          animate={{ opacity: 1, scale: 1, y: 0 }}
-          exit={{ opacity: 0, scale: 0.5, y: 20 }}
-          onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
-          className="fixed bottom-6 right-6 z-50 w-12 h-12 rounded-full bg-primary text-primary-foreground shadow-glow flex items-center justify-center hover:scale-110 transition-transform"
-          aria-label="العودة للأعلى"
-        >
-          <ArrowUp size={20} />
-        </motion.button>
-      )}
       {/* ============ Vision ============ */}
       <section className="container mx-auto px-6 pt-20 pb-16">
         <div className="max-w-3xl mx-auto text-center">
@@ -447,11 +428,11 @@ function AboutPage() {
             description={
               <span className="relative inline-flex items-center justify-center gap-2">
                 لأنّ الثقة أساس أيّ علاقة، ننشر تقريراً مفصّلاً عن كلّ مساهمة تصلنا — مهما كانت صغيرة.
-                <div className="group/fact relative inline-flex">
-                  <button className="text-primary hover:text-primary/80 transition-colors">
+                <div className="group/fact relative inline-flex outline-none" tabIndex={0}>
+                  <button className="text-primary hover:text-primary/80 transition-colors pointer-events-none">
                     <Info size={16} />
                   </button>
-                  <div className="absolute bottom-full right-0 mb-2 w-64 p-3 bg-card border border-border/50 text-foreground text-xs rounded-xl opacity-0 group-hover/fact:opacity-100 transition-opacity pointer-events-none z-50 text-right shadow-lg">
+                  <div className="absolute bottom-full right-0 mb-2 w-64 p-3 bg-card border border-border/50 text-foreground text-xs rounded-xl opacity-0 group-hover/fact:opacity-100 group-focus/fact:opacity-100 transition-opacity pointer-events-none z-50 text-right shadow-lg">
                     <span className="font-bold text-primary block mb-1">هل تعلم؟ 💡</span>
                     يستغرق إنتاج حلقة وثائقية واحدة أكثر من ٤٠ ساعة عمل متواصلة تتوزع بين البحث الميداني، التصوير، والمونتاج لضمان خروجها بجودة تليق بذاكرة إربد.
                   </div>
@@ -472,9 +453,9 @@ function AboutPage() {
                 ].map((row) => (
                   <div key={row.l}>
                     <div className="flex justify-between text-xs mb-1.5 gap-3">
-                      <span className="text-foreground/80 font-semibold group/tooltip relative cursor-help">
+                      <span className="text-foreground/80 font-semibold group/tooltip relative cursor-help outline-none" tabIndex={0}>
                         <span className="border-b border-dashed border-primary/50">{row.l}</span>
-                        <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-48 p-2 bg-foreground text-background text-[10px] rounded opacity-0 group-hover/tooltip:opacity-100 transition-opacity pointer-events-none z-50 text-center shadow-md">
+                        <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-48 p-2 bg-foreground text-background text-[10px] rounded opacity-0 group-hover/tooltip:opacity-100 group-focus/tooltip:opacity-100 transition-opacity pointer-events-none z-50 text-center shadow-md">
                           {row.tooltip}
                         </span>
                       </span>
