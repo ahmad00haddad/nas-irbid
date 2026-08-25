@@ -2,7 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import {
   Heart, Coffee, Megaphone, Building2, Users, Camera, Mic2, Palette,
   Share2, MessageCircle, MapPin, Lightbulb, Handshake, GraduationCap,
-  Landmark, Sparkles, ArrowLeft, Quote, ArrowUp, Check
+  Landmark, Sparkles, ArrowLeft, Quote, ArrowUp, Check, Scale
 } from "lucide-react";
 import { useSiteSettings } from "@/lib/site-settings";
 import { ReadingProgressBar } from "@/components/ui/reading-progress";
@@ -343,16 +343,16 @@ function AboutPage() {
 
         <div className="max-w-6xl mx-auto grid md:grid-cols-2 lg:grid-cols-3 gap-5 mt-12">
           {[
-            { icon: Share2, title: "شارك الحلقات", desc: "كلّ مشاركة بتوصل البرنامج لعائلة جديدة." },
-            { icon: MessageCircle, title: "اكتب تعليقاً", desc: "تعليقك — على أي منصّة — يساعد الحلقة توصل لمزيد من الناس." },
+            { icon: Share2, title: "النشر المستهدف", desc: "انشر روابط حلقاتنا في جروبات الفيسبوك الكبيرة الخاصة بعائلات وقرى إربد." },
+            { icon: MessageCircle, title: "المنشن الاستراتيجي", desc: "أشر (منشن) للصحفيين والمؤثرين في تعليقات حلقاتنا ليلتفتوا للمشروع." },
             { icon: Users, title: "رشّح شخصية", desc: "تعرف حدا عنده حكاية تستحقّ التوثيق؟ رشّحه.", to: "/suggest" },
             { icon: MapPin, title: "افتح لنا بيتك أو محلّك", desc: "نحتاج مواقع تصوير أصيلة في إربد القديمة." },
             { icon: Handshake, title: "عرّفنا على ناس إربد", desc: "اربطنا بأصحاب المهن، الحكواتية، والشخصيات اللي تستاهل حلقة." },
-            { icon: Mic2, title: "تطوّع بمهارتك", desc: "مصور، مونتير، صوت، مترجم؟ فريقنا بحاجتك." },
+            { icon: Mic2, title: "تطوّع وخبرة (SEO)", desc: "خبير تحسين محركات بحث، مونتير، أو تقني؟ مهاراتك تضاعف أثرنا." },
             { icon: Lightbulb, title: "اقترح فكرة حلقة", desc: "ميدان، مهنة، حدث — أي شي يستحقّ التوثيق." },
-            { icon: Palette, title: "ترجم محتوانا", desc: "ساعدنا نوصل لجمهور أوسع داخل الأردن وخارجه." },
+            { icon: Palette, title: "ترجمة ولغة إشارة", desc: "تطوع بترجمة الحلقات للغات أخرى أو إضافة لغة الإشارة لفئة الصم." },
             { icon: Megaphone, title: "اكتب عنّا", desc: "صحفي، بلوغر، مؤثر؟ نسعد بأيّ تغطية تكتبها." },
-            { icon: Camera, title: "شاركنا أرشيفك العائلي", desc: "صور قديمة، أشرطة أعراس (VHS)، أو وثائق.. الأرشيف هو روح الوثائقي." },
+            { icon: Scale, title: "استشارة قانونية مجانية", desc: "محامٍ؟ ساعدنا بمراجعة عقود وموافقات النشر لحفظ حقوق الجميع." },
             { icon: Sparkles, title: "نظّم عرضاً محلياً", desc: "اعرض حلقاتنا في مدرستك، جامعتك، أو مقهاك لنشر الحكاية." },
             { icon: Quote, title: "ساعدنا في البحث والتدقيق", desc: "شغوف بالتاريخ؟ ساعدنا في توثيق وتدقيق أسماء الأماكن والأحداث." },
           ].map((item) => {
