@@ -169,12 +169,8 @@ function AboutPage() {
                 نحنُ لا نطلبُ دعماً {" "}
                 <span className="relative inline-block whitespace-nowrap">
                   <span className="relative z-10 text-gradient-gold">مقابل خدمة</span>
-                  <motion.span 
-                    initial={{ scaleX: 0 }}
-                    whileInView={{ scaleX: 1 }}
-                    viewport={{ once: true, margin: "-100px" }}
-                    transition={{ duration: 0.5, delay: 0.3 }}
-                    className="absolute top-1/2 left-0 w-full h-[3px] bg-red-500/80 -translate-y-1/2 origin-left z-20"
+                  <span 
+                    className="absolute top-1/2 right-0 w-full h-[3px] bg-primary -translate-y-1/2 origin-right scale-x-0 transition-transform duration-500 ease-out group-hover:scale-x-100 z-20 shadow-glow"
                   />
                 </span>
                 .
