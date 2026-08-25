@@ -308,9 +308,9 @@ function AboutPage() {
               }`}
             >
               {s.featured && (
-                <div className="absolute -top-1.5 -right-1.5 w-3 h-3 z-20">
+                <div className="absolute -top-4 -right-4 w-3.5 h-3.5 z-20">
                   <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
-                  <span className="relative inline-flex rounded-full h-3 w-3 bg-primary"></span>
+                  <span className="relative inline-flex rounded-full h-3.5 w-3.5 bg-primary shadow-glow"></span>
                 </div>
               )}
               <div className="text-xs font-bold text-primary tracking-widest mb-1">{s.tier}</div>
