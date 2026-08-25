@@ -453,7 +453,7 @@ function AboutPage() {
                   </button>
                   <div className="absolute bottom-full right-0 mb-2 w-64 p-3 bg-card border border-border/50 text-foreground text-xs rounded-xl opacity-0 group-hover/fact:opacity-100 transition-opacity pointer-events-none z-50 text-right shadow-lg">
                     <span className="font-bold text-primary block mb-1">هل تعلم؟ 💡</span>
-                    تكلفة إنتاج حلقة وثائقية واحدة بمستوى "ناس إربد" في القنوات الفضائية تتجاوز 10,000 دولار، لكننا ننفذها بربع التكلفة بفضل الشغف والعمل التطوعي.
+                    يستغرق إنتاج حلقة وثائقية واحدة أكثر من ٤٠ ساعة عمل متواصلة تتوزع بين البحث الميداني، التصوير، والمونتاج لضمان خروجها بجودة تليق بذاكرة إربد.
                   </div>
                 </div>
               </span>
@@ -465,22 +465,18 @@ function AboutPage() {
               <h3 className="font-display text-xl text-foreground mb-5">توزيع تكلفة الحلقة الواحدة</h3>
               <div className="space-y-4">
                 {[
-                  { l: "التصوير والعدسات السينمائية (إيجار + فريق + خبرة)", v: 38 },
-                  { l: "المونتاج والتلوين السينمائي", v: 32 },
-                  { l: "إدارة الإنتاج (بحث، تنسيق، إخراج)", v: 20 },
-                  { l: "بحث ميداني وتنقّلات", v: 10 },
+                  { l: "التصوير والعدسات السينمائية (إيجار + فريق)", v: 38, tooltip: "نعتمد كاميرات ومعدات سينمائية عالية الجودة لتوثيق الصورة بأفضل شكل يليق بإربد." },
+                  { l: "المونتاج والتلوين السينمائي", v: 32, tooltip: "يتطلب أجهزة وتراخيص متخصصة لتوحيد ألوان الكاميرات وإعطاء الطابع الوثائقي المميز." },
+                  { l: "إدارة الإنتاج (بحث، تنسيق، إخراج)", v: 20, tooltip: "إدارة اللوجستيات، وتنسيق فريق العمل والمعدات لضمان سير التصوير بسلاسة." },
+                  { l: "بحث ميداني وتنقّلات", v: 10, tooltip: "تكاليف التنقل للقرى والأطراف للجلوس مع كبار السن وجمع المعلومات بدقة." },
                 ].map((row) => (
                   <div key={row.l}>
                     <div className="flex justify-between text-xs mb-1.5 gap-3">
                       <span className="text-foreground/80 font-semibold group/tooltip relative cursor-help">
-                        {row.l === "المونتاج والتلوين السينمائي" ? (
-                          <>
-                            المونتاج و<span className="border-b border-dashed border-primary/50">التلوين السينمائي</span>
-                            <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-48 p-2 bg-foreground text-background text-[10px] rounded opacity-0 group-hover/tooltip:opacity-100 transition-opacity pointer-events-none z-50 text-center">
-                              لماذا هو مكلف؟ لأنه يتطلب أجهزة وتراخيص متخصصة لتوحيد ألوان الكاميرات وإعطاء الطابع الوثائقي.
-                            </span>
-                          </>
-                        ) : row.l}
+                        <span className="border-b border-dashed border-primary/50">{row.l}</span>
+                        <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-48 p-2 bg-foreground text-background text-[10px] rounded opacity-0 group-hover/tooltip:opacity-100 transition-opacity pointer-events-none z-50 text-center shadow-md">
+                          {row.tooltip}
+                        </span>
                       </span>
                       <span className="font-bold text-primary shrink-0">
                         <AnimatedCounter from={0} to={row.v} formatter={(v) => `${Math.round(v)}%`} />
@@ -523,8 +519,13 @@ function AboutPage() {
                 className="relative inline-flex items-center justify-center gap-2 px-8 py-3.5 rounded-full bg-background text-foreground text-sm font-bold hover:bg-background/90 transition group/btn hover:scale-105"
               >
                 <Heart size={16} fill="currentColor" className="text-primary transition-transform duration-300 group-hover/btn:scale-125 group-hover/btn:animate-pulse" />
-                <span className="group-hover/btn:hidden">راسلنا الآن</span>
-                <span className="hidden group-hover/btn:inline-block">{contactEmail}</span>
+                <span>راسلنا الآن</span>
+                
+                {/* Email tooltip on hover */}
+                <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-3 w-max text-center text-[11px] text-primary-foreground/90 bg-background/20 backdrop-blur-sm rounded-md py-1.5 px-3 opacity-0 group-hover/btn:opacity-100 transition-all pointer-events-none font-sans tracking-wider" dir="ltr">
+                  {contactEmail}
+                  <span className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-background/20" />
+                </span>
               </a>
             </div>
             
