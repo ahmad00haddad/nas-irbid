@@ -426,18 +426,18 @@ function AboutPage() {
             eyebrow="٥ · شفافية"
             title="أين يذهب كلّ دينار؟"
             description={
-              <span className="relative inline-flex items-center justify-center gap-2">
-                لأنّ الثقة أساس أيّ علاقة، ننشر تقريراً مفصّلاً عن كلّ مساهمة تصلنا — مهما كانت صغيرة.
-                <div className="group/fact relative inline-flex outline-none" tabIndex={0}>
-                  <button className="text-primary hover:text-primary/80 transition-colors pointer-events-none">
-                    <Info size={16} />
+              <>
+                لأنّ الثقة أساس أيّ علاقة، ننشر تقريراً مفصّلاً عن كلّ مساهمة تصلنا — مهما كانت صغيرة.{" "}
+                <span className="group/fact relative inline-block align-middle outline-none" tabIndex={0}>
+                  <button className="text-primary hover:text-primary/80 transition-colors pointer-events-none translate-y-[2px]">
+                    <Info size={15} />
                   </button>
-                  <div className="absolute bottom-full right-0 mb-2 w-64 p-3 bg-card border border-border/50 text-foreground text-xs rounded-xl opacity-0 group-hover/fact:opacity-100 group-focus/fact:opacity-100 transition-opacity pointer-events-none z-50 text-right shadow-lg">
-                    <span className="font-bold text-primary block mb-1">هل تعلم؟ 💡</span>
+                  <span className="absolute bottom-full left-0 sm:left-auto sm:right-0 mb-2 w-[260px] p-3 bg-card border border-border/50 text-foreground text-xs rounded-xl opacity-0 group-hover/fact:opacity-100 group-focus/fact:opacity-100 transition-all pointer-events-none z-50 text-right shadow-lg">
+                    <strong className="font-bold text-primary block mb-1">هل تعلم؟ 💡</strong>
                     يستغرق إنتاج حلقة وثائقية واحدة أكثر من ٤٠ ساعة عمل متواصلة تتوزع بين البحث الميداني، التصوير، والمونتاج لضمان خروجها بجودة تليق بذاكرة إربد.
-                  </div>
-                </div>
-              </span>
+                  </span>
+                </span>
+              </>
             }
           />
 
