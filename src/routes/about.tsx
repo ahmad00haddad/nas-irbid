@@ -154,6 +154,7 @@ function AboutPage() {
       {/* ============ 1. Small Donations ============ */}
       <section id="donate" className="container mx-auto px-6 py-20 scroll-mt-24">
         <SectionHeader
+          id="donate"
           eyebrow="١ · للأفراد"
           title="ساهم برمز محبّة"
           description="أيّ مبلغ — مهما كان صغيراً — يفرق. لا امتيازات، لا اشتراكات، لا مقابل. فقط إيمانٌ بأنّ ما نفعله يستحقّ أن يبقى."
@@ -205,6 +206,7 @@ function AboutPage() {
       {/* ============ 2. Sponsor an Episode ============ */}
       <section id="sponsor" className="container mx-auto px-6 py-20 scroll-mt-24 border-t border-border/60">
         <SectionHeader
+          id="sponsor"
           eyebrow="٢ · للشركات والمؤسسات"
           title="باقات الرعاية المعتمدة"
           description={
@@ -283,6 +285,7 @@ function AboutPage() {
       {/* ============ 3. Institutional Partners ============ */}
       <section id="partners" className="container mx-auto px-6 py-20 scroll-mt-24 border-t border-border/60">
         <SectionHeader
+          id="partners"
           eyebrow="٣ · الشركاء المعرفيون"
           title="شراكات لخدمة الذاكرة المشتركة"
           description="ندعو المؤسسات الثقافية والجامعات والمنظمات غير الربحية التي تؤمن بأنّ صون الهويّة الثقافية مسؤوليّةٌ مشتركة، لنتعاون معاً في بناء هذا الأرشيف وإتاحته للجميع."
@@ -332,6 +335,7 @@ function AboutPage() {
       {/* ============ 4. Non-Monetary Support ============ */}
       <section id="non-monetary" className="container mx-auto px-6 py-20 scroll-mt-24 border-t border-border/60">
         <SectionHeader
+          id="non-monetary"
           eyebrow="٤ · بدون مال"
           title="تسع طرق تدعم فيها البرنامج مجاناً"
           description="الدعم لا يُقاس بالمال وحده. وقتك، صوتك، ذاكرتك، ومهارتك — كلّها مساهمات حقيقية."
@@ -351,7 +355,7 @@ function AboutPage() {
           ].map((item) => {
             const Inner = (
               <>
-                <div className="w-11 h-11 rounded-lg bg-primary/10 border border-primary/20 flex items-center justify-center mb-4">
+                <div className="w-11 h-11 rounded-lg bg-primary/10 border border-primary/20 flex items-center justify-center mb-4 transition-transform duration-300 group-hover:scale-110 group-hover:rotate-6">
                   <item.icon size={18} className="text-primary" />
                 </div>
                 <h3 className="font-display text-lg text-foreground mb-1.5">{item.title}</h3>
@@ -362,12 +366,12 @@ function AboutPage() {
               <Link
                 key={item.title}
                 to={item.to}
-                className="p-6 rounded-xl bg-card border border-border/60 hover:border-primary/40 transition block"
+                className="group p-6 rounded-xl bg-card border border-border/60 hover:border-primary/40 transition block"
               >
                 {Inner}
               </Link>
             ) : (
-              <div key={item.title} className="p-6 rounded-xl bg-card border border-border/60 hover:border-primary/40 transition">
+              <div key={item.title} className="group p-6 rounded-xl bg-card border border-border/60 hover:border-primary/40 transition">
                 {Inner}
               </div>
             );
@@ -376,9 +380,10 @@ function AboutPage() {
       </section>
 
       {/* ============ 5. Transparency ============ */}
-      <section className="container mx-auto px-6 py-20 border-t border-border/60">
+      <section id="transparency" className="container mx-auto px-6 py-20 scroll-mt-24 border-t border-border/60">
         <div className="max-w-4xl mx-auto">
           <SectionHeader
+            id="transparency"
             eyebrow="٥ · شفافية"
             title="أين يذهب كلّ دينار؟"
             description="لأنّ الثقة أساس أيّ علاقة، ننشر تقريراً مفصّلاً عن كلّ مساهمة تصلنا — مهما كانت صغيرة."
@@ -419,32 +424,64 @@ function AboutPage() {
 
       {/* ============ Final CTA ============ */}
       <section className="container mx-auto px-6 py-24">
-        <div className="max-w-3xl mx-auto text-center p-12 rounded-3xl bg-gradient-warm shadow-deep">
-          <h3 className="font-display text-3xl md:text-4xl text-primary-foreground mb-4">
+        <div className="max-w-3xl mx-auto text-center p-12 rounded-3xl bg-gradient-warm shadow-deep relative overflow-hidden group">
+          <div className="absolute inset-0 bg-primary/10 opacity-0 group-hover:opacity-100 transition-opacity duration-1000" />
+          <h3 className="font-display text-3xl md:text-4xl text-primary-foreground mb-4 relative z-10">
             البرنامج يستحقّ أن يستمرّ
           </h3>
-          <p className="text-primary-foreground/90 text-base mb-7 leading-relaxed">
+          <p className="text-primary-foreground/90 text-base mb-7 leading-relaxed relative z-10">
             إن كنتَ تؤمن بأنّ ذاكرة إربد أمانة، راسلنا بكلمة واحدة: «بدّي أساهم»،
             ونحن نرتّب معك أنسب طريقة — حسب وقتك وإمكانياتك.
           </p>
-          <a
-            href={`mailto:${contactEmail}?subject=بدّي أساهم في ناس إربد`}
-            className="inline-flex items-center gap-2 px-8 py-3.5 rounded-full bg-background text-foreground text-sm font-bold hover:bg-background/90 transition group"
-          >
-            <Heart size={16} fill="currentColor" className="text-primary transition-transform duration-300 group-hover:scale-125 group-hover:animate-pulse" />
-            راسلنا الآن
-          </a>
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 relative z-10">
+            <a
+              href={`mailto:${contactEmail}?subject=بدّي أساهم في ناس إربد`}
+              className="inline-flex items-center justify-center gap-2 px-8 py-3.5 rounded-full bg-background text-foreground text-sm font-bold hover:bg-background/90 transition group/btn hover:scale-105"
+            >
+              <Heart size={16} fill="currentColor" className="text-primary transition-transform duration-300 group-hover/btn:scale-125 group-hover/btn:animate-pulse" />
+              راسلنا الآن
+            </a>
+            <button
+              onClick={copyEmail}
+              className="inline-flex items-center justify-center gap-2 px-8 py-3.5 rounded-full border border-primary-foreground/30 text-primary-foreground text-sm font-bold hover:bg-primary-foreground/10 transition"
+            >
+              {emailCopied ? <Check size={16} /> : <Share2 size={16} />}
+              {emailCopied ? "تم النسخ" : "انسخ البريد"}
+            </button>
+          </div>
         </div>
       </section>
     </div>
   );
 }
 
-function SectionHeader({ eyebrow, title, description }: { eyebrow: string; title: string; description: React.ReactNode }) {
+function SectionHeader({ eyebrow, title, description, id }: { eyebrow: string; title: string; description: React.ReactNode; id?: string }) {
+  const [copied, setCopied] = useState(false);
+
+  const copyAnchor = () => {
+    if (!id) return;
+    const url = `${window.location.origin}${window.location.pathname}#${id}`;
+    navigator.clipboard.writeText(url);
+    setCopied(true);
+    toast.success("تم نسخ رابط القسم المباشر");
+    setTimeout(() => setCopied(false), 2000);
+  };
+
   return (
-    <div className="max-w-2xl mx-auto text-center">
+    <div className="max-w-2xl mx-auto text-center group">
       <span className="text-xs font-bold text-primary tracking-widest">{eyebrow}</span>
-      <h2 className="font-display text-3xl md:text-5xl mt-3 mb-4 text-foreground">{title}</h2>
+      <h2 className="font-display text-3xl md:text-5xl mt-3 mb-4 text-foreground relative inline-flex items-center justify-center gap-3">
+        {title}
+        {id && (
+          <button 
+            onClick={copyAnchor}
+            className="opacity-0 group-hover:opacity-100 transition-opacity p-2 rounded-full hover:bg-secondary/50 text-muted-foreground hover:text-primary"
+            title="انسخ رابط هذا القسم"
+          >
+            {copied ? <Check size={20} className="text-green-500" /> : <Share2 size={20} />}
+          </button>
+        )}
+      </h2>
       <div className="text-base text-muted-foreground leading-relaxed">{description}</div>
     </div>
   );
