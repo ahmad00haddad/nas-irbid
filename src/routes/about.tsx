@@ -302,6 +302,11 @@ function AboutPage() {
               title: "الجامعات والباحثون",
               desc: "أرشيف ناس إربد متاحٌ مجاناً للباحثين في الأنثروبولوجيا والتاريخ الشفوي. علمٌ يُهدى للعلم.",
             },
+            {
+              icon: Users,
+              title: "المبادرات والمساحات الشبابية",
+              desc: "المساحات الثقافية، نوادي القراءة، والفرق التطوعية — لنتعاون في نقل هذه الذاكرة للأجيال الشابة.",
+            },
           ].map((p) => (
             <div key={p.title} className="p-7 rounded-2xl bg-card border border-border/60 hover:border-primary/40 transition">
               <div className="flex items-start gap-5">
