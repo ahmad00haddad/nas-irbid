@@ -147,28 +147,31 @@ function AboutPage() {
       {/* ============ 2. Sponsor an Episode ============ */}
       <section id="sponsor" className="container mx-auto px-6 py-20 scroll-mt-24 border-t border-border/60">
         <SectionHeader
-          eyebrow="٢ · مساهمات أكبر"
-          title="ادعم حلقة كاملة"
-          description="إن أردتَ المساهمة في تكاليف حلقة بأكملها، فهذا فعلٌ يحمي قصّة كاملةً من النسيان. لا اسم على التترات، ولا مقابلٌ معلن — فقط أثرٌ يبقى."
+          eyebrow="٢ · للشركات والمؤسسات"
+          title="باقات الرعاية المعتمدة"
+          description="استثمار مجتمعي يربط علامتك التجارية بذاكرة وهوية المدينة. يقتصر قبول الرعايات على ٢٠ راعياً كحد أقصى لضمان حصرية وأناقة الظهور، مع أكثر من ٢ مليون مشاهدة مجتمعة لأعمالنا."
         />
 
         <div className="max-w-5xl mx-auto grid md:grid-cols-3 gap-6 mt-12">
           {[
             {
-              tier: "جزء من حلقة",
-              amount: "٢٠٠ JOD",
-              desc: "تساهم في جزءٍ من تكاليف حلقة (تنقّلات، تفريغ، صور).",
+              tier: "راعي ريل",
+              name: "Reel Sponsor",
+              amount: "٥٠٠ - ١,٠٠٠ JOD",
+              desc: "رعاية ريل واحد من مكتبة الريلز، يشمل بطاقة رعاية مستقلة والذكر في وصف المنشور.",
             },
             {
-              tier: "حلقة كاملة",
-              amount: "٧٥٠ JOD",
-              desc: "تغطّي تكاليف حلقة من البحث إلى التصوير إلى التلوين السينمائي.",
+              tier: "راعي أساسي",
+              name: "Basic Sponsor",
+              amount: "٢,٠٠٠ JOD",
+              desc: "يرتبط اسمك بإحدى الحلقات، ظهور ضمن شاشة الرعاة الجامعة، وإدراج في المواد الرقمية.",
               featured: true,
             },
             {
-              tier: "موسم كامل",
-              amount: "٤٠٠٠ JOD",
-              desc: "تحمي موسماً كاملاً من ست حلقات — ست قصصٍ تُروى وتُحفظ للأجيال.",
+              tier: "راعي حصري لحلقة",
+              name: "Exclusive Sponsor",
+              amount: "٥,٠٠٠ JOD",
+              desc: "شاشة «بدعم من» بشعار كبير للحلقة والريلز المرتبطة بها، وظهور أوضح في حملة الإطلاق.",
             },
           ].map((s) => (
             <div
@@ -177,44 +180,46 @@ function AboutPage() {
                 s.featured ? "border-primary/60 shadow-glow" : "border-border/60"
               }`}
             >
-              <div className="text-xs font-bold text-primary tracking-widest mb-2">{s.tier}</div>
-              <div className="font-display text-4xl text-gradient-gold mb-3">{s.amount}</div>
+              <div className="text-xs font-bold text-primary tracking-widest mb-1">{s.tier}</div>
+              <div className="text-[10px] uppercase text-muted-foreground mb-3">{s.name}</div>
+              <div className="font-display text-3xl text-gradient-gold mb-3" dir="ltr">{s.amount}</div>
               <p className="text-sm text-muted-foreground leading-relaxed mb-7">{s.desc}</p>
               <a
-
-                href="mailto:ahmad000haddad@gmail.com?subject=أرغب بدعم حلقة"
+                href="mailto:ahmad000haddad@gmail.com?subject=طلب رعاية - ناس إربد"
                 className="block text-center w-full py-3 rounded-full bg-gradient-warm text-primary-foreground text-sm font-bold shadow-glow hover:opacity-90"
               >
-                تواصل معنا
+                تواصل لحجز الرعاية
               </a>
             </div>
           ))}
         </div>
-        <p className="text-center text-xs text-muted-foreground/80 italic mt-8 max-w-xl mx-auto">
-          إن رغبتَ بعدم ذكر اسمك، نحترم ذلك.
-        </p>
+        
+        <div className="max-w-3xl mx-auto mt-12 p-6 rounded-2xl bg-secondary/30 border border-border/50">
+          <h4 className="font-display text-lg mb-3">قيمة ومحددات الظهور (ضوابط الرعاية):</h4>
+          <ul className="list-disc list-inside text-sm text-muted-foreground leading-relaxed space-y-2">
+            <li>شاشة مستقلة من 3 إلى 5 ثوانٍ بعنوان "بدعم من: [شعار الراعي]".</li>
+            <li>شعار أزرار ثابت، لا تدخل تحريري في المحتوى.</li>
+            <li>لا شعار داخل المشاهد أثناء السرد.</li>
+            <li>راعٍ كبير واحد لكل حلقة، وشاشة جامعة لا تتجاوز 20 شعاراً.</li>
+          </ul>
+        </div>
       </section>
 
 
       {/* ============ 3. Institutional Partners ============ */}
       <section id="partners" className="container mx-auto px-6 py-20 scroll-mt-24 border-t border-border/60">
         <SectionHeader
-          eyebrow="٣ · للمؤسسات"
-          title="دعم مؤسسي بروح المسؤولية"
-          description="ندعو المؤسسات التي تؤمن بأنّ صون الهويّة الثقافية مسؤوليّةٌ مشتركة. لا حزم إعلانية، ولا رعايات تجارية بمحتوى ممول — فقط دعمٌ نبيل لرسالةٍ نبيلة."
+          eyebrow="٣ · الشركاء المعرفيون"
+          title="شراكات لخدمة الذاكرة المشتركة"
+          description="ندعو المؤسسات الثقافية والجامعات والمنظمات غير الربحية التي تؤمن بأنّ صون الهويّة الثقافية مسؤوليّةٌ مشتركة، لنتعاون معاً في بناء هذا الأرشيف وإتاحته للجميع."
         />
 
         <div className="max-w-5xl mx-auto grid md:grid-cols-2 gap-6 mt-12">
           {[
             {
-              icon: Building2,
-              title: "شركات إربد المحلية",
-              desc: "إن كانت علامتك التجارية من إربد وتؤمن بأهميّة توثيق هويّة مدينتها، ندعوك لتكون شريكاً في الرسالة لا في الإعلان.",
-            },
-            {
               icon: Landmark,
               title: "المؤسسات الثقافية والحكومية",
-              desc: "أمانة إربد الكبرى، وزارة الثقافة، الجامعات، المراكز الثقافية — شراكاتٌ في خدمة الذاكرة المشتركة.",
+              desc: "أمانة إربد الكبرى، وزارة الثقافة، المراكز الثقافية — شراكاتٌ في خدمة الذاكرة المشتركة.",
             },
             {
               icon: Handshake,
