@@ -2,12 +2,12 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import {
   Heart, Coffee, Megaphone, Building2, Users, Camera, Mic2, Palette,
   Share2, MessageCircle, MapPin, Lightbulb, Handshake, GraduationCap,
-  Landmark, Sparkles, ArrowLeft, Quote, ArrowUp, Check, Scale
+  Landmark, Sparkles, ArrowLeft, Quote, ArrowUp, Check, Scale, Clock, Info
 } from "lucide-react";
 import { useSiteSettings } from "@/lib/site-settings";
 import { ReadingProgressBar } from "@/components/ui/reading-progress";
-import { motion, animate, useScroll, useSpring } from "framer-motion";
-import { useEffect, useState } from "react";
+import { motion, animate, useScroll, useSpring, AnimatePresence } from "framer-motion";
+import { useEffect, useState, useRef } from "react";
 import { toast } from "sonner";
 import { TextReveal } from "@/components/ui/text-reveal";
 import { FadeIn } from "@/components/ui/fade-in";
@@ -68,6 +68,23 @@ function AboutPage() {
   const contactEmail = settings?.contact_email ?? "ahmad000haddad@gmail.com";
   const [showScrollTop, setShowScrollTop] = useState(false);
   const [emailCopied, setEmailCopied] = useState(false);
+  
+  // Exit intent logic
+  const hasTriggeredExit = useRef(false);
+  useEffect(() => {
+    const handleMouseLeave = (e: MouseEvent) => {
+      if (e.clientY < 0 && !hasTriggeredExit.current && window.scrollY > 1000) {
+        hasTriggeredExit.current = true;
+        toast("لحظة من فضلك!", {
+          description: "حتى لو لم تدعمنا مالياً.. يمكنك دعمنا بأكثر من ١٢ طريقة مختلفة (مجاناً) 💛",
+          duration: 6000,
+          position: "top-center"
+        });
+      }
+    };
+    document.addEventListener("mouseleave", handleMouseLeave);
+    return () => document.removeEventListener("mouseleave", handleMouseLeave);
+  }, []);
 
   useEffect(() => {
     const handleScroll = () => setShowScrollTop(window.scrollY > 400);
@@ -101,7 +118,13 @@ function AboutPage() {
       {/* ============ Vision ============ */}
       <section className="container mx-auto px-6 pt-20 pb-16">
         <div className="max-w-3xl mx-auto text-center">
-          <span className="text-xs font-bold text-primary tracking-widest">عن البرنامج</span>
+          <div className="flex flex-col items-center gap-3 mb-3">
+            <span className="text-xs font-bold text-primary tracking-widest">عن البرنامج</span>
+            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-secondary/50 text-xs text-muted-foreground border border-border/50">
+              <Clock size={12} />
+              يستغرق القراءة: ٤ دقائق
+            </span>
+          </div>
           <TextReveal
             as="h1"
             by="word"
@@ -143,9 +166,18 @@ function AboutPage() {
             <Quote size={32} className="text-primary/20 absolute top-5 right-5 rotate-180 transition-transform duration-500 group-hover:scale-110 group-hover:text-primary/40" />
             <FadeIn delay={0.2}>
               <p className="text-lg md:text-xl text-foreground/90 leading-loose text-center font-display relative z-10">
-                نحنُ لا نطلبُ دعماً <span className="text-gradient-gold">مقابل خدمة</span>.
-                <br />
-                ولا نقدّمُ امتيازات للمتبرّعين.
+                نحنُ لا نطلبُ دعماً {" "}
+                <span className="relative inline-block whitespace-nowrap">
+                  <span className="relative z-10 text-gradient-gold">مقابل خدمة</span>
+                  <motion.span 
+                    initial={{ scaleX: 0 }}
+                    whileInView={{ scaleX: 1 }}
+                    viewport={{ once: true, margin: "-100px" }}
+                    transition={{ duration: 0.5, delay: 0.3 }}
+                    className="absolute top-1/2 left-0 w-full h-[3px] bg-red-500/80 -translate-y-1/2 origin-left z-20"
+                  />
+                </span>
+                .
                 <br />
                 ندعو فقط من يؤمن أنّ <span className="text-gradient-gold">حفظ الذاكرة مسؤولية</span>،
                 وأنّ هذا البرنامج يستحقّ أن يستمرّ
@@ -416,7 +448,20 @@ function AboutPage() {
             id="transparency"
             eyebrow="٥ · شفافية"
             title="أين يذهب كلّ دينار؟"
-            description="لأنّ الثقة أساس أيّ علاقة، ننشر تقريراً مفصّلاً عن كلّ مساهمة تصلنا — مهما كانت صغيرة."
+            description={
+              <span className="relative inline-flex items-center justify-center gap-2">
+                لأنّ الثقة أساس أيّ علاقة، ننشر تقريراً مفصّلاً عن كلّ مساهمة تصلنا — مهما كانت صغيرة.
+                <div className="group/fact relative inline-flex">
+                  <button className="text-primary hover:text-primary/80 transition-colors">
+                    <Info size={16} />
+                  </button>
+                  <div className="absolute bottom-full right-0 mb-2 w-64 p-3 bg-card border border-border/50 text-foreground text-xs rounded-xl opacity-0 group-hover/fact:opacity-100 transition-opacity pointer-events-none z-50 text-right shadow-lg">
+                    <span className="font-bold text-primary block mb-1">هل تعلم؟ 💡</span>
+                    تكلفة إنتاج حلقة وثائقية واحدة بمستوى "ناس إربد" في القنوات الفضائية تتجاوز 10,000 دولار، لكننا ننفذها بربع التكلفة بفضل الشغف والعمل التطوعي.
+                  </div>
+                </div>
+              </span>
+            }
           />
 
           <div className="mt-12">
@@ -431,8 +476,19 @@ function AboutPage() {
                 ].map((row) => (
                   <div key={row.l}>
                     <div className="flex justify-between text-xs mb-1.5 gap-3">
-                      <span className="text-foreground/80 font-semibold">{row.l}</span>
-                      <span className="font-bold text-primary shrink-0">{row.v}%</span>
+                      <span className="text-foreground/80 font-semibold group/tooltip relative cursor-help">
+                        {row.l === "المونتاج والتلوين السينمائي" ? (
+                          <>
+                            المونتاج و<span className="border-b border-dashed border-primary/50">التلوين السينمائي</span>
+                            <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-48 p-2 bg-foreground text-background text-[10px] rounded opacity-0 group-hover/tooltip:opacity-100 transition-opacity pointer-events-none z-50 text-center">
+                              لماذا هو مكلف؟ لأنه يتطلب أجهزة وتراخيص متخصصة لتوحيد ألوان الكاميرات وإعطاء الطابع الوثائقي.
+                            </span>
+                          </>
+                        ) : row.l}
+                      </span>
+                      <span className="font-bold text-primary shrink-0">
+                        <AnimatedCounter from={0} to={row.v} formatter={(v) => `${Math.round(v)}%`} />
+                      </span>
                     </div>
                     <div className="h-2.5 rounded-full bg-muted overflow-hidden">
                       <motion.div 
@@ -464,20 +520,39 @@ function AboutPage() {
             ونحن نرتّب معك أنسب طريقة — حسب وقتك وإمكانياتك.
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 relative z-10">
-            <a
-              href={`mailto:${contactEmail}?subject=بدّي أساهم في ناس إربد`}
-              className="inline-flex items-center justify-center gap-2 px-8 py-3.5 rounded-full bg-background text-foreground text-sm font-bold hover:bg-background/90 transition group/btn hover:scale-105"
-            >
-              <Heart size={16} fill="currentColor" className="text-primary transition-transform duration-300 group-hover/btn:scale-125 group-hover/btn:animate-pulse" />
-              راسلنا الآن
-            </a>
-            <button
-              onClick={copyEmail}
-              className="inline-flex items-center justify-center gap-2 px-8 py-3.5 rounded-full border border-primary-foreground/30 text-primary-foreground text-sm font-bold hover:bg-primary-foreground/10 transition"
-            >
-              {emailCopied ? <Check size={16} /> : <Share2 size={16} />}
-              {emailCopied ? "تم النسخ" : "انسخ البريد"}
-            </button>
+            <div className="relative group/glow">
+              <div className="absolute -inset-0.5 bg-gradient-to-r from-primary via-background to-primary rounded-full blur opacity-30 group-hover/glow:opacity-75 transition duration-1000 group-hover/glow:duration-200 animate-tilt"></div>
+              <a
+                href={`mailto:${contactEmail}?subject=بدّي أساهم في ناس إربد`}
+                className="relative inline-flex items-center justify-center gap-2 px-8 py-3.5 rounded-full bg-background text-foreground text-sm font-bold hover:bg-background/90 transition group/btn hover:scale-105"
+              >
+                <Heart size={16} fill="currentColor" className="text-primary transition-transform duration-300 group-hover/btn:scale-125 group-hover/btn:animate-pulse" />
+                <span className="group-hover/btn:hidden">راسلنا الآن</span>
+                <span className="hidden group-hover/btn:inline-block">{contactEmail}</span>
+              </a>
+            </div>
+            
+            <div className="relative">
+              <button
+                onClick={copyEmail}
+                className="inline-flex items-center justify-center gap-2 px-8 py-3.5 rounded-full border border-primary-foreground/30 text-primary-foreground text-sm font-bold hover:bg-primary-foreground/10 transition"
+              >
+                {emailCopied ? <Check size={16} /> : <Share2 size={16} />}
+                {emailCopied ? "تم النسخ" : "انسخ البريد"}
+              </button>
+              <AnimatePresence>
+                {emailCopied && (
+                  <motion.div
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0 }}
+                    className="absolute top-full left-1/2 -translate-x-1/2 mt-3 w-48 text-center text-[11px] text-primary-foreground/80 bg-background/20 backdrop-blur-sm rounded py-1 px-2 pointer-events-none"
+                  >
+                    يمكنك الآن لصقه في تطبيق البريد الخاص بك
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
           </div>
         </div>
       </section>
