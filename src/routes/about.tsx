@@ -43,6 +43,26 @@ function AnimatedCounter({ from, to, formatter }: { from: number; to: number; fo
   return <>{displayValue}</>;
 }
 
+function GlowCard({ children, className }: { children: React.ReactNode; className?: string }) {
+  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
+  const handleMouseMove = (e: React.MouseEvent) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    setMousePosition({ x: e.clientX - rect.left, y: e.clientY - rect.top });
+  };
+  return (
+    <div onMouseMove={handleMouseMove} className={`group relative overflow-hidden ${className}`}>
+      <div 
+        className="pointer-events-none absolute -inset-px rounded-2xl opacity-0 transition duration-300 group-hover:opacity-100"
+        style={{
+          background: `radial-gradient(400px circle at ${mousePosition.x}px ${mousePosition.y}px, rgba(196, 164, 107, 0.15), transparent 40%)`,
+          zIndex: 1
+        }}
+      />
+      <div className="relative z-10 h-full">{children}</div>
+    </div>
+  );
+}
+
 function AboutPage() {
   const { data: settings } = useSiteSettings();
   const contactEmail = settings?.contact_email ?? "ahmad000haddad@gmail.com";
@@ -82,14 +102,21 @@ function AboutPage() {
       <section className="container mx-auto px-6 pt-20 pb-16">
         <div className="max-w-3xl mx-auto text-center">
           <span className="text-xs font-bold text-primary tracking-widest">عن البرنامج</span>
-          <h1 className="font-display text-5xl md:text-6xl mt-3 mb-6 text-foreground">
-            نوثّقُ إربد <span className="text-gradient-gold">بصوت أهلها</span>
-          </h1>
-          <p className="text-lg text-muted-foreground leading-relaxed">
-            «ناس إربد» مشروع وثائقي مستقل، يولد من إيمانٍ بأن المدن تحيا بذاكرة ناسها.
-            نسجّل القصص قبل أن تضيع، نوثّق المهن قبل أن تنقرض، ونحفظ لهجة المدينة وأسماء حاراتها
-            من النسيان. كل حلقة هي رسالة حب من جيلٍ لجيل.
-          </p>
+          <TextReveal
+            as="h1"
+            by="word"
+            delay={0.1}
+            className="font-display text-5xl md:text-6xl mt-3 mb-6 text-foreground"
+          >
+            نوثّقُ إربد بصوت أهلها
+          </TextReveal>
+          <FadeIn delay={0.3}>
+            <p className="text-lg text-muted-foreground leading-relaxed">
+              «ناس إربد» مشروع وثائقي مستقل، يولد من إيمانٍ بأن المدن تحيا بذاكرة ناسها.
+              نسجّل القصص قبل أن تضيع، نوثّق المهن قبل أن تنقرض، ونحفظ لهجة المدينة وأسماء حاراتها
+              من النسيان. كل حلقة هي رسالة حب من جيلٍ لجيل.
+            </p>
+          </FadeIn>
         </div>
 
       </section>
@@ -242,14 +269,14 @@ function AboutPage() {
               featured: true,
             },
           ].map((s) => (
-            <div
+            <GlowCard
               key={s.tier}
-              className={`relative p-8 rounded-2xl bg-card border transition group hover:-translate-y-1 ${
+              className={`p-8 rounded-2xl bg-card border transition-all duration-300 hover:-translate-y-1 ${
                 s.featured ? "border-primary/60 shadow-glow" : "border-border/60 hover:border-primary/40"
               }`}
             >
               {s.featured && (
-                <div className="absolute -top-1.5 -right-1.5 w-3 h-3">
+                <div className="absolute -top-1.5 -right-1.5 w-3 h-3 z-20">
                   <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
                   <span className="relative inline-flex rounded-full h-3 w-3 bg-primary"></span>
                 </div>
@@ -258,7 +285,7 @@ function AboutPage() {
               <div className="text-[10px] uppercase text-muted-foreground mb-3">{s.name}</div>
               <div className="font-display text-3xl text-gradient-gold mb-3" dir="ltr">{s.amount}</div>
               <p className="text-sm text-muted-foreground leading-relaxed mb-7">{s.desc}</p>
-            </div>
+            </GlowCard>
           ))}
         </div>
 
