@@ -256,14 +256,17 @@ function AboutPage() {
               <div className="text-[10px] uppercase text-muted-foreground mb-3">{s.name}</div>
               <div className="font-display text-3xl text-gradient-gold mb-3" dir="ltr">{s.amount}</div>
               <p className="text-sm text-muted-foreground leading-relaxed mb-7">{s.desc}</p>
-              <a
-                href="mailto:ahmad000haddad@gmail.com?subject=طلب رعاية - ناس إربد"
-                className="block text-center w-full py-3 rounded-full bg-gradient-warm text-primary-foreground text-sm font-bold shadow-glow hover:opacity-90"
-              >
-                تواصل لحجز الرعاية
-              </a>
             </div>
           ))}
+        </div>
+
+        <div className="flex justify-center mt-10">
+          <a
+            href="mailto:ahmad000haddad@gmail.com?subject=طلب رعاية - ناس إربد"
+            className="inline-flex items-center gap-2 px-8 py-3.5 rounded-full bg-gradient-warm text-primary-foreground text-sm font-bold shadow-glow hover:opacity-90 transition hover:scale-105"
+          >
+            تواصل معنا لحجز رعايتك
+          </a>
         </div>
         
         <div className="max-w-3xl mx-auto mt-12 p-6 rounded-2xl bg-secondary/30 border border-border/50">
