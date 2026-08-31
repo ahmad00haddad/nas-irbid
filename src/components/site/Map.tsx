@@ -336,12 +336,18 @@ function BottomSheet({
 }
 
 function MapInteractionWatcher({ onInteract }: { onInteract: () => void }) {
-  useMapEvents({
+  const map = useMapEvents({
     mousedown: onInteract,
-    touchstart: onInteract,
     wheel: onInteract,
     keydown: onInteract,
   });
+
+  useEffect(() => {
+    const el = map.getContainer();
+    el.addEventListener("touchstart", onInteract, { passive: true });
+    return () => el.removeEventListener("touchstart", onInteract);
+  }, [map, onInteract]);
+
   return null;
 }
 
@@ -843,13 +849,13 @@ export default function Map({ episodes }: { episodes: Episode[] }) {
                           <ChevronRight size={13} /> السابق
                         </button>
                         <span className="text-[10px] font-bold px-1" style={{ color: PIN_COLOR }}>
-                          {tourIndex + 1}/{trailEpisodes.length}
+                          {(tourIndex ?? 0) + 1}/{trailEpisodes.length}
                         </span>
                         <button onClick={nextTourStop} disabled={tourIndex === trailEpisodes.length - 1} className="flex-1 flex items-center justify-center gap-1 py-1.5 rounded-lg text-[11px] font-bold bg-black/6 hover:bg-black/10 disabled:opacity-40 transition">
                           التالي <ChevronLeft size={13} />
                         </button>
                       </div>
-                      {trailEpisodes[tourIndex] && (
+                      {tourIndex !== null && trailEpisodes[tourIndex] && (
                         <p className="text-[10px] text-center font-bold line-clamp-1" style={{ color: "#6b4c35" }}>
                           {trailEpisodes[tourIndex].title}
                         </p>
