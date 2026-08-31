@@ -461,9 +461,9 @@ export default function Map({ episodes }: { episodes: Episode[] }) {
       className="flex-1 w-full h-full min-h-[calc(100vh-80px)] relative z-0"
     >
       {/* ── preconnect for tile server (perf) ── */}
-      <link rel="preconnect" href="https://a.basemaps.cartocdn.com" crossOrigin="anonymous" />
-      <link rel="preconnect" href="https://b.basemaps.cartocdn.com" crossOrigin="anonymous" />
-      <link rel="preconnect" href="https://c.basemaps.cartocdn.com" crossOrigin="anonymous" />
+      <link rel="preconnect" href="https://a.tile.openstreetmap.org" crossOrigin="anonymous" />
+      <link rel="preconnect" href="https://b.tile.openstreetmap.org" crossOrigin="anonymous" />
+      <link rel="preconnect" href="https://c.tile.openstreetmap.org" crossOrigin="anonymous" />
 
       {/* ── noscript / SEO text list ── */}
       <noscript>
@@ -667,8 +667,8 @@ export default function Map({ episodes }: { episodes: Episode[] }) {
         <MapInteractionWatcher onInteract={() => setHasInteracted(true)} />
         <TileLayer
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank">OpenStreetMap</a>'
-          url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png"
-          maxZoom={20}
+          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+          maxZoom={19}
         />
         <ZoomControl position="bottomright" />
         <FitToMarkers episodes={filteredEpisodes} />
