@@ -338,15 +338,19 @@ function BottomSheet({
 function MapInteractionWatcher({ onInteract }: { onInteract: () => void }) {
   const map = useMapEvents({
     mousedown: onInteract,
-    wheel: onInteract,
     keydown: onInteract,
   });
 
   useEffect(() => {
     const el = map.getContainer();
     el.addEventListener("touchstart", onInteract, { passive: true });
-    return () => el.removeEventListener("touchstart", onInteract);
+    el.addEventListener("wheel", onInteract, { passive: true });
+    return () => {
+      el.removeEventListener("touchstart", onInteract);
+      el.removeEventListener("wheel", onInteract);
+    };
   }, [map, onInteract]);
+
 
   return null;
 }
