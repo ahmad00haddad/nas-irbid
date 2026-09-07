@@ -338,15 +338,19 @@ function BottomSheet({
 function MapInteractionWatcher({ onInteract }: { onInteract: () => void }) {
   const map = useMapEvents({
     mousedown: onInteract,
-    wheel: onInteract,
     keydown: onInteract,
   });
 
   useEffect(() => {
     const el = map.getContainer();
     el.addEventListener("touchstart", onInteract, { passive: true });
-    return () => el.removeEventListener("touchstart", onInteract);
+    el.addEventListener("wheel", onInteract, { passive: true });
+    return () => {
+      el.removeEventListener("touchstart", onInteract);
+      el.removeEventListener("wheel", onInteract);
+    };
   }, [map, onInteract]);
+
 
   return null;
 }
@@ -855,11 +859,17 @@ export default function Map({ episodes }: { episodes: Episode[] }) {
                           التالي <ChevronLeft size={13} />
                         </button>
                       </div>
-                      {tourIndex !== null && trailEpisodes[tourIndex] && (
-                        <p className="text-[10px] text-center font-bold line-clamp-1" style={{ color: "#6b4c35" }}>
-                          {trailEpisodes[tourIndex].title}
-                        </p>
-                      )}
+                      {(() => {
+                        const ep = trailEpisodes[tourIndex ?? 0];
+                        if (!ep) return null;
+                        return (
+                          <p className="text-[10px] text-center font-bold line-clamp-1" style={{ color: "#6b4c35" }}>
+                            {ep.title}
+                          </p>
+                        );
+                      })()}
+
+
                       <button onClick={endTour} className="w-full mt-1.5 py-1 text-[10px] text-center text-red-500 hover:underline">
                         إنهاء الجولة
                       </button>
