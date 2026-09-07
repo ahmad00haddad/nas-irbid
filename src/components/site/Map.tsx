@@ -859,11 +859,18 @@ export default function Map({ episodes }: { episodes: Episode[] }) {
                           التالي <ChevronLeft size={13} />
                         </button>
                       </div>
-                      {tourIndex !== null && trailEpisodes[tourIndex] && (
-                        <p className="text-[10px] text-center font-bold line-clamp-1" style={{ color: "#6b4c35" }}>
-                          {trailEpisodes[tourIndex].title}
-                        </p>
-                      )}
+                      {(() => {
+                        const idx = tourIndex;
+                        if (idx === null) return null;
+                        const ep = trailEpisodes[idx];
+                        if (!ep) return null;
+                        return (
+                          <p className="text-[10px] text-center font-bold line-clamp-1" style={{ color: "#6b4c35" }}>
+                            {ep.title}
+                          </p>
+                        );
+                      })()}
+
                       <button onClick={endTour} className="w-full mt-1.5 py-1 text-[10px] text-center text-red-500 hover:underline">
                         إنهاء الجولة
                       </button>
