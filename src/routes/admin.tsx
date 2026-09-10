@@ -1,7 +1,11 @@
 import { createFileRoute, Outlet, Link, redirect } from "@tanstack/react-router";
+import { useQuery } from "@tanstack/react-query";
 import { useAuth } from "@/lib/auth";
 import { supabase } from "@/integrations/supabase/client";
-import { LayoutDashboard, Film, Users, MessageSquare, HelpCircle, LogOut, Settings, ShieldAlert, BarChart3 } from "lucide-react";
+import { LayoutDashboard, Film, Users, MessageSquare, HelpCircle, LogOut, Settings, ShieldAlert, BarChart3, Search, Compass } from "lucide-react";
+import { AdminTour, startAdminTour } from "@/components/admin/AdminTour";
+import { AdminCommandPalette, openAdminPalette } from "@/components/admin/AdminCommandPalette";
+import { AdminHint } from "@/components/admin/AdminHint";
 
 export const Route = createFileRoute("/admin")({
   // Client-only render so the admin shell never appears in server HTML — no SSR flash.
