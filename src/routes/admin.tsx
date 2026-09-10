@@ -20,20 +20,37 @@ export const Route = createFileRoute("/admin")({
   head: () => ({ meta: [{ title: "لوحة الإدارة · ناس إربد" }, { name: "robots", content: "noindex" }] }),
 });
 
+type NavItem = { to: string; label: string; icon: any; exact?: boolean; badge?: "msgs" | "sugs" };
+
 // Nav items visible to all editors (admin + editor role)
-const editorNav: { to: string; label: string; icon: typeof LayoutDashboard; exact?: boolean }[] = [
+const editorNav: NavItem[] = [
   { to: "/admin", label: "نظرة عامة", icon: LayoutDashboard, exact: true },
   { to: "/admin/episodes", label: "الحلقات", icon: Film },
-  { to: "/admin/suggestions", label: "الاقتراحات", icon: Users },
+  { to: "/admin/suggestions", label: "الاقتراحات", icon: Users, badge: "sugs" },
   { to: "/admin/questions", label: "بنك الأسئلة", icon: HelpCircle },
-  { to: "/admin/messages", label: "الرسائل", icon: MessageSquare },
+  { to: "/admin/messages", label: "الرسائل", icon: MessageSquare, badge: "msgs" },
 ];
 
 // Nav items visible only to admins
-const adminOnlyNav: { to: string; label: string; icon: any }[] = [
+const adminOnlyNav: NavItem[] = [
   { to: "/admin/analytics", label: "إحصائيات الموقع", icon: BarChart3 },
   { to: "/admin/settings", label: "إعدادات الموقع", icon: Settings },
 ];
+
+// Live "needs attention" counters shown as pulsing badges next to nav links.
+function useAdminCounts() {
+  return useQuery({
+    queryKey: ["admin-counts"],
+    queryFn: async () => {
+      const [msgs, sugs] = await Promise.all([
+        supabase.from("contact_messages").select("id", { count: "exact", head: true }).eq("handled", false),
+        supabase.from("guest_suggestions").select("id", { count: "exact", head: true }).eq("status", "new"),
+      ]);
+      return { msgs: msgs.count ?? 0, sugs: sugs.count ?? 0 };
+    },
+    staleTime: 30_000,
+  });
+}
 
 function AdminLayout() {
   const { user, loading, isEditor, isAdmin, signOut } = useAuth();
