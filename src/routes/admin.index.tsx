@@ -3,8 +3,12 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import {
   Film, Users, MessageSquare, HelpCircle, Eye, Clock,
-  Inbox, CheckCircle2, ArrowLeft, Sparkles,
+  Inbox, ArrowLeft, Sparkles,
 } from "lucide-react";
+import { Skeleton } from "@/components/ui/skeleton";
+import { CountUp } from "@/components/admin/CountUp";
+import { AdminHint } from "@/components/admin/AdminHint";
+import { relativeTimeAr, fullDateAr } from "@/lib/relative-time";
 
 export const Route = createFileRoute("/admin/")({
   component: AdminHome,
