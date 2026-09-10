@@ -3,8 +3,12 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import {
   Film, Users, MessageSquare, HelpCircle, Eye, Clock,
-  Inbox, CheckCircle2, ArrowLeft, Sparkles,
+  Inbox, ArrowLeft, Sparkles,
 } from "lucide-react";
+import { Skeleton } from "@/components/ui/skeleton";
+import { CountUp } from "@/components/admin/CountUp";
+import { AdminHint } from "@/components/admin/AdminHint";
+import { relativeTimeAr, fullDateAr } from "@/lib/relative-time";
 
 export const Route = createFileRoute("/admin/")({
   component: AdminHome,
@@ -46,10 +50,26 @@ function AdminHome() {
   });
 
   const stats = [
-    { label: "حلقات منشورة", value: data?.epsPublished ?? "—", sub: `${data?.epsDraft ?? 0} مسودّة`, icon: Film, href: "/admin/episodes" },
-    { label: "رسائل جديدة", value: data?.msgsNew ?? "—", sub: `${data?.msgsAll ?? 0} إجمالاً`, icon: Inbox, href: "/admin/messages", urgent: (data?.msgsNew ?? 0) > 0 },
-    { label: "اقتراحات جديدة", value: data?.sugNew ?? "—", sub: `${data?.sugAll ?? 0} إجمالاً`, icon: Users, href: "/admin/suggestions", urgent: (data?.sugNew ?? 0) > 0 },
-    { label: "أسئلة في البنك", value: data?.qsAll ?? "—", sub: "للاستخدام بالحلقات", icon: HelpCircle, href: "/admin/questions" },
+    {
+      label: "حلقات منشورة", value: data?.epsPublished ?? 0, sub: `${data?.epsDraft ?? 0} مسودّة`,
+      icon: Film, href: "/admin/episodes",
+      hint: "المنشورة يراها الزوّار على الموقع مباشرة. المسودّة محفوظة عندك فقط ولا تظهر لأحد حتى تضغط «نشر».",
+    },
+    {
+      label: "رسائل جديدة", value: data?.msgsNew ?? 0, sub: `${data?.msgsAll ?? 0} إجمالاً`,
+      icon: Inbox, href: "/admin/messages", urgent: (data?.msgsNew ?? 0) > 0,
+      hint: "رسائل وصلت من صفحة التواصل ولم تُميَّز كمُعالجة بعد. ميّزها بعد الرد حتى يختفي التنبيه.",
+    },
+    {
+      label: "اقتراحات جديدة", value: data?.sugNew ?? 0, sub: `${data?.sugAll ?? 0} إجمالاً`,
+      icon: Users, href: "/admin/suggestions", urgent: (data?.sugNew ?? 0) > 0,
+      hint: "شخصيات رشّحها الجمهور بانتظار مراجعتك: تواصل معها، اقبلها للتصوير، أو استبعدها.",
+    },
+    {
+      label: "أسئلة في البنك", value: data?.qsAll ?? 0, sub: "للاستخدام بالحلقات",
+      icon: HelpCircle, href: "/admin/questions",
+      hint: "أسئلة أرسلها الجمهور للضيوف. ميّز الأفضل بالنجمة لتجدها بسرعة قبل التصوير.",
+    },
   ];
 
   if (isError) {
