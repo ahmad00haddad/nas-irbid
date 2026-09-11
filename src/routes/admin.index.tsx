@@ -92,26 +92,36 @@ function AdminHome() {
       </div>
 
       {/* Stats Grid */}
-      <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-10">
-        {stats.map((c) => (
-          <Link
-            to={c.href as "/admin"}
-            key={c.label}
-            className={`p-5 rounded-2xl bg-card border transition hover:-translate-y-0.5 ${c.urgent ? "border-primary/60 shadow-glow" : "border-border/60 hover:border-primary/40"}`}
-          >
-            <div className="flex items-start justify-between mb-3">
-              <c.icon size={20} className={c.urgent ? "text-primary" : "text-muted-foreground"} />
-              {c.urgent && <span className="text-[10px] font-bold text-primary tracking-widest">جديد</span>}
-            </div>
-            <div className="font-display text-3xl text-foreground">{isLoading ? "…" : c.value}</div>
-            <div className="text-xs text-muted-foreground mt-1">{c.label}</div>
-            <div className="text-[11px] text-muted-foreground/70 mt-2 pt-2 border-t border-border/40">{c.sub}</div>
-          </Link>
-        ))}
+      <div data-tour="stats" className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-10">
+        {isLoading
+          ? Array.from({ length: 4 }).map((_, i) => <Skeleton key={i} className="h-36 w-full rounded-2xl" />)
+          : stats.map((c, i) => (
+            <Link
+              to={c.href as "/admin"}
+              key={c.label}
+              style={{ animationDelay: `${i * 70}ms` }}
+              className={`group p-5 rounded-2xl bg-card border transition-all duration-300 hover:-translate-y-1 hover:shadow-deep animate-in fade-in-0 slide-in-from-bottom-2 fill-mode-both ${c.urgent ? "border-primary/60 shadow-glow" : "border-border/60 hover:border-primary/40"}`}
+            >
+              <div className="flex items-start justify-between mb-3">
+                <c.icon size={20} className={`transition-transform duration-300 group-hover:scale-110 ${c.urgent ? "text-primary" : "text-muted-foreground"}`} />
+                <div className="flex items-center gap-1.5">
+                  {c.urgent && (
+                    <span className="inline-flex items-center gap-1 text-[10px] font-bold text-primary tracking-widest">
+                      <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" /> جديد
+                    </span>
+                  )}
+                  <AdminHint label={`شرح ${c.label}`}>{c.hint}</AdminHint>
+                </div>
+              </div>
+              <div className="font-display text-3xl text-foreground tabular-nums"><CountUp value={Number(c.value)} /></div>
+              <div className="text-xs text-muted-foreground mt-1">{c.label}</div>
+              <div className="text-[11px] text-muted-foreground/70 mt-2 pt-2 border-t border-border/40">{c.sub}</div>
+            </Link>
+          ))}
       </div>
 
       {/* Recent Activity */}
-      <div className="grid lg:grid-cols-3 gap-5">
+      <div data-tour="activity" className="grid lg:grid-cols-3 gap-5">
         <ActivityCard
           title="أحدث الرسائل"
           icon={MessageSquare}
