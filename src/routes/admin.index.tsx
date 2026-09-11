@@ -198,16 +198,20 @@ function ActivityCard({ title, icon: Icon, href, items, empty }: {
         <p className="text-sm text-muted-foreground text-center py-6">{empty}</p>
       ) : (
         <ul className="space-y-2.5">
-          {items.map((it) => (
-            <li key={it.id} className="text-sm border-b border-border/40 last:border-b-0 pb-2.5 last:pb-0">
+          {items.map((it, i) => (
+            <li
+              key={it.id}
+              style={{ animationDelay: `${i * 50}ms` }}
+              className="group text-sm border-b border-border/40 last:border-b-0 pb-2.5 last:pb-0 animate-in fade-in-0 slide-in-from-bottom-1 fill-mode-both"
+            >
               <div className="flex items-start justify-between gap-2">
-                <span className="text-foreground font-semibold line-clamp-1 flex-1">{it.primary}</span>
+                <span className="text-foreground font-semibold line-clamp-1 flex-1 transition-colors group-hover:text-primary">{it.primary}</span>
                 {it.badge && <span className="text-[10px] font-bold text-primary bg-primary/10 px-2 py-0.5 rounded-full shrink-0">{it.badge}</span>}
               </div>
               {it.secondary && <div className="text-xs text-muted-foreground mt-0.5">{it.secondary}</div>}
               {it.time && (
-                <div className="text-[11px] text-muted-foreground/70 mt-1 inline-flex items-center gap-1">
-                  <Clock size={10} /> {new Date(it.time).toLocaleDateString("ar")}
+                <div className="text-[11px] text-muted-foreground/70 mt-1 inline-flex items-center gap-1" title={fullDateAr(it.time)}>
+                  <Clock size={10} /> {relativeTimeAr(it.time)}
                 </div>
               )}
             </li>
