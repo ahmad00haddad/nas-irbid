@@ -164,7 +164,7 @@ function AdminHome() {
       </div>
 
       {/* Quick Actions */}
-      <div className="mt-10 p-6 rounded-2xl bg-card border border-border/60">
+      <div data-tour="quick" className="mt-10 p-6 rounded-2xl bg-card border border-border/60">
         <h2 className="font-display text-xl text-foreground mb-4">إجراءات سريعة</h2>
         <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-3">
           <QuickAction to="/admin/episodes" icon={Film} label="إدارة الحلقات" />
