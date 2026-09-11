@@ -92,26 +92,36 @@ function AdminHome() {
       </div>
 
       {/* Stats Grid */}
-      <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-10">
-        {stats.map((c) => (
-          <Link
-            to={c.href as "/admin"}
-            key={c.label}
-            className={`p-5 rounded-2xl bg-card border transition hover:-translate-y-0.5 ${c.urgent ? "border-primary/60 shadow-glow" : "border-border/60 hover:border-primary/40"}`}
-          >
-            <div className="flex items-start justify-between mb-3">
-              <c.icon size={20} className={c.urgent ? "text-primary" : "text-muted-foreground"} />
-              {c.urgent && <span className="text-[10px] font-bold text-primary tracking-widest">جديد</span>}
-            </div>
-            <div className="font-display text-3xl text-foreground">{isLoading ? "…" : c.value}</div>
-            <div className="text-xs text-muted-foreground mt-1">{c.label}</div>
-            <div className="text-[11px] text-muted-foreground/70 mt-2 pt-2 border-t border-border/40">{c.sub}</div>
-          </Link>
-        ))}
+      <div data-tour="stats" className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-10">
+        {isLoading
+          ? Array.from({ length: 4 }).map((_, i) => <Skeleton key={i} className="h-36 w-full rounded-2xl" />)
+          : stats.map((c, i) => (
+            <Link
+              to={c.href as "/admin"}
+              key={c.label}
+              style={{ animationDelay: `${i * 70}ms` }}
+              className={`group p-5 rounded-2xl bg-card border transition-all duration-300 hover:-translate-y-1 hover:shadow-deep animate-in fade-in-0 slide-in-from-bottom-2 fill-mode-both ${c.urgent ? "border-primary/60 shadow-glow" : "border-border/60 hover:border-primary/40"}`}
+            >
+              <div className="flex items-start justify-between mb-3">
+                <c.icon size={20} className={`transition-transform duration-300 group-hover:scale-110 ${c.urgent ? "text-primary" : "text-muted-foreground"}`} />
+                <div className="flex items-center gap-1.5">
+                  {c.urgent && (
+                    <span className="inline-flex items-center gap-1 text-[10px] font-bold text-primary tracking-widest">
+                      <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" /> جديد
+                    </span>
+                  )}
+                  <AdminHint label={`شرح ${c.label}`}>{c.hint}</AdminHint>
+                </div>
+              </div>
+              <div className="font-display text-3xl text-foreground tabular-nums"><CountUp value={Number(c.value)} /></div>
+              <div className="text-xs text-muted-foreground mt-1">{c.label}</div>
+              <div className="text-[11px] text-muted-foreground/70 mt-2 pt-2 border-t border-border/40">{c.sub}</div>
+            </Link>
+          ))}
       </div>
 
       {/* Recent Activity */}
-      <div className="grid lg:grid-cols-3 gap-5">
+      <div data-tour="activity" className="grid lg:grid-cols-3 gap-5">
         <ActivityCard
           title="أحدث الرسائل"
           icon={MessageSquare}
@@ -154,7 +164,7 @@ function AdminHome() {
       </div>
 
       {/* Quick Actions */}
-      <div className="mt-10 p-6 rounded-2xl bg-card border border-border/60">
+      <div data-tour="quick" className="mt-10 p-6 rounded-2xl bg-card border border-border/60">
         <h2 className="font-display text-xl text-foreground mb-4">إجراءات سريعة</h2>
         <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-3">
           <QuickAction to="/admin/episodes" icon={Film} label="إدارة الحلقات" />
@@ -188,16 +198,20 @@ function ActivityCard({ title, icon: Icon, href, items, empty }: {
         <p className="text-sm text-muted-foreground text-center py-6">{empty}</p>
       ) : (
         <ul className="space-y-2.5">
-          {items.map((it) => (
-            <li key={it.id} className="text-sm border-b border-border/40 last:border-b-0 pb-2.5 last:pb-0">
+          {items.map((it, i) => (
+            <li
+              key={it.id}
+              style={{ animationDelay: `${i * 50}ms` }}
+              className="group text-sm border-b border-border/40 last:border-b-0 pb-2.5 last:pb-0 animate-in fade-in-0 slide-in-from-bottom-1 fill-mode-both"
+            >
               <div className="flex items-start justify-between gap-2">
-                <span className="text-foreground font-semibold line-clamp-1 flex-1">{it.primary}</span>
+                <span className="text-foreground font-semibold line-clamp-1 flex-1 transition-colors group-hover:text-primary">{it.primary}</span>
                 {it.badge && <span className="text-[10px] font-bold text-primary bg-primary/10 px-2 py-0.5 rounded-full shrink-0">{it.badge}</span>}
               </div>
               {it.secondary && <div className="text-xs text-muted-foreground mt-0.5">{it.secondary}</div>}
               {it.time && (
-                <div className="text-[11px] text-muted-foreground/70 mt-1 inline-flex items-center gap-1">
-                  <Clock size={10} /> {new Date(it.time).toLocaleDateString("ar")}
+                <div className="text-[11px] text-muted-foreground/70 mt-1 inline-flex items-center gap-1" title={fullDateAr(it.time)}>
+                  <Clock size={10} /> {relativeTimeAr(it.time)}
                 </div>
               )}
             </li>
