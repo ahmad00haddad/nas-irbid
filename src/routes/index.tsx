@@ -12,7 +12,7 @@ import { Magnetic } from "@/components/ui/magnetic";
 import { TextReveal } from "@/components/ui/text-reveal";
 import { HorizontalScroll } from "@/components/ui/horizontal-scroll";
 import { Marquee } from "@/components/ui/marquee";
-import { motion } from "framer-motion";
+import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 
 const MotionLink = motion.create(Link);
 
@@ -48,7 +48,69 @@ function AnimatedCounter({ from, to, formatter }: { from: number; to: number; fo
   return <>{displayValue}</>;
 }
 
+const goldParticles = [
+  { x: -104, y: -58, size: 5, delay: 0 },
+  { x: -76, y: -112, size: 3, delay: 0.05 },
+  { x: -30, y: -138, size: 4, delay: 0.1 },
+  { x: 22, y: -126, size: 3, delay: 0.14 },
+  { x: 70, y: -96, size: 5, delay: 0.18 },
+  { x: 108, y: -48, size: 3, delay: 0.22 },
+  { x: -118, y: 2, size: 3, delay: 0.25 },
+  { x: 122, y: 8, size: 4, delay: 0.28 },
+];
+
+function IdleGoldParticles() {
+  const reduceMotion = useReducedMotion();
+  const [visible, setVisible] = useState(false);
+
+  useEffect(() => {
+    if (reduceMotion) return;
+    let timer = window.setTimeout(() => setVisible(true), 8000);
+    const reset = () => {
+      window.clearTimeout(timer);
+      if (!visible) timer = window.setTimeout(() => setVisible(true), 8000);
+    };
+    window.addEventListener("pointermove", reset, { passive: true });
+    window.addEventListener("keydown", reset);
+    window.addEventListener("scroll", reset, { passive: true });
+    return () => {
+      window.clearTimeout(timer);
+      window.removeEventListener("pointermove", reset);
+      window.removeEventListener("keydown", reset);
+      window.removeEventListener("scroll", reset);
+    };
+  }, [reduceMotion, visible]);
+
+  return (
+    <AnimatePresence>
+      {visible && (
+        <motion.div
+          aria-hidden="true"
+          className="pointer-events-none absolute left-1/2 top-[38%] z-[2]"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: [0, 1, 1, 0] }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 2.4 }}
+          onAnimationComplete={() => setVisible(false)}
+        >
+          {goldParticles.map((particle, index) => (
+            <motion.span
+              key={index}
+              className="absolute rounded-full bg-gold shadow-glow"
+              style={{ width: particle.size, height: particle.size }}
+              initial={{ x: 0, y: 0, scale: 0 }}
+              animate={{ x: particle.x, y: particle.y, scale: [0, 1, 0], rotate: 90 }}
+              transition={{ duration: 1.7, delay: particle.delay, ease: [0.22, 1, 0.36, 1] }}
+            />
+          ))}
+        </motion.div>
+      )}
+    </AnimatePresence>
+  );
+}
+
 function Index() {
+  const reduceMotion = useReducedMotion();
   const { data: settings } = useSiteSettings();
   const { data: episodes = [], isLoading, isError, refetch } = useQuery({
     queryKey: ["home-episodes"],
@@ -99,20 +161,36 @@ function Index() {
       {/* HERO TEXT */}
       <section className="relative overflow-hidden border-b border-border/60">
         <div className="arch-backdrop" aria-hidden="true" />
+        <IdleGoldParticles />
+        <motion.div
+          aria-hidden="true"
+          className="absolute left-[12%] top-[26%] z-[2] hidden items-center justify-center rounded-full border border-gold/50 bg-card/80 p-2 text-primary shadow-deep backdrop-blur-sm md:flex"
+          initial={{ opacity: 0, y: -20, scale: 0.8 }}
+          animate={reduceMotion ? { opacity: 1 } : { opacity: 1, y: [0, -18, 0, -7, 0], scale: 1 }}
+          transition={{ delay: 1.05, duration: 0.9, ease: "easeOut" }}
+        >
+          <MapPin size={18} fill="currentColor" />
+        </motion.div>
         <div className="container relative z-[1] mx-auto px-6 py-14 md:py-20">
           <FadeIn delay={0.2} className="max-w-3xl mx-auto text-center">
             <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary/10 border border-primary/30 mb-6">
               <span className="w-2 h-2 rounded-full bg-primary animate-pulse" />
               <span className="text-xs font-semibold text-primary tracking-wider">برنامج وثائقي · موسم ٢٠٢٦</span>
             </div>
-            <TextReveal
-              as="h1"
-              by="word"
-              delay={0.3}
-              className="font-display type-display mb-6 text-foreground"
+            <motion.div
+              initial={{ fontWeight: 650 }}
+              animate={reduceMotion ? { fontWeight: 700 } : { fontWeight: [650, 800, 680, 740, 700] }}
+              transition={{ delay: 0.3, duration: 1.8, ease: "easeInOut" }}
             >
-              {settings?.hero_title ?? "نوثّقُ إربد بصوت أهلها"}
-            </TextReveal>
+              <TextReveal
+                as="h1"
+                by="word"
+                delay={0.3}
+                className="font-display type-display mb-6 text-foreground [font-weight:inherit]"
+              >
+                {settings?.hero_title ?? "نوثّقُ إربد بصوت أهلها"}
+              </TextReveal>
+            </motion.div>
             <p className="type-lead text-muted-foreground measure mx-auto mb-10">
               {settings?.hero_subtitle ?? "برنامج وثائقي مستقل يحفظ ذاكرة المدينة وحكايات ناسها"}
             </p>

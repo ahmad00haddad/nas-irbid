@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useDeferredValue, useEffect, useMemo, useState } from "react";
+import { AnimatePresence, LayoutGroup, motion, useMotionValueEvent, useReducedMotion, useScroll } from "framer-motion";
 
 import { supabase } from "@/integrations/supabase/client";
 import { Search, RotateCcw, X, Play, Heart, Eye, Clock } from "lucide-react";
@@ -102,7 +103,13 @@ function useTypewriterPlaceholder(texts: string[], speed = 100, pause = 2000) {
 function EpisodesPage() {
   const [query, setQuery] = useState("");
   const [sort, setSort] = useState<SortMode>("latest");
+  const [visibleCount, setVisibleCount] = useState(6);
+  const [compactFilters, setCompactFilters] = useState(false);
   const deferredQuery = useDeferredValue(query);
+  const reduceMotion = useReducedMotion();
+  const { scrollY } = useScroll();
+
+  useMotionValueEvent(scrollY, "change", (latest) => setCompactFilters(latest > 260));
 
   const { data: episodes = [], isLoading, isError, refetch } = useQuery({
     queryKey: ["public-episodes"],
@@ -171,6 +178,13 @@ function EpisodesPage() {
   const totalViews = useMemo(() => episodes.reduce((acc, ep) => acc + (ep.instagram_views || 0), 0), [episodes]);
   const totalLikes = useMemo(() => episodes.reduce((acc, ep) => acc + (ep.instagram_likes || 0), 0), [episodes]);
 
+  useEffect(() => {
+    setVisibleCount(6);
+  }, [deferredQuery, sort]);
+
+  const visibleEpisodes = filtered.slice(0, visibleCount);
+  const hasMore = visibleCount < filtered.length;
+
   return (
     <div className="container mx-auto px-6 py-20">
       <FadeIn className="max-w-3xl mb-14">
@@ -202,7 +216,12 @@ function EpisodesPage() {
         </p>
       </FadeIn>
 
-      <FadeIn delay={0.1} className="mb-6">
+      <FadeIn delay={0.1} className="relative z-30 mb-6">
+        <motion.div
+          animate={{ padding: compactFilters ? "0.45rem" : "0rem", borderWidth: compactFilters ? 2 : 0 }}
+          transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
+          className={`sticky top-3 rounded-2xl border-gold bg-background/90 backdrop-blur-md ${compactFilters ? "shadow-deep" : ""}`}
+        >
         <div className="flex flex-col sm:flex-row gap-3">
           <label className="relative block flex-1">
             <Search className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none" size={17} />
@@ -226,34 +245,38 @@ function EpisodesPage() {
             )}
           </label>
 
-          <div className="inline-flex items-center rounded-xl border border-border bg-card p-1 gap-1">
+          <LayoutGroup id="episode-sort">
+          <div className="relative inline-flex items-center rounded-xl border border-border bg-card p-1 gap-1">
             <button
               type="button"
               onClick={() => setSort("latest")}
               aria-pressed={sort === "latest"}
-              className={`inline-flex items-center gap-1.5 rounded-lg px-3 py-2 text-xs font-semibold transition-colors ${
+              className={`relative inline-flex items-center gap-1.5 rounded-lg px-3 py-2 text-xs font-semibold transition-colors ${
                 sort === "latest"
-                  ? "bg-primary text-primary-foreground"
+                  ? "text-primary-foreground"
                   : "text-muted-foreground hover:text-foreground hover:bg-secondary"
               }`}
             >
-              <Clock size={13} />
-              الأحدث
+              {sort === "latest" && <motion.span layoutId="active-sort-chip" className="absolute inset-0 rounded-lg bg-primary" transition={{ type: "spring", stiffness: 420, damping: 34 }} />}
+              <Clock size={13} className="relative z-10" />
+              <span className="relative z-10">الأحدث</span>
             </button>
             <button
               type="button"
               onClick={() => setSort("views")}
               aria-pressed={sort === "views"}
-              className={`inline-flex items-center gap-1.5 rounded-lg px-3 py-2 text-xs font-semibold transition-colors ${
+              className={`relative inline-flex items-center gap-1.5 rounded-lg px-3 py-2 text-xs font-semibold transition-colors ${
                 sort === "views"
-                  ? "bg-primary text-primary-foreground"
+                  ? "text-primary-foreground"
                   : "text-muted-foreground hover:text-foreground hover:bg-secondary"
               }`}
             >
-              <Eye size={13} />
-              الأعلى مشاهدة
+              {sort === "views" && <motion.span layoutId="active-sort-chip" className="absolute inset-0 rounded-lg bg-primary" transition={{ type: "spring", stiffness: 420, damping: 34 }} />}
+              <Eye size={13} className="relative z-10" />
+              <span className="relative z-10">الأعلى مشاهدة</span>
             </button>
           </div>
+          </LayoutGroup>
         </div>
 
         {/* ── Quick Search Bubbles (Empty State) ── */}
@@ -279,6 +302,7 @@ function EpisodesPage() {
               : "لا توجد نتائج"}
           </p>
         )}
+        </motion.div>
       </FadeIn>
 
       {isLoading ? (
@@ -312,11 +336,43 @@ function EpisodesPage() {
           </Button>
         </div>
       ) : (
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filtered.map((ep) => (
-            <PublicEpisodeCard key={ep.id} episode={ep as PublicEpisode} />
-          ))}
-        </div>
+        <>
+          <motion.div layout className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <AnimatePresence mode="popLayout" initial={false}>
+              {visibleEpisodes.map((ep, index) => (
+                <motion.div
+                  layout
+                  key={ep.id}
+                  initial={reduceMotion ? { opacity: 1 } : { opacity: 0, y: 28, scale: 0.97 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  exit={reduceMotion ? { opacity: 0 } : { opacity: 0, y: 16, scale: 0.96 }}
+                  transition={{ duration: 0.36, delay: reduceMotion ? 0 : Math.min(index * 0.035, 0.18), ease: [0.22, 1, 0.36, 1] }}
+                >
+                  <PublicEpisodeCard episode={ep as PublicEpisode} />
+                </motion.div>
+              ))}
+            </AnimatePresence>
+          </motion.div>
+          {hasMore && (
+            <div className="mt-10 flex justify-center">
+              <Button
+                variant="outline"
+                className="h-12 rounded-full border-2 border-gold bg-card px-7 font-bold shadow-deep"
+                onClick={() => setVisibleCount((count) => Math.min(count + 6, filtered.length))}
+                asChild
+              >
+                <motion.button
+                  type="button"
+                  whileTap={reduceMotion ? undefined : { scale: 0.9 }}
+                  animate={reduceMotion ? undefined : { scale: [1, 0.97, 1] }}
+                  transition={{ duration: 0.32, type: "spring", stiffness: 520, damping: 24 }}
+                >
+                  تحميل المزيد
+                </motion.button>
+              </Button>
+            </div>
+          )}
+        </>
       )}
     </div>
   );
