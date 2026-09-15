@@ -218,11 +218,11 @@ function EpisodesPage() {
         </p>
       </FadeIn>
 
-      <FadeIn delay={0.1} className="relative z-30 mb-6">
+      <FadeIn delay={0.1} className="sticky top-24 z-30 mb-6">
         <motion.div
           animate={{ padding: compactFilters ? "0.45rem" : "0rem", borderWidth: compactFilters ? 2 : 0 }}
           transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
-          className={`sticky top-3 rounded-2xl border-gold bg-background/90 backdrop-blur-md ${compactFilters ? "shadow-deep" : ""}`}
+          className={`rounded-2xl border-gold bg-background/90 backdrop-blur-md ${compactFilters ? "shadow-deep" : ""}`}
         >
         <div className="flex flex-col sm:flex-row gap-3">
           <label className="relative block flex-1">

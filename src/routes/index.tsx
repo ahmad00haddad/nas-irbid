@@ -33,7 +33,7 @@ export const Route = createFileRoute("/")({
 });
 
 import { animate } from "framer-motion";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 function AnimatedCounter({ from, to, formatter }: { from: number; to: number; formatter: (val: number) => string }) {
   const [displayValue, setDisplayValue] = useState(formatter(from));
@@ -66,13 +66,18 @@ const goldParticles = [
 function IdleGoldParticles() {
   const reduceMotion = useReducedMotion();
   const [visible, setVisible] = useState(false);
+  const hasPlayed = useRef(false);
 
   useEffect(() => {
-    if (reduceMotion) return;
-    let timer = window.setTimeout(() => setVisible(true), 8000);
+    if (reduceMotion || hasPlayed.current) return;
+    const reveal = () => {
+      hasPlayed.current = true;
+      setVisible(true);
+    };
+    let timer = window.setTimeout(reveal, 8000);
     const reset = () => {
       window.clearTimeout(timer);
-      if (!visible) timer = window.setTimeout(() => setVisible(true), 8000);
+      if (!hasPlayed.current) timer = window.setTimeout(reveal, 8000);
     };
     window.addEventListener("pointermove", reset, { passive: true });
     window.addEventListener("keydown", reset);
@@ -83,7 +88,7 @@ function IdleGoldParticles() {
       window.removeEventListener("keydown", reset);
       window.removeEventListener("scroll", reset);
     };
-  }, [reduceMotion, visible]);
+  }, [reduceMotion]);
 
   return (
     <AnimatePresence>
