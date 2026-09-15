@@ -171,15 +171,7 @@ function Index() {
       <section className="relative overflow-hidden border-b border-border/60">
         <div className="arch-backdrop" aria-hidden="true" />
         <IdleGoldParticles />
-        <motion.div
-          aria-hidden="true"
-          className="absolute left-[12%] top-[26%] z-[2] hidden items-center justify-center rounded-full border border-gold/50 bg-card/80 p-2 text-primary shadow-deep backdrop-blur-sm md:flex"
-          initial={{ opacity: 0, y: -20, scale: 0.8 }}
-          animate={reduceMotion ? { opacity: 1 } : { opacity: 1, y: [0, -18, 0, -7, 0], scale: 1 }}
-          transition={{ delay: 1.05, duration: 0.9, ease: "easeOut" }}
-        >
-          <MapPin size={18} fill="currentColor" />
-        </motion.div>
+
         <div className="container relative z-[1] mx-auto px-6 py-14 md:py-20">
           <FadeIn delay={0.2} className="max-w-3xl mx-auto text-center">
             <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary/10 border border-primary/30 mb-6">
