@@ -30,7 +30,9 @@ export const Route = createFileRoute("/episodes")({
         { name: "description", content: "كل حلقات برنامج ناس إربد الوثائقي، مرتبة ومفهرسة حسب الشخصية والحي والمهنة." },
         { property: "og:title", content: "أرشيف الحلقات · ناس إربد" },
         { property: "og:description", content: "كل حلقات البرنامج بجودة عالية، مع تفاصيل خلف الكواليس." },
+        { property: "og:type", content: "website" },
         { property: "og:url", content: "https://nas-irbid.lovable.app/episodes" },
+        { name: "twitter:card", content: "summary" },
       ],
       links: [{ rel: "canonical", href: "https://nas-irbid.lovable.app/episodes" }],
       scripts: [
@@ -364,8 +366,7 @@ function EpisodesPage() {
                 <motion.button
                   type="button"
                   whileTap={reduceMotion ? undefined : { scale: 0.9 }}
-                  animate={reduceMotion ? undefined : { scale: [1, 0.97, 1] }}
-                  transition={{ duration: 0.32, type: "spring", stiffness: 520, damping: 24 }}
+                  transition={{ type: "spring", stiffness: 520, damping: 18 }}
                 >
                   تحميل المزيد
                 </motion.button>

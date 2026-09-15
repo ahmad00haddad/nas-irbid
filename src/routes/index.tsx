@@ -22,7 +22,11 @@ export const Route = createFileRoute("/")({
     meta: [
       { title: "ناس إربد · حكايات أهل المدينة" },
       { name: "description", content: "برنامج وثائقي يوثّق قصص أهل إربد ومهنهم القديمة وذاكرتهم الشفوية." },
+      { property: "og:title", content: "ناس إربد · حكايات أهل المدينة" },
+      { property: "og:description", content: "برنامج وثائقي يوثّق قصص أهل إربد ومهنهم القديمة وذاكرتهم الشفوية." },
+      { property: "og:type", content: "website" },
       { property: "og:url", content: "https://nas-irbid.lovable.app/" },
+      { name: "twitter:card", content: "summary" },
     ],
     links: [{ rel: "canonical", href: "https://nas-irbid.lovable.app/" }],
   }),
