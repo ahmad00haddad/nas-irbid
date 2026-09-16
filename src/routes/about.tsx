@@ -20,7 +20,9 @@ export const Route = createFileRoute("/about")({
       { name: "description", content: "تعرّف على رؤية ناس إربد، وكيف يمكنك أن تكون جزءاً من حماية ذاكرة المدينة." },
       { property: "og:title", content: "عن البرنامج · ناس إربد" },
       { property: "og:description", content: "الدعم مسؤولية مجتمعية، لا خدمة بمقابل." },
+      { property: "og:type", content: "website" },
       { property: "og:url", content: "https://nas-irbid.lovable.app/about" },
+      { name: "twitter:card", content: "summary" },
     ],
     links: [{ rel: "canonical", href: "https://nas-irbid.lovable.app/about" }],
   }),
@@ -41,26 +43,6 @@ function AnimatedCounter({ from, to, formatter }: { from: number; to: number; fo
   }, [from, to, formatter]);
 
   return <>{displayValue}</>;
-}
-
-function GlowCard({ children, className }: { children: React.ReactNode; className?: string }) {
-  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
-  const handleMouseMove = (e: React.MouseEvent) => {
-    const rect = e.currentTarget.getBoundingClientRect();
-    setMousePosition({ x: e.clientX - rect.left, y: e.clientY - rect.top });
-  };
-  return (
-    <div onMouseMove={handleMouseMove} className={`group relative overflow-hidden ${className}`}>
-      <div 
-        className="pointer-events-none absolute -inset-px rounded-2xl opacity-0 transition duration-300 group-hover:opacity-100"
-        style={{
-          background: `radial-gradient(400px circle at ${mousePosition.x}px ${mousePosition.y}px, rgba(196, 164, 107, 0.15), transparent 40%)`,
-          zIndex: 1
-        }}
-      />
-      <div className="relative z-10 h-full">{children}</div>
-    </div>
-  );
 }
 
 function VerticalReadingProgress() {
@@ -132,7 +114,11 @@ function SupportFlipCard({
         animate={{ rotateY: reduceMotion ? 0 : flipped ? 180 : 0 }}
         transition={{ duration: reduceMotion ? 0 : 0.58, ease: [0.22, 1, 0.36, 1] }}
       >
-        <div className={`absolute inset-0 flex flex-col rounded-2xl border bg-card p-7 [backface-visibility:hidden] ${featured ? "border-primary/60 shadow-glow" : "border-border/60"}`} aria-hidden={flipped}>
+        <motion.div
+          className={`absolute inset-0 flex flex-col rounded-2xl border bg-card p-7 [backface-visibility:hidden] ${flipped && reduceMotion ? "pointer-events-none" : ""} ${featured ? "border-primary/60 shadow-glow" : "border-border/60"}`}
+          animate={{ opacity: flipped && reduceMotion ? 0 : 1 }}
+          aria-hidden={flipped}
+        >
           <div className="mb-5 flex h-12 w-12 items-center justify-center rounded-xl border border-primary/20 bg-primary/10">
             <Icon size={22} className="text-primary" />
           </div>
@@ -143,9 +129,13 @@ function SupportFlipCard({
               اكتشف التفاصيل <ArrowLeft size={15} />
             </Button>
           </div>
-        </div>
+        </motion.div>
 
-        <div className={`absolute inset-0 flex flex-col rounded-2xl border bg-secondary p-7 [backface-visibility:hidden] [transform:rotateY(180deg)] ${featured ? "border-primary/60" : "border-border/60"}`} aria-hidden={!flipped}>
+        <motion.div
+          className={`absolute inset-0 flex flex-col rounded-2xl border bg-secondary p-7 [backface-visibility:hidden] ${reduceMotion ? "[transform:none]" : "[transform:rotateY(180deg)]"} ${!flipped && reduceMotion ? "pointer-events-none" : ""} ${featured ? "border-primary/60" : "border-border/60"}`}
+          animate={{ opacity: !flipped && reduceMotion ? 0 : 1 }}
+          aria-hidden={!flipped}
+        >
           <div className="mb-3 flex items-center gap-3">
             <Icon size={20} className="text-primary" />
             <h3 className="font-display text-lg text-foreground">{title}</h3>
@@ -157,7 +147,7 @@ function SupportFlipCard({
               <RotateCcw size={16} />
             </Button>
           </div>
-        </div>
+        </motion.div>
       </motion.div>
     </motion.article>
   );
