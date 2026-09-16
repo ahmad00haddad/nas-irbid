@@ -2,15 +2,15 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import {
   Heart, Coffee, Megaphone, Building2, Users, Camera, Mic2, Palette,
   Share2, MessageCircle, MapPin, Lightbulb, Handshake, GraduationCap,
-  Landmark, Sparkles, ArrowLeft, Quote, ArrowUp, Check, Scale, Clock, Info
+  Landmark, Sparkles, ArrowLeft, Quote, Check, Scale, Clock, Info, RotateCcw
 } from "lucide-react";
 import { useSiteSettings } from "@/lib/site-settings";
-import { ReadingProgressBar } from "@/components/ui/reading-progress";
-import { motion, animate, useScroll, useSpring, AnimatePresence } from "framer-motion";
+import { motion, animate, useScroll, useSpring, useTransform, useReducedMotion, AnimatePresence } from "framer-motion";
 import { useEffect, useState, useRef } from "react";
 import { toast } from "sonner";
 import { TextReveal } from "@/components/ui/text-reveal";
 import { FadeIn } from "@/components/ui/fade-in";
+import { Button } from "@/components/ui/button";
 
 export const Route = createFileRoute("/about")({
   component: AboutPage,
@@ -20,7 +20,9 @@ export const Route = createFileRoute("/about")({
       { name: "description", content: "تعرّف على رؤية ناس إربد، وكيف يمكنك أن تكون جزءاً من حماية ذاكرة المدينة." },
       { property: "og:title", content: "عن البرنامج · ناس إربد" },
       { property: "og:description", content: "الدعم مسؤولية مجتمعية، لا خدمة بمقابل." },
+      { property: "og:type", content: "website" },
       { property: "og:url", content: "https://nas-irbid.lovable.app/about" },
+      { name: "twitter:card", content: "summary" },
     ],
     links: [{ rel: "canonical", href: "https://nas-irbid.lovable.app/about" }],
   }),
@@ -43,23 +45,111 @@ function AnimatedCounter({ from, to, formatter }: { from: number; to: number; fo
   return <>{displayValue}</>;
 }
 
-function GlowCard({ children, className }: { children: React.ReactNode; className?: string }) {
-  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
-  const handleMouseMove = (e: React.MouseEvent) => {
-    const rect = e.currentTarget.getBoundingClientRect();
-    setMousePosition({ x: e.clientX - rect.left, y: e.clientY - rect.top });
-  };
+function VerticalReadingProgress() {
+  const { scrollYProgress } = useScroll();
+  const progress = useSpring(scrollYProgress, { stiffness: 140, damping: 28, restDelta: 0.001 });
+  const dotTop = useTransform(progress, [0, 1], [0, 152]);
+
   return (
-    <div onMouseMove={handleMouseMove} className={`group relative overflow-hidden ${className}`}>
-      <div 
-        className="pointer-events-none absolute -inset-px rounded-2xl opacity-0 transition duration-300 group-hover:opacity-100"
-        style={{
-          background: `radial-gradient(400px circle at ${mousePosition.x}px ${mousePosition.y}px, rgba(196, 164, 107, 0.15), transparent 40%)`,
-          zIndex: 1
-        }}
-      />
-      <div className="relative z-10 h-full">{children}</div>
+    <div className="fixed left-3 top-1/2 z-[80] hidden h-40 w-5 -translate-y-1/2 items-center justify-center md:flex" aria-hidden="true">
+      <div className="absolute h-full w-px bg-border/70" />
+      <motion.div className="absolute top-0 h-full w-px origin-top bg-primary" style={{ scaleY: progress }} />
+      <motion.div className="absolute top-0 h-2.5 w-2.5 rounded-full border-2 border-background bg-gold shadow-glow" style={{ y: dotTop }} />
     </div>
+  );
+}
+
+function HandDrawnOrnament() {
+  const reduceMotion = useReducedMotion();
+  const lineMotion = reduceMotion
+    ? { initial: { pathLength: 1, opacity: 1 }, whileInView: { pathLength: 1, opacity: 1 } }
+    : { initial: { pathLength: 0, opacity: 0 }, whileInView: { pathLength: 1, opacity: 1 } };
+
+  return (
+    <motion.svg
+      viewBox="0 0 360 74"
+      className="mx-auto mt-8 h-16 w-full max-w-sm text-primary/55"
+      fill="none"
+      aria-hidden="true"
+      initial="initial"
+      whileInView="whileInView"
+      viewport={{ once: true, amount: 0.8 }}
+    >
+      <motion.path d="M22 58C68 58 70 18 111 18C145 18 147 51 180 51C213 51 215 18 249 18C290 18 292 58 338 58" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" variants={lineMotion} transition={{ duration: 1.8, ease: [0.22, 1, 0.36, 1] }} />
+      <motion.path d="M56 57C85 49 85 31 111 26M304 57C275 49 275 31 249 26" stroke="currentColor" strokeWidth="1" strokeLinecap="round" variants={lineMotion} transition={{ duration: 1.35, delay: reduceMotion ? 0 : 0.45 }} />
+      <motion.path d="M170 51C174 43 176 37 180 29C184 37 186 43 190 51" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" variants={lineMotion} transition={{ duration: 0.9, delay: reduceMotion ? 0 : 0.9 }} />
+    </motion.svg>
+  );
+}
+
+function SupportFlipCard({
+  icon: Icon,
+  title,
+  highlight,
+  details,
+  action,
+  featured = false,
+  compact = false,
+}: {
+  icon: React.ElementType;
+  title: string;
+  highlight?: string;
+  details: string;
+  action?: React.ReactNode;
+  featured?: boolean;
+  compact?: boolean;
+}) {
+  const [flipped, setFlipped] = useState(false);
+  const reduceMotion = useReducedMotion();
+
+  return (
+    <motion.article
+      className={`relative w-full [perspective:1200px] ${compact ? "h-64" : "h-72"}`}
+      initial={{ opacity: 0, y: reduceMotion ? 0 : 18 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, amount: 0.25 }}
+    >
+      <motion.div
+        className="relative h-full w-full [transform-style:preserve-3d]"
+        animate={{ rotateY: reduceMotion ? 0 : flipped ? 180 : 0 }}
+        transition={{ duration: reduceMotion ? 0 : 0.58, ease: [0.22, 1, 0.36, 1] }}
+      >
+        <motion.div
+          className={`absolute inset-0 flex flex-col rounded-2xl border bg-card p-7 [backface-visibility:hidden] ${flipped && reduceMotion ? "pointer-events-none" : ""} ${featured ? "border-primary/60 shadow-glow" : "border-border/60"}`}
+          animate={{ opacity: flipped && reduceMotion ? 0 : 1 }}
+          aria-hidden={flipped}
+        >
+          <div className="mb-5 flex h-12 w-12 items-center justify-center rounded-xl border border-primary/20 bg-primary/10">
+            <Icon size={22} className="text-primary" />
+          </div>
+          <h3 className="font-display text-xl text-foreground">{title}</h3>
+          {highlight && <div className="mt-1 font-display text-2xl text-primary">{highlight}</div>}
+          <div className="mt-auto pt-5">
+            <Button type="button" variant="outline" className="w-full rounded-full" onClick={() => setFlipped(true)} aria-expanded={flipped}>
+              اكتشف التفاصيل <ArrowLeft size={15} />
+            </Button>
+          </div>
+        </motion.div>
+
+        <motion.div
+          className={`absolute inset-0 flex flex-col rounded-2xl border bg-secondary p-7 [backface-visibility:hidden] ${reduceMotion ? "[transform:none]" : "[transform:rotateY(180deg)]"} ${!flipped && reduceMotion ? "pointer-events-none" : ""} ${featured ? "border-primary/60" : "border-border/60"}`}
+          animate={{ opacity: !flipped && reduceMotion ? 0 : 1 }}
+          aria-hidden={!flipped}
+        >
+          <div className="mb-3 flex items-center gap-3">
+            <Icon size={20} className="text-primary" />
+            <h3 className="font-display text-lg text-foreground">{title}</h3>
+          </div>
+          <p className="text-sm leading-relaxed text-muted-foreground">{details}</p>
+          <div className="mt-auto flex items-center gap-2 pt-4">
+            {action}
+            <Button type="button" size="icon" variant="ghost" className="shrink-0 rounded-full" onClick={() => setFlipped(false)} aria-label={`إغلاق تفاصيل ${title}`}>
+              <RotateCcw size={16} />
+            </Button>
+          </div>
+        </motion.div>
+      </motion.div>
+    </motion.article>
   );
 }
 
@@ -94,7 +184,7 @@ function AboutPage() {
 
   return (
     <div className="relative overflow-x-hidden">
-      <ReadingProgressBar />
+      <VerticalReadingProgress />
       
       {/* ============ Vision ============ */}
       <section className="container mx-auto px-6 pt-20 pb-16">
@@ -139,6 +229,7 @@ function AboutPage() {
             <h2 className="font-display text-4xl md:text-6xl mt-4 mb-6 text-foreground">
               ذاكرة إربد <span className="text-gradient-gold">أمانة بإيدينا</span>
             </h2>
+            <HandDrawnOrnament />
           </div>
 
           {/* Philosophy statement */}
@@ -207,29 +298,15 @@ function AboutPage() {
               t.custom ? "أرغب بالمساهمة في ناس إربد" : `مساهمة ${t.amount} · ناس إربد`,
             )}`;
             return (
-              <div
+              <SupportFlipCard
                 key={t.name}
-                className={`relative p-7 rounded-2xl bg-card border transition hover:-translate-y-1 ${
-                  t.featured ? "border-primary/60 shadow-glow" : "border-border/60"
-                }`}
-              >
-                <div className="w-12 h-12 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center mb-5">
-                  <t.icon size={22} className="text-primary" />
-                </div>
-                <div className="font-display text-xl text-foreground">{t.name}</div>
-                <div className="font-display text-3xl text-gradient-gold mt-1 mb-4">{t.amount}</div>
-                <p className="text-sm text-muted-foreground leading-relaxed mb-6 min-h-[3rem]">{t.note}</p>
-                <a
-                  href={mailto}
-                  className={`block text-center w-full py-2.5 rounded-full text-sm font-bold transition ${
-                    t.featured
-                      ? "bg-gradient-warm text-primary-foreground shadow-glow hover:opacity-90"
-                      : "border border-border text-foreground hover:border-primary"
-                  }`}
-                >
-                  {t.custom ? "ساهم بمبلغ مفتوح" : `ساهم بـ ${t.amount}`}
-                </a>
-              </div>
+                icon={t.icon}
+                title={t.name}
+                highlight={t.amount}
+                details={t.note}
+                featured={t.featured}
+                action={<Button asChild className="flex-1 rounded-full"><a href={mailto}>{t.custom ? "ساهم بمبلغ مفتوح" : `ساهم بـ ${t.amount}`}</a></Button>}
+              />
             );
           })}
         </div>
@@ -278,23 +355,15 @@ function AboutPage() {
               featured: true,
             },
           ].map((s) => (
-            <GlowCard
+            <SupportFlipCard
               key={s.tier}
-              className={`p-8 rounded-2xl bg-card border transition-all duration-300 hover:-translate-y-1 ${
-                s.featured ? "border-primary/60 shadow-glow" : "border-border/60 hover:border-primary/40"
-              }`}
-            >
-              {s.featured && (
-                <div className="absolute -top-4 -right-4 w-3.5 h-3.5 z-20">
-                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
-                  <span className="relative inline-flex rounded-full h-3.5 w-3.5 bg-primary shadow-glow"></span>
-                </div>
-              )}
-              <div className="text-xs font-bold text-primary tracking-widest mb-1">{s.tier}</div>
-              <div className="text-[10px] uppercase text-muted-foreground mb-3">{s.name}</div>
-              <div className="font-display text-3xl text-gradient-gold mb-3" dir="ltr">{s.amount}</div>
-              <p className="text-sm text-muted-foreground leading-relaxed mb-7">{s.desc}</p>
-            </GlowCard>
+              icon={s.featured ? Sparkles : Building2}
+              title={s.tier}
+              highlight={s.amount}
+              details={`${s.name} — ${s.desc}`}
+              featured={s.featured}
+              action={<Button asChild className="flex-1 rounded-full"><a href="mailto:ahmad000haddad@gmail.com?subject=طلب رعاية - ناس إربد">اطلب الرعاية</a></Button>}
+            />
           ))}
         </div>
 
@@ -350,20 +419,13 @@ function AboutPage() {
               desc: "المساحات الثقافية، نوادي القراءة، والفرق التطوعية — لنتعاون في نقل هذه الذاكرة للأجيال الشابة.",
             },
           ].map((p) => (
-            <div key={p.title} className="p-7 rounded-2xl bg-card border border-border/60 hover:border-primary/40 transition">
-              <div className="flex items-start gap-5">
-                <div className="w-14 h-14 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center shrink-0">
-                  <p.icon size={24} className="text-primary" />
-                </div>
-                <div className="flex-1">
-                  <h3 className="font-display text-xl text-foreground mb-2">{p.title}</h3>
-                  <p className="text-sm text-muted-foreground leading-relaxed mb-4">{p.desc}</p>
-                  <a href="mailto:ahmad000haddad@gmail.com" className="text-sm font-bold text-primary hover:underline inline-flex items-center gap-1">
-                    تواصل معنا <ArrowLeft size={14} />
-                  </a>
-                </div>
-              </div>
-            </div>
+            <SupportFlipCard
+              key={p.title}
+              icon={p.icon}
+              title={p.title}
+              details={p.desc}
+              action={<Button asChild className="flex-1 rounded-full"><a href="mailto:ahmad000haddad@gmail.com">تواصل معنا</a></Button>}
+            />
           ))}
         </div>
       </section>
@@ -392,27 +454,15 @@ function AboutPage() {
             { icon: Sparkles, title: "نظّم عرضاً محلياً", desc: "اعرض حلقاتنا في مدرستك، جامعتك، أو مقهاك لنشر الحكاية." },
             { icon: Quote, title: "ساعدنا في البحث والتدقيق", desc: "شغوف بالتاريخ؟ ساعدنا في توثيق وتدقيق أسماء الأماكن والأحداث." },
           ].map((item) => {
-            const Inner = (
-              <>
-                <div className="w-11 h-11 rounded-lg bg-primary/10 border border-primary/20 flex items-center justify-center mb-4 transition-transform duration-300 group-hover:scale-110 group-hover:rotate-6">
-                  <item.icon size={18} className="text-primary" />
-                </div>
-                <h3 className="font-display text-lg text-foreground mb-1.5">{item.title}</h3>
-                <p className="text-sm text-muted-foreground leading-relaxed">{item.desc}</p>
-              </>
-            );
-            return item.to ? (
-              <Link
+            return (
+              <SupportFlipCard
                 key={item.title}
-                to={item.to}
-                className="group p-6 rounded-xl bg-card border border-border/60 hover:border-primary/40 transition block"
-              >
-                {Inner}
-              </Link>
-            ) : (
-              <div key={item.title} className="group p-6 rounded-xl bg-card border border-border/60 hover:border-primary/40 transition">
-                {Inner}
-              </div>
+                icon={item.icon}
+                title={item.title}
+                details={item.desc}
+                compact
+                action={item.to ? <Button asChild className="flex-1 rounded-full"><Link to={item.to}>ابدأ الآن</Link></Button> : <Button asChild className="flex-1 rounded-full"><a href="mailto:ahmad000haddad@gmail.com">تواصل معنا</a></Button>}
+              />
             );
           })}
         </div>
