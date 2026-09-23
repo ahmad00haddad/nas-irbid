@@ -57,6 +57,12 @@ export function Footer() {
               <span>تقديم بسمة الذينات</span>
             </div>
             <span className="mt-1">جميع الحقوق محفوظة © {new Date().getFullYear()}</span>
+            <span className="mt-2 text-[10px] opacity-70">
+              تصميم وتطوير:{" "}
+              <a href="https://haddad-dev.lovable.app/" target="_blank" rel="noreferrer" className="hover:text-primary hover:opacity-100 transition-colors underline underline-offset-2">
+                أحمد حداد
+              </a>
+            </span>
           </div>
         </div>
       </div>
