@@ -274,7 +274,7 @@ function AboutPage() {
         </div>
 
         <p className="text-center text-xs text-muted-foreground mt-8 max-w-2xl mx-auto">
-          سيتم تفعيل الدفع الإلكتروني قريباً (CliQ، فيزا، حوالة بنكية، PayPal). حالياً يمكنك التواصل معنا مباشرة لإتمام المساهمة.
+          للمساهمة تواصل معنا مباشرة، وسنرتّب معك الطريقة الأنسب (CliQ أو حوالة بنكية).
         </p>
       </section>
 
@@ -286,7 +286,7 @@ function AboutPage() {
           title="باقات الرعاية المعتمدة"
           description={
             <>
-              استثمار مجتمعي يربط علامتك التجارية بذاكرة وهوية المدينة. يقتصر قبول الرعايات على ٢٠ راعياً كحد أقصى لضمان حصرية وأناقة الظهور، مع أكثر من{" "}
+              استثمار مجتمعي يربط علامتك التجارية بذاكرة وهوية المدينة. نقبل عدداً محدوداً من الرعاة لضمان أناقة الظهور، مع أكثر من{" "}
               <span className="font-bold text-primary inline-block" dir="ltr">
                 +<AnimatedCounter from={0} to={2000000} formatter={(v) => (v / 1000000).toFixed(1) + "M"} />
               </span>{" "}
@@ -300,19 +300,19 @@ function AboutPage() {
             {
               tier: "راعي ريل",
               name: "Reel Sponsor",
-              amount: "٥٠٠ - ١,٠٠٠ JOD",
+              amount: "حسب الاتفاق",
               desc: "رعاية ريل واحد من مكتبة الريلز، يشمل بطاقة رعاية مستقلة والذكر في وصف المنشور.",
             },
             {
               tier: "راعي أساسي",
               name: "Basic Sponsor",
-              amount: "٢,٠٠٠ JOD",
+              amount: "حسب الاتفاق",
               desc: "يرتبط اسمك بإحدى الحلقات، ظهور ضمن شاشة الرعاة الجامعة، وإدراج في المواد الرقمية.",
             },
             {
               tier: "راعي حصري لحلقة",
               name: "Exclusive Sponsor",
-              amount: "٥,٠٠٠ JOD",
+              amount: "حسب الاتفاق",
               desc: "شاشة «بدعم من» بشعار كبير للحلقة والريلز المرتبطة بها، وظهور أوضح في حملة الإطلاق.",
               featured: true,
             },
@@ -331,7 +331,7 @@ function AboutPage() {
               )}
               <div className="text-xs font-bold text-primary tracking-widest mb-1">{s.tier}</div>
               <div className="text-[10px] uppercase text-muted-foreground mb-3">{s.name}</div>
-              <div className="font-display text-3xl text-gradient-gold mb-3" dir="ltr">{s.amount}</div>
+              <div className="font-display text-2xl text-gradient-gold mb-3">{s.amount}</div>
               <p className="text-sm text-muted-foreground leading-relaxed mb-7">{s.desc}</p>
             </GlowCard>
           ))}
@@ -351,7 +351,8 @@ function AboutPage() {
           <ul className="list-disc list-inside text-sm text-muted-foreground leading-relaxed space-y-2">
             <li>شاشة مستقلة من 3 إلى 5 ثوانٍ بعنوان "بدعم من: [شعار الراعي]".</li>
             <li>لا شعار داخل المشاهد أثناء السرد.</li>
-            <li>راعٍ كبير واحد لكل حلقة، وشاشة جامعة لا تتجاوز 20 شعاراً.</li>
+            <li>راعٍ كبير واحد لكل حلقة، وشاشة جامعة بعدد محدود من الشعارات.</li>
+            <li>للاطلاع على الأسعار والباقات الموسمية، راسلنا وسنرسل لك ملف العرض.</li>
           </ul>
         </div>
       </section>
@@ -371,7 +372,7 @@ function AboutPage() {
             {
               icon: Landmark,
               title: "المؤسسات الثقافية والحكومية",
-              desc: "أمانة إربد الكبرى، وزارة الثقافة، المراكز الثقافية — شراكاتٌ في خدمة الذاكرة المشتركة.",
+              desc: "نسعى للتعاون مع أمانة إربد الكبرى ووزارة الثقافة والمراكز الثقافية في خدمة الذاكرة المشتركة.",
             },
             {
               icon: Handshake,
@@ -466,7 +467,7 @@ function AboutPage() {
             title="أين يذهب كلّ دينار؟"
             description={
               <>
-                لأنّ الثقة أساس أيّ علاقة، ننشر تقريراً مفصّلاً عن كلّ مساهمة تصلنا — مهما كانت صغيرة.{" "}
+                لأنّ الثقة أساس أيّ علاقة، ننشر تقريراً دورياً عن أوجه صرف الدعم الذي يصلنا.{" "}
                 <span className="group/fact relative inline-block align-middle outline-none" tabIndex={0}>
                   <button className="text-primary hover:text-primary/80 transition-colors pointer-events-none translate-y-[2px]">
                     <Info size={15} />
