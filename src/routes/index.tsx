@@ -13,6 +13,7 @@ import { TextReveal } from "@/components/ui/text-reveal";
 import { HorizontalScroll } from "@/components/ui/horizontal-scroll";
 import { Marquee } from "@/components/ui/marquee";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
+import { elastic } from "@/lib/motion";
 
 const MotionLink = motion.create(Link);
 
@@ -200,8 +201,9 @@ function Index() {
               <Magnetic>
                 <MotionLink
                   to="/episodes"
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
+                  whileHover={{ scale: 1.06 }}
+                  whileTap={{ scale: 0.92 }}
+                  transition={elastic}
                   data-cursor-text="انطلق"
                   className="inline-flex items-center gap-2 px-7 py-4 rounded-full bg-primary text-primary-foreground font-bold shadow-glow hover:opacity-90 transition"
                 >
@@ -212,8 +214,9 @@ function Index() {
               <Magnetic>
                 <MotionLink
                   to="/suggest"
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
+                  whileHover={{ scale: 1.06 }}
+                  whileTap={{ scale: 0.92 }}
+                  transition={elastic}
                   className="inline-flex items-center gap-2 px-7 py-4 rounded-full border-2 border-primary/40 text-foreground font-bold hover:bg-primary/10 transition"
                 >
                   اقترح شخصية للحلقة الجاية
@@ -315,7 +318,7 @@ function Index() {
           </div>
           <div className="max-w-6xl mx-auto">
             <FadeIn delay={0.1}>
-              <MotionLink to="/episodes/$slug" params={{ slug: episodes[0].slug } as never} whileHover={{ y: -8 }} whileTap={{ scale: 0.98 }} data-cursor-text="شاهد" className="group mb-7 block overflow-hidden rounded-3xl border border-primary/30 bg-card shadow-deep transition-colors hover:border-primary/70">
+              <MotionLink to="/episodes/$slug" params={{ slug: episodes[0].slug } as never} whileHover={{ y: -8, scale: 1.01 }} whileTap={{ scale: 0.96 }} transition={elastic} data-cursor-text="شاهد" className="group mb-7 block overflow-hidden rounded-3xl border border-primary/30 bg-card shadow-deep transition-colors hover:border-primary/70">
                 <div className="grid md:grid-cols-[1.35fr_1fr]">
                   <div className="relative min-h-72 overflow-hidden bg-secondary md:min-h-[25rem]">
                     <img src={episodes[0].cover_image_url ?? `https://img.youtube.com/vi/${episodes[0].youtube_id}/hqdefault.jpg`} alt={`صورة الحلقة المميزة ${episodes[0].title}`} className="h-full w-full object-cover transition duration-700 group-hover:scale-105" />
@@ -358,7 +361,7 @@ function Index() {
               </HorizontalScroll>
             </div>
             <FadeIn direction="up" delay={0.2} className="mt-10 flex justify-center">
-              <MotionLink whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} to="/episodes" className="inline-flex items-center gap-2 px-7 py-3 rounded-full border-2 border-primary/40 text-foreground font-bold hover:bg-primary/10 transition">
+              <MotionLink whileHover={{ scale: 1.06 }} whileTap={{ scale: 0.92 }} transition={elastic} to="/episodes" className="inline-flex items-center gap-2 px-7 py-3 rounded-full border-2 border-primary/40 text-foreground font-bold hover:bg-primary/10 transition">
                 كل الحلقات <ArrowLeft size={16} />
               </MotionLink>
             </FadeIn>
@@ -387,8 +390,9 @@ function Index() {
             <StaggerItem key={title}>
               <MotionLink
                 to={link}
-                whileHover={{ y: -5 }}
-                whileTap={{ scale: 0.98 }}
+                whileHover={{ y: -7, scale: 1.02 }}
+                whileTap={{ scale: 0.96 }}
+                transition={elastic}
                 className="group block p-7 rounded-2xl bg-card border border-border/60 hover:border-primary/60 transition-colors shadow-deep"
               >
                 <div className="w-12 h-12 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center mb-5 group-hover:bg-primary group-hover:border-primary transition">
@@ -441,8 +445,9 @@ function Index() {
                   <MotionLink
                     to="/about"
                     hash="support"
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
+                    whileHover={{ scale: 1.06 }}
+                    whileTap={{ scale: 0.92 }}
+                    transition={elastic}
                     className="inline-flex items-center gap-2 px-8 py-4 rounded-full bg-primary text-primary-foreground font-bold shadow-glow hover:opacity-90 transition"
                   >
                     طرق الدعم

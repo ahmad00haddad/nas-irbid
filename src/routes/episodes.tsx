@@ -10,6 +10,7 @@ import { Skeleton, EpisodeGridSkeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 import { FadeIn } from "@/components/ui/fade-in";
 import { ErrorState } from "@/components/ui/error-state";
+import { elasticBouncy, elasticSnappy, elasticSoft } from "@/lib/motion";
 
 export const Route = createFileRoute("/episodes")({
   component: EpisodesPage,
@@ -259,7 +260,7 @@ function EpisodesPage() {
                   : "text-muted-foreground hover:text-foreground hover:bg-secondary"
               }`}
             >
-              {sort === "latest" && <motion.span layoutId="active-sort-chip" className="absolute inset-0 rounded-lg bg-primary" transition={{ type: "spring", stiffness: 420, damping: 34 }} />}
+              {sort === "latest" && <motion.span layoutId="active-sort-chip" className="absolute inset-0 rounded-lg bg-primary" transition={elasticBouncy} />}
               <Clock size={13} className="relative z-10" />
               <span className="relative z-10">الأحدث</span>
             </button>
@@ -273,7 +274,7 @@ function EpisodesPage() {
                   : "text-muted-foreground hover:text-foreground hover:bg-secondary"
               }`}
             >
-              {sort === "views" && <motion.span layoutId="active-sort-chip" className="absolute inset-0 rounded-lg bg-primary" transition={{ type: "spring", stiffness: 420, damping: 34 }} />}
+              {sort === "views" && <motion.span layoutId="active-sort-chip" className="absolute inset-0 rounded-lg bg-primary" transition={elasticBouncy} />}
               <Eye size={13} className="relative z-10" />
               <span className="relative z-10">الأعلى مشاهدة</span>
             </button>
@@ -334,7 +335,7 @@ function EpisodesPage() {
                   initial={reduceMotion ? { opacity: 1 } : { opacity: 0, y: 28, scale: 0.97 }}
                   animate={{ opacity: 1, y: 0, scale: 1 }}
                   exit={reduceMotion ? { opacity: 0 } : { opacity: 0, y: 16, scale: 0.96 }}
-                  transition={{ duration: 0.36, delay: reduceMotion ? 0 : Math.min(index * 0.035, 0.18), ease: [0.22, 1, 0.36, 1] }}
+                  transition={reduceMotion ? { duration: 0.2 } : { ...elasticSoft, delay: Math.min(index * 0.035, 0.18) }}
                 >
                   <PublicEpisodeCard episode={ep as PublicEpisode} />
                 </motion.div>
@@ -351,8 +352,9 @@ function EpisodesPage() {
               >
                 <motion.button
                   type="button"
-                  whileTap={reduceMotion ? undefined : { scale: 0.9 }}
-                  transition={{ type: "spring", stiffness: 520, damping: 18 }}
+                  whileHover={reduceMotion ? undefined : { scale: 1.05 }}
+                  whileTap={reduceMotion ? undefined : { scale: 0.88 }}
+                  transition={elasticSnappy}
                 >
                   تحميل المزيد
                 </motion.button>

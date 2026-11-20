@@ -1,5 +1,6 @@
 import { motion, useInView } from "framer-motion";
 import { useRef, ReactNode } from "react";
+import { elasticSoft } from "@/lib/motion";
 
 interface FadeInProps {
   children: ReactNode;
@@ -26,7 +27,7 @@ export function FadeIn({ children, delay = 0, className = "", direction = "up", 
       ref={ref}
       initial={{ opacity: 0, ...directionOffset[direction] }}
       animate={isInView ? { opacity: 1, x: 0, y: 0 } : { opacity: 0, ...directionOffset[direction] }}
-      transition={{ duration, delay, ease: [0.22, 1, 0.36, 1] }}
+      transition={{ ...elasticSoft, delay }}
       className={className}
     >
       {children}
@@ -56,7 +57,7 @@ export function StaggerItem({ children, className = "" }: { children: ReactNode,
     <motion.div
       variants={{
         hidden: { opacity: 0, y: 20 },
-        show: { opacity: 1, y: 0, transition: { duration: 0.5, ease: [0.22, 1, 0.36, 1] } }
+        show: { opacity: 1, y: 0, transition: elasticSoft }
       }}
       className={className}
     >

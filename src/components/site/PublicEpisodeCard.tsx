@@ -1,6 +1,7 @@
 import { Link } from "@tanstack/react-router";
 import { BriefcaseBusiness, CalendarDays, MapPin, Play } from "lucide-react";
 import { motion } from "framer-motion";
+import { elastic } from "@/lib/motion";
 import { toArabicNumerals } from "@/lib/utils";
 import { BlurImage } from "@/components/ui/blur-image";
 
@@ -37,15 +38,15 @@ export function PublicEpisodeCard({ episode, asPreview = false }: { episode: Pub
     : {
         to: "/episodes/$slug",
         params: { slug: episode.slug } as never,
-        whileHover: { y: -6 },
-        whileTap: { scale: 0.97 },
+        whileHover: { y: -8, scale: 1.015 },
+        whileTap: { scale: 0.95 },
         "data-cursor-text": "شاهد",
       };
 
   return (
     <Wrapper
       {...wrapperProps}
-      transition={{ type: "spring", stiffness: 400, damping: 25 }}
+      transition={elastic}
       className={`group block overflow-hidden rounded-2xl border border-border/70 bg-card shadow-deep transition-colors duration-300 ${
         asPreview ? "" : "hover:border-primary/60"
       }`}

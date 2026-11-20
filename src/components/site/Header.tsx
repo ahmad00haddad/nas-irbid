@@ -2,6 +2,7 @@ import { Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { Menu, X, LayoutDashboard } from "lucide-react";
 import { motion, useScroll, useMotionValueEvent, AnimatePresence } from "framer-motion";
+import { elastic, elasticSoft } from "@/lib/motion";
 import { useAuth } from "@/lib/auth";
 import { Button } from "@/components/ui/button";
 import { trackSiteEvent } from "@/components/site/AnalyticsTracker";
@@ -50,9 +51,14 @@ export function Header() {
     >
       <div className="container mx-auto px-6 h-20 flex items-center justify-between">
         <Link to="/" className="flex items-center gap-3 group">
-          <div className="w-11 h-11 rounded-full bg-gradient-warm flex items-center justify-center shadow-glow group-hover:scale-105 transition-transform">
+          <motion.div
+            whileHover={{ scale: 1.12, rotate: -6 }}
+            whileTap={{ scale: 0.9 }}
+            transition={elastic}
+            className="w-11 h-11 rounded-full bg-gradient-warm flex items-center justify-center shadow-glow"
+          >
             <span className="font-display text-xl font-bold text-primary-foreground">ن</span>
-          </div>
+          </motion.div>
           <div className="leading-tight">
             <div className="font-display text-xl font-bold text-foreground">ناس إربد</div>
             <div className="text-[11px] text-muted-foreground tracking-wider">برنامج وثائقي</div>
@@ -113,8 +119,8 @@ export function Header() {
           <motion.div
             initial={{ height: 0, opacity: 0 }}
             animate={{ height: "auto", opacity: 1 }}
-            exit={{ height: 0, opacity: 0 }}
-            transition={{ duration: 0.2, ease: "easeInOut" }}
+            exit={{ height: 0, opacity: 0, transition: { duration: 0.18, ease: "easeIn" } }}
+            transition={elasticSoft}
             className="md:hidden border-t border-border bg-background overflow-hidden"
           >
             <nav className="container mx-auto px-6 py-4 flex flex-col gap-1">
