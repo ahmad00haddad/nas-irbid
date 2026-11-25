@@ -21,10 +21,10 @@ export const Route = createFileRoute("/")({
   component: Index,
   head: () => ({
     meta: [
-      { title: "ناس إربد · حكايات أهل المدينة" },
-      { name: "description", content: "برنامج وثائقي يوثّق قصص أهل إربد ومهنهم القديمة وذاكرتهم الشفوية." },
-      { property: "og:title", content: "ناس إربد · حكايات أهل المدينة" },
-      { property: "og:description", content: "برنامج وثائقي يوثّق قصص أهل إربد ومهنهم القديمة وذاكرتهم الشفوية." },
+      { title: "ناس إربد · حكايات أهل إربد القديمة، مهن وأماكن وذاكرة" },
+      { name: "description", content: "برنامج وثائقي يوثّق إربد بصوت أهلها: مخبز حارة البارحة، عطّار شارع الهاشمي، مقهى الكمال، سينما الزهراء، ديوان التل، ومهن وحكايات من ذاكرة المدينة." },
+      { property: "og:title", content: "ناس إربد · حكايات أهل إربد القديمة" },
+      { property: "og:description", content: "برنامج وثائقي يوثّق إربد بصوت أهلها: مهن قديمة، أماكن عريقة، وذاكرة شفوية." },
       { property: "og:type", content: "website" },
       { property: "og:url", content: "https://nas-irbid.lovable.app/" },
       { name: "twitter:card", content: "summary" },

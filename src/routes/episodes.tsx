@@ -28,7 +28,7 @@ export const Route = createFileRoute("/episodes")({
     return {
       meta: [
         { title: "أرشيف الحلقات · ناس إربد" },
-        { name: "description", content: "كل حلقات برنامج ناس إربد الوثائقي، مرتبة ومفهرسة حسب الشخصية والحي والمهنة." },
+        { name: "description", content: "كل حلقات برنامج ناس إربد الوثائقي: مخبز، عطارة، مقهى الكمال، شارع السينما، ديوان التل، والدحنون، مرتبة حسب الشخصية والحي والمهنة." },
         { property: "og:title", content: "أرشيف الحلقات · ناس إربد" },
         { property: "og:description", content: "كل حلقات البرنامج بجودة عالية، مع تفاصيل خلف الكواليس." },
         { property: "og:type", content: "website" },

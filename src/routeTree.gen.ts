@@ -20,6 +20,7 @@ import { Route as InstallRouteImport } from './routes/install'
 import { Route as MapRouteImport } from './routes/map'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as SuggestRouteImport } from './routes/suggest'
+import { Route as IrbidMemoryRouteImport } from './routes/irbid-memory'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
 import { Route as AdminAnalyticsRouteImport } from './routes/admin.analytics'
 import { Route as AdminEpisodesRouteImport } from './routes/admin.episodes'
@@ -84,6 +85,11 @@ const SuggestRoute = SuggestRouteImport.update({
   path: '/suggest',
   getParentRoute: () => rootRouteImport,
 } as any)
+const IrbidMemoryRoute = IrbidMemoryRouteImport.update({
+  id: '/irbid-memory',
+  path: '/irbid-memory',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AdminIndexRoute = AdminIndexRouteImport.update({
   id: '/',
   path: '/',
@@ -137,6 +143,7 @@ export interface FileRoutesByFullPath {
   '/map': typeof MapRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/suggest': typeof SuggestRoute
+  '/irbid-memory': typeof IrbidMemoryRoute
   '/admin/analytics': typeof AdminAnalyticsRoute
   '/admin/episodes': typeof AdminEpisodesRoute
   '/admin/messages': typeof AdminMessagesRoute
@@ -157,6 +164,7 @@ export interface FileRoutesByTo {
   '/map': typeof MapRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/suggest': typeof SuggestRoute
+  '/irbid-memory': typeof IrbidMemoryRoute
   '/admin/analytics': typeof AdminAnalyticsRoute
   '/admin/episodes': typeof AdminEpisodesRoute
   '/admin/messages': typeof AdminMessagesRoute
@@ -179,6 +187,7 @@ export interface FileRoutesById {
   '/map': typeof MapRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/suggest': typeof SuggestRoute
+  '/irbid-memory': typeof IrbidMemoryRoute
   '/admin/analytics': typeof AdminAnalyticsRoute
   '/admin/episodes': typeof AdminEpisodesRoute
   '/admin/messages': typeof AdminMessagesRoute
@@ -202,6 +211,7 @@ export interface FileRouteTypes {
     | '/map'
     | '/sitemap.xml'
     | '/suggest'
+    | '/irbid-memory'
     | '/admin/analytics'
     | '/admin/episodes'
     | '/admin/messages'
@@ -222,6 +232,7 @@ export interface FileRouteTypes {
     | '/map'
     | '/sitemap.xml'
     | '/suggest'
+    | '/irbid-memory'
     | '/admin/analytics'
     | '/admin/episodes'
     | '/admin/messages'
@@ -243,6 +254,7 @@ export interface FileRouteTypes {
     | '/map'
     | '/sitemap.xml'
     | '/suggest'
+    | '/irbid-memory'
     | '/admin/analytics'
     | '/admin/episodes'
     | '/admin/messages'
@@ -265,6 +277,7 @@ export interface RootRouteChildren {
   MapRoute: typeof MapRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   SuggestRoute: typeof SuggestRoute
+  IrbidMemoryRoute: typeof IrbidMemoryRoute
   EpisodesSlugRoute: typeof EpisodesSlugRoute
 }
 
@@ -345,6 +358,13 @@ declare module '@tanstack/react-router' {
       path: '/suggest'
       fullPath: '/suggest'
       preLoaderRoute: typeof SuggestRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/irbid-memory': {
+      id: '/irbid-memory'
+      path: '/irbid-memory'
+      fullPath: '/irbid-memory'
+      preLoaderRoute: typeof IrbidMemoryRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/admin/': {
@@ -440,6 +460,7 @@ const rootRouteChildren: RootRouteChildren = {
   MapRoute: MapRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   SuggestRoute: SuggestRoute,
+  IrbidMemoryRoute: IrbidMemoryRoute,
   EpisodesSlugRoute: EpisodesSlugRoute,
 }
 export const routeTree = rootRouteImport
