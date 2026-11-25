@@ -146,3 +146,21 @@ export const faq = [
     a: "من صفحة «اقترح حكاية» في الموقع، يمكنك ترشيح صاحب مهنة قديمة أو مكان أو حكاية من إربد لتُوثَّق في حلقة قادمة.",
   },
 ];
+
+// slug صفحة الحلقة في الموقع (للحلقات المنشورة فقط)
+export const episodeSlugs: Record<string, string> = {
+  jBTSEPj5GyI: "saroukis-baker",
+  zgpJlRXTZ4o: "om-mohammad-masreyya",
+  rmWhFLqr6t8: "qadri",
+  m9JwqHfYGmw: "dalqamouni",
+  KYhOjJrzCkI: "darkal",
+  z9fOcExmjl4: "cinema-street-hawazen",
+  "4yKOrO7fLJs": "shabbar",
+  oQEB_p50CXA: "kamal",
+  S70efx54A6E: "abushtaya",
+  Mx9ut2vL5R0: "altal",
+};
+
+export function findTopic(youtubeId?: string | null) {
+  return youtubeId ? topicEpisodes.find((t) => t.youtubeId === youtubeId) : undefined;
+}

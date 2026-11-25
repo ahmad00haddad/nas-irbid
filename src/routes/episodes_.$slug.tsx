@@ -10,6 +10,7 @@ import { ReadingProgressBar } from "@/components/ui/reading-progress";
 import { TextReveal } from "@/components/ui/text-reveal";
 import { FadeIn } from "@/components/ui/fade-in";
 import { ErrorState } from "@/components/ui/error-state";
+import { findTopic } from "@/lib/seo-topics";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 export const Route = createFileRoute("/episodes_/$slug")({
@@ -20,11 +21,15 @@ export const Route = createFileRoute("/episodes_/$slug")({
     const ogImage =
       ep.cover_image_url ??
       (ep.youtube_id ? `https://img.youtube.com/vi/${ep.youtube_id}/maxresdefault.jpg` : null);
+    const topic = findTopic(ep.youtube_id);
+    const pageTitle = topic ? topic.title : ep.title;
+    const pageDesc = topic?.summary ?? ep.short_description ?? ep.title;
     const meta: Array<{ title?: string; name?: string; property?: string; content?: string }> = [
-      { title: `${ep.title} · ناس إربد` },
-      { name: "description", content: ep.short_description ?? ep.title },
-      { property: "og:title", content: ep.title },
-      { property: "og:description", content: ep.short_description ?? "" },
+      { title: `${pageTitle} · ناس إربد` },
+      { name: "description", content: pageDesc },
+      ...(topic ? [{ name: "keywords", content: topic.keywords.join("، ") }] : []),
+      { property: "og:title", content: pageTitle },
+      { property: "og:description", content: pageDesc },
       { property: "og:url", content: `https://nas-irbid.lovable.app/episodes/${ep.slug}` },
       { property: "og:type", content: "article" },
     ];
@@ -37,8 +42,12 @@ export const Route = createFileRoute("/episodes_/$slug")({
         children: JSON.stringify({
           "@context": "https://schema.org",
           "@type": "VideoObject",
-          name: ep.title,
-          description: ep.short_description ?? ep.title,
+          name: pageTitle,
+          description: pageDesc,
+          inLanguage: "ar",
+          keywords: topic?.keywords.join(", "),
+          about: topic?.keywords.map((k) => ({ "@type": "Thing", name: k })),
+          contentLocation: { "@type": "City", name: "إربد" },
           thumbnailUrl: ogImage ? [ogImage] : undefined,
           uploadDate: ep.published_at ?? ep.created_at,
           embedUrl: ep.youtube_id ? `https://www.youtube.com/embed/${ep.youtube_id}` : undefined,
@@ -78,6 +87,7 @@ export const Route = createFileRoute("/episodes_/$slug")({
 
 function EpisodeDetail() {
   const ep = Route.useLoaderData() as unknown as PublicEpisode & Record<string, any>;
+  const topic = findTopic(ep.youtube_id);
   const { data: related = [] } = useQuery({
     queryKey: ["related-episodes", ep.id, ep.neighborhood],
     queryFn: async () => {
@@ -181,6 +191,24 @@ function EpisodeDetail() {
           )}
         </div>
       </div>
+
+      {/* Topics covered in this episode (from the episode transcript) */}
+      {topic && (
+        <section className="container mx-auto px-6 pb-12" aria-labelledby="episode-topics">
+          <div className="max-w-3xl mx-auto rounded-2xl border border-border/60 bg-card p-8">
+            <h2 id="episode-topics" className="font-display text-2xl text-foreground mb-4">مواضيع في هذه الحلقة</h2>
+            <p className="leading-loose text-muted-foreground">{topic.summary}</p>
+            <ul className="mt-5 flex flex-wrap gap-2">
+              {topic.keywords.map((k) => (
+                <li key={k} className="rounded-full bg-primary/10 px-3 py-1 text-sm text-primary">{k}</li>
+              ))}
+            </ul>
+            <Link to="/irbid-memory" className="mt-5 inline-block text-sm font-bold text-primary hover:underline">
+              المزيد من ذاكرة إربد: مهن وأماكن وحكايات
+            </Link>
+          </div>
+        </section>
+      )}
 
       {/* Prev / next episode */}
       <EpisodeNav current={ep} />

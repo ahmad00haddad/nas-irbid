@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { PLAYLIST_URL, SITE_URL, faq, siteKeywords, themes, topicEpisodes } from "@/lib/seo-topics";
+import { PLAYLIST_URL, SITE_URL, episodeSlugs, faq, siteKeywords, themes, topicEpisodes } from "@/lib/seo-topics";
 
 const TITLE = "ذاكرة إربد · مهن وأماكن وحكايات أهلها | ناس إربد";
 const DESC =
@@ -39,7 +39,7 @@ export const Route = createFileRoute("/irbid-memory")({
               itemListElement: topicEpisodes.map((e, i) => ({
                 "@type": "ListItem",
                 position: i + 1,
-                url: `https://www.youtube.com/watch?v=${e.youtubeId}`,
+                url: episodeSlugs[e.youtubeId] ? `${SITE_URL}/episodes/${episodeSlugs[e.youtubeId]}` : `https://www.youtube.com/watch?v=${e.youtubeId}`,
                 name: e.title,
               })),
             },
@@ -89,14 +89,24 @@ function IrbidMemoryPage() {
                       </li>
                     ))}
                   </ul>
-                  <a
-                    href={`https://www.youtube.com/watch?v=${e.youtubeId}`}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="mt-4 inline-block font-bold text-primary hover:underline"
-                  >
-                    شاهد الحلقة على يوتيوب
-                  </a>
+                  {episodeSlugs[e.youtubeId] ? (
+                    <Link
+                      to="/episodes/$slug"
+                      params={{ slug: episodeSlugs[e.youtubeId] }}
+                      className="mt-4 inline-block font-bold text-primary hover:underline"
+                    >
+                      صفحة الحلقة
+                    </Link>
+                  ) : (
+                    <a
+                      href={`https://www.youtube.com/watch?v=${e.youtubeId}`}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="mt-4 inline-block font-bold text-primary hover:underline"
+                    >
+                      شاهد الحلقة على يوتيوب
+                    </a>
+                  )}
                 </article>
               ))}
             </div>
